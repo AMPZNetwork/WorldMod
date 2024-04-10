@@ -1,9 +1,0 @@
-mcsd:
-  hubBaseUrl: http://localhost:42064
-  rabbitMqUri: amqp://anonymous:anonymous@rabbitmq.comroid.org:5672/dev
-  consoleLevel: INFO
-  server:
-    id: 3e54984d-d372-48ab-8b0e-e6ec50e2a5b3
-  agent:
-    id: f2fcb65d-da38-4011-b8b2-270bafe10501
-    token: token

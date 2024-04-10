@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{/layout/head}"></head>
+<body>
+<div class="ui-menubar" th:insert="~{/layout/menubar}"></div>
+<div class="ui-container-page ui-content">
+    <h2>Users</h2>
+    <table>
+        <thead>
+        <tr>
+            <th></th>
+            <th>Minecraft</th>
+            <th>Discord ID</th>
+            <th>Hub Profile</th>
+            <th>E-Mail</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user: ${userRepo}">
+            <td><a class="ui-button" th:href="@{'/user/view/'+${user.id}}">View</a></td>
+            <td>
+                <span class="null-text" th:unless="${user.minecraftId != null}">Not linked</span>
+                <a target="_blank" th:href="${user.nameMcURL}"
+                   th:if="${user.minecraftId != null}" th:text="${user.blockingMinecraftName()}">Minecraft Profile</a>
+            </td>
+            <td>
+                <span class="null-text" th:unless="${user.discordId != null}">Not linked</span>
+                <a target="_blank"
+                   th:href="'https://discordapp.com/channels/@me/'+${user.discordId}"
+                   th:if="${user.discordId != null}" th:text="${user.discordId}">Discord ID</a>
+            </td>
+            <td>
+                <span class="null-text" th:unless="${user.hubId != null}">Not linked</span>
+                <a target="_blank" th:href="'https://hub.comroid.org/hub/users/'+${user.hubId}"
+                   th:if="${user.hubId != null}">Hub</a>
+            </td>
+            <td>
+                <span class="null-text" th:unless="${user.email != null}">Not provided</span>
+                <a target="_blank" th:href="'mailto:'+${user.email}" th:if="${user.email != null}"
+                   th:text="${user.email}">E-Mail</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div class="ui-footer" th:insert="~{/layout/footer}"></div>
+</body>
+</html>

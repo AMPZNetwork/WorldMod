@@ -1,0 +1,34 @@
+name: Unit Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: mc-server-hub
+
+      - name: Clone japi repository
+        uses: actions/checkout@v2
+        with:
+          repository: comroid-git/japi
+          path: japi
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - name: Run Unit Tests
+        run: cd mc-server-hub && ./gradlew test

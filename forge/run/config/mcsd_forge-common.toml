@@ -1,0 +1,11 @@
+#The agents target ID
+target = "3e54984d-d372-48ab-8b0e-e6ec50e2a5b3"
+#The agents ID
+agent = "b0e23c49-cf2e-467c-8287-1b7bcaeea497"
+#The agents token
+token = "token"
+#The agents base url
+baseUrl = "http://localhost:42065"
+#The hub base url
+hubBaseUrl = "http://localhost:42064"
+

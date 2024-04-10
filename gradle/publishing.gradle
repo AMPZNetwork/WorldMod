@@ -1,0 +1,66 @@
+apply plugin: 'maven-publish'
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+
+    try {
+        archiveClassifier.set 'sources'
+    } catch (MissingPropertyException ignored) {
+        classifier = "sources"
+    }
+}
+
+task javadocJar(type: Jar) {
+    from javadoc.destinationDir
+
+    try {
+        archiveClassifier.set 'javadoc'
+    } catch (MissingPropertyException ignored) {
+        classifier = "javadoc"
+    }
+}
+
+publishing {
+    repositories {
+        mavenLocal()
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = project.artifactName
+            from components.java
+
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom {
+                name = rootProject.name
+                description = project.projectDescription
+                inceptionYear = '2020'
+                url = "https://github.com/$userbase/$rootProject.name".toString()
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'kaleidox'
+                        name = 'Tobias Burdow'
+                        email = 'contact@comroid.org'
+                    }
+                }
+
+                scm {
+                    connection = "scm:git:git://github.com/$userbase/${rootProject.name}.git".toString()
+                    developerConnection = "scm:git:ssh://github.com/$userbase/${rootProject.name}.git".toString()
+                    url = "https://github.com/$userbase/$rootProject.name".toString()
+                }
+            }
+
+            System.out.println("Registered artifact publication: '${group}:${artifactId}:${project.version}' -> $project.projectDescription")
+        }
+    }
+}

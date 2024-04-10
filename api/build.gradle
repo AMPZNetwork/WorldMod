@@ -1,0 +1,53 @@
+plugins {
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+ext {
+    artifactName = 'mcsd-api'
+    projectDescription = 'comroid Minecraft Server Hub Base API'
+    userbase = 'comroid-git'
+}
+
+group = 'org.comroid.mcsd'
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+sourceSets {
+    main.java.srcDirs       = files(parent.projectDir.toString() + "/src/api/main/java")
+    main.resources.srcDirs  = files(parent.projectDir.toString() + "/src/api/main/resources")
+    test.java.srcDirs       = files(parent.projectDir.toString() + "/src/api/test/java")
+    test.resources.srcDirs  = files(parent.projectDir.toString() + "/src/api/test/java")
+}
+
+apply from: "$rootDir/gradle/publishing.gradle"
+
+repositories {
+    maven { url 'https://maven.comroid.org' }
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    // json
+    api 'com.fasterxml.jackson.core:jackson-databind:2.14.+'
+
+    // jpa
+    implementation 'jakarta.persistence:jakarta.persistence-api:2.+'
+
+    // logger
+    compileOnly 'org.apache.logging.log4j:log4j-core:2.17.2'
+
+    // utility
+    compileOnly 'org.projectlombok:lombok:+'
+    annotationProcessor 'org.projectlombok:lombok:+'
+}
+
+task simplifyArtifact(type: Copy) {
+    // api module should be slim, and only contain mcsd's own api
+    dependsOn test, jar
+    from jar.outputs.files.singleFile
+    into "$rootDir/build/libs/"
+    rename { n -> "mcsd-api.jar" }
+}

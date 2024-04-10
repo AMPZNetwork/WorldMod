@@ -1,0 +1,47 @@
+def getCommitTimestampSeconds() {
+    // Run 'git log' command to get the timestamp of the latest commit
+    def result = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'log', '-1', '--format=%ct'
+        standardOutput = result
+    }
+
+    // Convert the timestamp to minutes
+    def timestampSeconds = result.toString().trim().toLong()
+
+    return timestampSeconds
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    group = 'org.comroid.mcsd'
+    version = "0.2.${getCommitTimestampSeconds()}"
+
+    compileJava.options.encoding = 'UTF-8'
+
+    sourceCompatibility = 17
+    targetCompatibility = 17
+
+    repositories {
+        maven { url 'https://maven.comroid.org' }
+        maven { url 'https://repo.opencollab.dev/maven-releases/' }
+        mavenLocal()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+
+    dependencies {
+        if (!project.name.endsWith('api'))
+            implementation project(':api')
+
+        if (project.name != 'japi')
+            if (findProject(':japi') != null)
+                implementation project(':japi')
+            else implementation 'org.comroid:japi:+'
+
+        // utility
+        compileOnly 'org.projectlombok:lombok:+'
+        annotationProcessor 'org.projectlombok:lombok:+'
+    }
+}

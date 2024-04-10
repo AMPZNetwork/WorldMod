@@ -1,0 +1,147 @@
+import net.fabricmc.loom.task.RemapJarTask
+
+plugins {
+	id 'com.github.johnrengelman.shadow' version '8.1.1'
+	id "de.undercouch.download" version "5.5.0"
+	id 'fabric-loom' version '1.5-SNAPSHOT'
+	id 'maven-publish'
+}
+
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
+
+sourceSets {
+	main.java.srcDirs       = files(parent.projectDir.toString() + "/src/fabric/main/java")
+	main.resources.srcDirs  = files(parent.projectDir.toString() + "/src/fabric/main/resources")
+	test.java.srcDirs       = files(parent.projectDir.toString() + "/src/fabric/test/java")
+	test.resources.srcDirs  = files(parent.projectDir.toString() + "/src/fabric/test/java")
+}
+
+tasks.register('dlServerJar', Download).configure {
+	src "https://serverjars.com/api/fetchJar/modded/fabric/${minecraft_version}"
+	dest "${buildDir}/libs/server.jar"
+}
+
+tasks.register('dlFabricApi', Download).configure {
+	src "https://mediafilez.forgecdn.net/files/${fabric_api_mod_cf}"
+	dest "${projectDir}/run/mods/fabric-api.jar"
+}
+
+tasks.register('serverJar', Copy) {
+	dependsOn dlServerJar, dlFabricApi
+	from dlServerJar.outputs.files.singleFile
+	into "$projectDir/run"
+	rename { n -> "server.jar" }
+}
+
+tasks.register('testMod', Copy) {
+	dependsOn shadowJar, serverJar
+	from shadowJar.outputs.files.singleFile
+	into "${projectDir}/run/mods"
+	rename { n -> "mcsd-fabric.jar" }
+}
+
+repositories {
+	// Add repositories to retrieve artifacts from in here.
+	// You should only use this when depending on other mods because
+	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
+	// for more information about repositories.
+}
+
+loom {
+    splitEnvironmentSourceSets()
+
+	mods {
+		"mcsd-fabric-integration" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
+
+}
+
+dependencies {
+	// To change the versions see the gradle.properties file
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+	// Fabric API. This is technically optional, but you probably want it anyway.
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+	// Uncomment the following line to enable the deprecated Fabric API modules.
+	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.
+
+	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
+
+	// mcsd api
+	implementation project(':api') // todo: include as shadowjar
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 17
+}
+
+java {
+	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+	// if it is present.
+	// If you remove this line, sources will not be generated.
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_17
+	targetCompatibility = JavaVersion.VERSION_17
+}
+
+jar {
+	from("LICENSE") {
+		rename { "${it}_${project.base.archivesName.get()}"}
+	}
+}
+
+task remappedShadowJar(type: RemapJarTask) {
+	dependsOn tasks.shadowJar
+	input.set(tasks.shadowJar.archiveFile)
+	addNestedDependencies.set(true)
+}
+
+// configure the maven publication
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+		}
+	}
+
+	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+	repositories {
+		// Add repositories to publish to here.
+		// Notice: This block does NOT have the same function as the block in the top level.
+		// The repositories here will be used for publishing your artifact, not for
+		// retrieving dependencies.
+
+		mavenLocal()
+	}
+}
+
+shadowJar {
+	dependsOn project(':api').simplifyArtifact
+}
+
+task simplifyArtifact(type: Copy) {
+	dependsOn test, remappedShadowJar
+	from remappedShadowJar.outputs.files.singleFile
+	into "$rootDir/build/libs/"
+	rename { n -> "mcsd-fabric.jar" }
+}

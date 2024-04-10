@@ -1,0 +1,88 @@
+name: Upload Files to Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    name: Upload Files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          path: mc-server-hub
+
+      - name: Clone japi repository
+        uses: actions/checkout@v2
+        with:
+          repository: comroid-git/japi
+          path: japi
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - name: Build Artifacts
+        run: cd mc-server-hub && ./gradlew simplifyArtifact
+
+      - name: Upload API JAR to Release
+        id: upload-api-assets
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: mc-server-hub/build/libs/mcsd-api.jar
+          asset_name: "mcsd-api-${{ github.event.release.tag_name }}.jar"
+          asset_content_type: application/java-archive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Core JAR to Release
+        id: upload-core-assets
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: mc-server-hub/build/libs/mcsd-core.jar
+          asset_name: "mcsd-core-${{ github.event.release.tag_name }}.jar"
+          asset_content_type: application/java-archive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Spigot Plugin to Release
+        id: upload-spigot-assets
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: mc-server-hub/build/libs/mcsd-spigot.jar
+          asset_name: "mcsd-spigot-${{ github.event.release.tag_name }}.jar"
+          asset_content_type: application/java-archive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Forge Mod to Release
+        id: upload-forge-assets
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: mc-server-hub/build/libs/mcsd-forge.jar
+          asset_name: "mcsd-forge-${{ github.event.release.tag_name }}.jar"
+          asset_content_type: application/java-archive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Fabric Mod to Release
+        id: upload-fabric-assets
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: mc-server-hub/build/libs/mcsd-fabric.jar
+          asset_name: "mcsd-fabric-${{ github.event.release.tag_name }}.jar"
+          asset_content_type: application/java-archive
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

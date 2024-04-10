@@ -25,9 +25,9 @@ include('spigot')
 include('forge')
 include('fabric')
 
-var dirApi = file('../../japi/')
+var dirApi = file('../../java/japi/')
 if (!dirApi.exists())
-    dirApi = file('../../api')
+    dirApi = file('../../java/api')
 if (dirApi.exists()) {
     include(':japi')
     project(':japi').projectDir = dirApi

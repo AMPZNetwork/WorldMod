@@ -1,4 +1,8 @@
 package com.ampznetwork.worldmod.forge;
 
-public class WorldMod$Forge {
+import com.ampznetwork.worldmod.api.WorldMod;
+import net.minecraftforge.fml.common.Mod;
+
+@Mod(WorldMod.AddonName)
+public class WorldMod$Forge implements WorldMod {
 }

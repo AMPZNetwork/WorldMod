@@ -1,7 +1,6 @@
 package com.ampznetwork.worldmod.api;
 
-import lombok.experimental.UtilityClass;
-
-@UtilityClass
-public class WorldMod {
+public interface WorldMod {
+    String AddonId = "worldmod";
+    String AddonName = "WorldMod";
 }

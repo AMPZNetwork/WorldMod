@@ -1,0 +1,39 @@
+{
+	"schemaVersion": 1,
+	"id": "worldmod",
+	"version": "${version}",
+	"name": "WorldMod",
+	"description": "World Protection Mod, because EngineHub people are assholes",
+	"authors": [
+		"Kaleidox"
+	],
+	"contact": {
+		"homepage": "https://github.com/AMPZNetwork/WorldMod",
+		"sources": "https://github.com/AMPZNetwork/WorldMod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/worldmod/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"org.comroid.mcsd.fabric.WorldMod$Fabric"
+		],
+		"client": []
+	},
+	"mixins": [
+		"worldmod-fabric.mixins.json",
+		{
+			"config": "mcsd-fabric-integration.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.15.9",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

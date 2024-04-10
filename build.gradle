@@ -15,8 +15,8 @@ def getCommitTimestampSeconds() {
 subprojects {
     apply plugin: 'java'
 
-    group = 'org.comroid.mcsd'
-    version = "0.2.${getCommitTimestampSeconds()}"
+    group = 'com.ampznetwork.worldmod'
+    version = "0.1.${getCommitTimestampSeconds()}"
 
     compileJava.options.encoding = 'UTF-8'
 

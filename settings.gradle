@@ -17,21 +17,17 @@ plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
 }
 
-rootProject.name = 'mcsd'
+rootProject.name = 'WorldMod'
 
 include('api')
-
-include('core')
-include('hub')
-include('agent')
 
 include('spigot')
 include('forge')
 include('fabric')
 
-var dirApi = file('../japi/')
+var dirApi = file('../../japi/')
 if (!dirApi.exists())
-    dirApi = file('../api')
+    dirApi = file('../../api')
 if (dirApi.exists()) {
     include(':japi')
     project(':japi').projectDir = dirApi

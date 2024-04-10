@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.release.tag_name }}
-          path: mc-server-hub
+          path: WorldMod
 
       - name: Clone japi repository
         uses: actions/checkout@v2
@@ -30,26 +30,15 @@ jobs:
           java-version: '17'
 
       - name: Build Artifacts
-        run: cd mc-server-hub && ./gradlew simplifyArtifact
+        run: cd WorldMod && ./gradlew simplifyArtifact
 
       - name: Upload API JAR to Release
         id: upload-api-assets
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: mc-server-hub/build/libs/mcsd-api.jar
-          asset_name: "mcsd-api-${{ github.event.release.tag_name }}.jar"
-          asset_content_type: application/java-archive
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Core JAR to Release
-        id: upload-core-assets
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: mc-server-hub/build/libs/mcsd-core.jar
-          asset_name: "mcsd-core-${{ github.event.release.tag_name }}.jar"
+          asset_path: WorldMod/build/libs/WorldMod-api.jar
+          asset_name: "WorldMod-api-${{ github.event.release.tag_name }}.jar"
           asset_content_type: application/java-archive
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,8 +48,8 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: mc-server-hub/build/libs/mcsd-spigot.jar
-          asset_name: "mcsd-spigot-${{ github.event.release.tag_name }}.jar"
+          asset_path: WorldMod/build/libs/WorldMod-spigot.jar
+          asset_name: "WorldMod-spigot-${{ github.event.release.tag_name }}.jar"
           asset_content_type: application/java-archive
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -70,8 +59,8 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: mc-server-hub/build/libs/mcsd-forge.jar
-          asset_name: "mcsd-forge-${{ github.event.release.tag_name }}.jar"
+          asset_path: WorldMod/build/libs/WorldMod-forge.jar
+          asset_name: "WorldMod-forge-${{ github.event.release.tag_name }}.jar"
           asset_content_type: application/java-archive
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -81,8 +70,8 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: mc-server-hub/build/libs/mcsd-fabric.jar
-          asset_name: "mcsd-fabric-${{ github.event.release.tag_name }}.jar"
+          asset_path: WorldMod/build/libs/WorldMod-fabric.jar
+          asset_name: "WorldMod-fabric-${{ github.event.release.tag_name }}.jar"
           asset_content_type: application/java-archive
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

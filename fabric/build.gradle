@@ -41,7 +41,7 @@ tasks.register('testMod', Copy) {
 	dependsOn shadowJar, serverJar
 	from shadowJar.outputs.files.singleFile
 	into "${projectDir}/run/mods"
-	rename { n -> "mcsd-fabric.jar" }
+	rename { n -> "WorldMod-fabric.jar" }
 }
 
 repositories {
@@ -56,7 +56,7 @@ loom {
     splitEnvironmentSourceSets()
 
 	mods {
-		"mcsd-fabric-integration" {
+		"worldmod-fabric-integration" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
@@ -78,7 +78,7 @@ dependencies {
 
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
-	// mcsd api
+	// worldmod api
 	implementation project(':api') // todo: include as shadowjar
 }
 
@@ -143,5 +143,5 @@ task simplifyArtifact(type: Copy) {
 	dependsOn test, remappedShadowJar
 	from remappedShadowJar.outputs.files.singleFile
 	into "$rootDir/build/libs/"
-	rename { n -> "mcsd-fabric.jar" }
+	rename { n -> "WorldMod-fabric.jar" }
 }

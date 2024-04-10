@@ -1,4 +1,4 @@
-package com.ampznetwork.worldmod.api;
+package com.ampznetwork.worldmod.spigot;
 
 import org.bukkit.plugin.java.JavaPlugin;
 

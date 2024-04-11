@@ -5,6 +5,8 @@ import com.ampznetwork.worldmod.api.model.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.Region;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public interface WorldMod {
     String AddonId = "worldmod";
@@ -14,4 +16,8 @@ public interface WorldMod {
     Collection<? extends Group> getGroups();
 
     PlayerAdapter getPlayerAdapter();
+
+    interface Permission {
+        String Selection = "worldmod.area.selection";
+    }
 }

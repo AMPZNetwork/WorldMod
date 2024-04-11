@@ -19,7 +19,7 @@ public class WorldModCommands {
         return selections.computeIfAbsent(playerId, $->new BasicArea.Builder());
     }
 
-    @Command(permission = "worldmod.area.selection",ephemeral = true)
+    @Command(permission = WorldMod.Permission.Selection,ephemeral = true)
     public String selection(UUID playerId, @Command.Arg(required = false) @Nullable Shape type) {
         if (type==null) {
             selections.remove(playerId);
@@ -28,7 +28,7 @@ public class WorldModCommands {
         return "Now selecting as "+type.name();
     }
 
-    @Command(permission = "worldmod.area.selection",ephemeral = true)
+    @Command(permission = WorldMod.Permission.Selection,ephemeral = true)
     public String position(UUID playerId, @Command.Arg int index) {
         var pos = worldMod.getPlayerAdapter().getPosition(playerId);
         sel(playerId).getSpatialAnchors().set(index,pos);

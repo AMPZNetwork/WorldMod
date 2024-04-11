@@ -5,5 +5,5 @@ import org.comroid.api.data.Vector;
 
 public interface Area {
     Shape getShape();
-    Vector.N3[] getSpatialAnchors();
+    Vector[] getSpatialAnchors();
 }

@@ -1,4 +1,4 @@
-package com.ampznetwork.worldmod.api.model;
+package com.ampznetwork.worldmod.api.model.adp;
 
 import org.comroid.api.data.Vector;
 

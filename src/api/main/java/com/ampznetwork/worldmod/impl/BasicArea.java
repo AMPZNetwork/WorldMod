@@ -1,7 +1,7 @@
 package com.ampznetwork.worldmod.impl;
 
 import com.ampznetwork.worldmod.api.math.Shape;
-import com.ampznetwork.worldmod.api.model.Area;
+import com.ampznetwork.worldmod.api.model.sel.Area;
 import lombok.*;
 import org.comroid.api.data.Vector;
 

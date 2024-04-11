@@ -1,4 +1,4 @@
-package com.ampznetwork.worldmod.api.model;
+package com.ampznetwork.worldmod.api.model.mini;
 
 import java.util.Set;
 import java.util.UUID;

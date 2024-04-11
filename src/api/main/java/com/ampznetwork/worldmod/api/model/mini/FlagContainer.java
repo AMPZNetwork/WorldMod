@@ -1,4 +1,4 @@
-package com.ampznetwork.worldmod.api.model;
+package com.ampznetwork.worldmod.api.model.mini;
 
 import com.ampznetwork.worldmod.api.game.Flag;
 import org.comroid.api.func.ext.StreamSupplier;

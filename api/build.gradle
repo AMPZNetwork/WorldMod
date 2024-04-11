@@ -33,6 +33,9 @@ dependencies {
     // json
     api 'com.fasterxml.jackson.core:jackson-databind:2.+'
 
+    // kyori
+    api 'net.kyori:adventure-api:4.11.+'
+
     // logger
     compileOnly 'org.apache.logging.log4j:log4j-core:2.+'
 

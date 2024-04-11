@@ -1,8 +1,8 @@
 package com.ampznetwork.worldmod.api;
 
-import com.ampznetwork.worldmod.api.model.Group;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
-import com.ampznetwork.worldmod.api.model.Region;
+import com.ampznetwork.worldmod.api.model.region.Group;
+import com.ampznetwork.worldmod.api.model.region.Region;
 
 import java.util.Collection;
 

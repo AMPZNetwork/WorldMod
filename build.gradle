@@ -13,7 +13,7 @@ def getCommitTimestampSeconds() {
 }
 
 subprojects {
-    apply plugin: 'java'
+    apply plugin: 'java-library'
 
     group = 'com.ampznetwork.worldmod'
     version = "0.1.${getCommitTimestampSeconds()}"
@@ -33,12 +33,12 @@ subprojects {
 
     dependencies {
         if (!project.name.endsWith('api'))
-            implementation project(':api')
+            api project(':api')
 
         if (project.name != 'japi')
             if (findProject(':japi') != null)
-                implementation project(':japi')
-            else implementation 'org.comroid:japi:+'
+                api project(':japi')
+            else api 'org.comroid:japi:+'
 
         // utility
         compileOnly 'org.projectlombok:lombok:+'

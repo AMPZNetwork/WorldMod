@@ -1,6 +1,7 @@
 package com.ampznetwork.worldmod.api;
 
 import com.ampznetwork.worldmod.api.model.Group;
+import com.ampznetwork.worldmod.api.model.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.Region;
 
 import java.util.Collection;
@@ -11,4 +12,6 @@ public interface WorldMod {
 
     Collection<? extends Region> getRegions();
     Collection<? extends Group> getGroups();
+
+    PlayerAdapter getPlayerAdapter();
 }

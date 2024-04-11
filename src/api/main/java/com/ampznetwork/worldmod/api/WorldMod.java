@@ -5,8 +5,6 @@ import com.ampznetwork.worldmod.api.model.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.Region;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public interface WorldMod {
     String AddonId = "worldmod";

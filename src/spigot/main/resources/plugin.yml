@@ -1,10 +1,10 @@
-name: MCSD
-version: '0.2.0'
+name: WorldMod
+version: '0.1.0'
 description: World Protection Mod, because EngineHub people are assholes
 main: com.ampznetwork.worldmod.spigot.WorldMod$Spigot
 api-version: '1.18'
 load: STARTUP
-website: https://github.com/comroid-git/mc-server-hub
+website: https://github.com/AMPZNetwork/WorldMod
 commands:
   reload:
     permission: worldmod.reload

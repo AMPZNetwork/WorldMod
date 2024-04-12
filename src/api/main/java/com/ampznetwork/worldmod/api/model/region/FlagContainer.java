@@ -10,15 +10,14 @@ public interface FlagContainer {
 
     default TriState getFlagState(Flag flag) {
         return streamDeclaredFlags()
-                .filter(value -> value.flag().equals(flag))
+                .filter(value -> value.getFlag().equals(flag))
                 .map(Flag.Value::getState)
                 .findFirst()
                 .orElse(TriState.NOT_SET);
     }
 
-    default Stream<Object> getFlagValues(Flag flag) {
+    default Stream<Flag.Value> getFlagValues(Flag flag) {
         return streamDeclaredFlags()
-                .filter(value -> value.flag().equals(flag))
-                .map(Flag.Value::getValue);
+                .filter(value -> value.getFlag().equals(flag));
     }
 }

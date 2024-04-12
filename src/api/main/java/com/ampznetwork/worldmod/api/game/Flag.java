@@ -54,13 +54,11 @@ public class Flag implements Named, Described, Prioritized {
     }
 
     @Data
-    public class Value implements Prioritized {
+    public static class Value implements Prioritized {
+        @NotNull Flag flag;
         @NotNull TriState state;
-        @Nullable String value;
-        long priority;
-
-        public Flag flag() {
-            return Flag.this;
-        }
+        @Nullable String value = null;
+        boolean force = false;
+        long priority = 0;
     }
 }

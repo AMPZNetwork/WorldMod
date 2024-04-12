@@ -39,7 +39,7 @@ public class Region implements Area, OwnedByParty, Prioritized, FlagContainer, N
         return (group == null
                 ? declaredFlags.stream()
                 : concat(declaredFlags.stream(), group.streamDeclaredFlags()))
-                .sorted(Comparator.<Flag.Value>comparingLong(value -> -value.flag().getPriority())
+                .sorted(Comparator.<Flag.Value>comparingLong(value -> -value.getFlag().getPriority())
                         .thenComparingLong(value -> -value.getPriority()));
     }
 }

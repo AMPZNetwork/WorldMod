@@ -2,6 +2,7 @@ package com.ampznetwork.worldmod.spigot;
 
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.WorldModCommands;
+import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.region.Group;
@@ -11,6 +12,7 @@ import lombok.Value;
 import net.kyori.adventure.util.TriState;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -20,14 +22,17 @@ import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Command;
+import org.comroid.api.func.util.Streams;
 import org.comroid.api.info.Constraint;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static com.ampznetwork.worldmod.api.game.Flag.Build;
+import static com.ampznetwork.worldmod.api.game.Flag.Passthrough;
 import static java.util.Comparator.comparingLong;
 import static org.bukkit.Bukkit.getPluginManager;
 
@@ -89,37 +94,59 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
 
     @Value
     private class EventDispatch implements Listener {
+        private boolean dependsOnFlag(Cancellable cancellable, Vector.N3 location, Flag... flagChain) {
+            return dependsOnFlag(cancellable, location, Streams.OP.LogicalAnd, flagChain);
+        }
+
+        private boolean dependsOnFlag(Cancellable cancellable,
+                                      Vector.N3 location,
+                                      @SuppressWarnings("SameParameterValue") Streams.OP chainOp_cancel,
+                                      Flag... flagChain) {
+            var iter = findRegions(location).iterator();
+            var cancel = true;
+            while (iter.hasNext()) {
+                var region = iter.next();
+                for (var flag : Arrays.stream(flagChain)
+                        .flatMap(region::getFlagValues)
+                        .toList()) {
+                    var state = flag.getState();
+                    if (state == TriState.NOT_SET)
+                        continue;
+                    if (state == TriState.FALSE)
+                        cancel = chainOp_cancel.test(cancel, true);
+                    else if (state == TriState.TRUE && flag.isForce())
+                        cancel = chainOp_cancel.test(cancel, false);
+                    cancellable.setCancelled(false);
+                }
+            }
+            cancellable.setCancelled(cancel);
+            return !cancel;
+        }
+
+        private boolean passthrough(Vector.N3 location) {
+            return findRegions(location)
+                    .map(region -> region.getFlagState(Passthrough))
+                    .findFirst()
+                    .filter(state -> state == TriState.TRUE)
+                    .isPresent();
+        }
+
+        private void dispatchEvent(Cancellable cancellable, Vector.N3 location, Flag... flagChain) {
+            if (passthrough(location))
+                return;
+            dependsOnFlag(cancellable, location, flagChain);
+        }
+
         @EventHandler(priority = EventPriority.HIGHEST)
         public void onBlockBreak(BlockBreakEvent event) {
             var location = vec(event.getBlock().getLocation());
-            var iter = findRegions(location).iterator();
-            while (iter.hasNext()) {
-                final var region = iter.next();
-                switch (region.getFlagState(Build)) {
-                    case FALSE -> {
-                        event.setCancelled(true);
-                        return;
-                    }
-                    case TRUE -> {
-                        //event.setCancelled(false);
-                        return;
-                    }
-                }
-            }
+            dispatchEvent(event, location, Build);
         }
 
         @EventHandler(priority = EventPriority.HIGHEST)
         public void onBlockPlace(BlockPlaceEvent event) {
             var location = vec(event.getBlock().getLocation());
-            var iter = findRegions(location).iterator();
-            while (iter.hasNext()) {
-                final var region = iter.next();
-                var state = region.getFlagState(Build);
-                if (state == TriState.FALSE)
-                    event.setCancelled(true);
-                if (state != TriState.NOT_SET)
-                    return;
-            }
+            dispatchEvent(event, location, Build);
         }
 
         //region todo

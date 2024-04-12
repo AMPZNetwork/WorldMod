@@ -7,7 +7,8 @@ import lombok.experimental.FieldDefaults;
 import org.comroid.api.data.Vector;
 import org.comroid.api.info.Constraint;
 
-import static java.lang.Math.*;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 @Getter
 @RequiredArgsConstructor
@@ -17,8 +18,8 @@ public enum Shape {
         //region anchor indices
         public static final int A = 0;
         public static final int B = 1;
-
         //endregion
+
         @Override
         public boolean isPointInside(Vector[] spatialAnchors, Vector.N3 point) {
             final var a = spatialAnchors[A];
@@ -45,6 +46,7 @@ public enum Shape {
             Constraint.equals(position.n(), 3, "Vector A Dimension").run();
             Constraint.Range.inside(1, 3, rn, "Vector B Dimension").run();
 
+            // todo fixme this is wrong dumbass
             for (var pn = 0; pn < 3; pn++) {
                 var p = point.get(pn);
                 var ri = pn == rn - 1 ? pn : 0;

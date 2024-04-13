@@ -1,9 +1,11 @@
 package com.ampznetwork.worldmod.api.model.sel;
 
+import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.comroid.api.data.Vector;
 
 @Value
+@EqualsAndHashCode(of = "id")
 public class Chunk {
     Vector.N2 id;
 

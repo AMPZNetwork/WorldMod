@@ -31,6 +31,7 @@ public class Region implements Area, OwnedByParty, Prioritized, FlagContainer, N
     Set<Flag.Value> declaredFlags = new HashSet<>();
 
     public Stream<Chunk> streamChunks() {
+        return shape.streamChunks(spatialAnchors);
     }
 
     @Override

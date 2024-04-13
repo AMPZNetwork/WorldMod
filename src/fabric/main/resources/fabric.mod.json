@@ -16,7 +16,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"org.comroid.mcsd.fabric.WorldMod$Fabric"
+			"org.comroid.mcsd.fabric.WorldMod_Fabric"
 		],
 		"client": []
 	},

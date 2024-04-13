@@ -64,7 +64,7 @@ public enum Shape {
                     .distinct();
         }
 
-    },
+    }/*,
     Spherical(2) {
         @Override
         public boolean isPointInside(Vector[] spatialAnchors, Vector.N3 point) {
@@ -111,7 +111,7 @@ public enum Shape {
         public static final int Position = 0;
         public static final int Radius = 1;
         //endregion
-    };
+    }*/;
 
     int anchorPointCount;
 

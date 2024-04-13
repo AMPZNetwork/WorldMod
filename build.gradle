@@ -43,5 +43,9 @@ subprojects {
         // utility
         compileOnly 'org.projectlombok:lombok:+'
         annotationProcessor 'org.projectlombok:lombok:+'
+
+        // tests
+        testImplementation 'junit:junit:+'
+        testImplementation 'org.easymock:easymock:+'
     }
 }

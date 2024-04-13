@@ -28,6 +28,8 @@ include('fabric')
 var dirApi = file('../../java/japi/')
 if (!dirApi.exists())
     dirApi = file('../../java/api')
+if (!dirApi.exists())
+    dirApi = file('../japi')
 if (dirApi.exists()) {
     include(':japi')
     project(':japi').projectDir = dirApi

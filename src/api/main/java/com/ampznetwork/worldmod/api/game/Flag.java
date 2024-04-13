@@ -25,15 +25,34 @@ public class Flag implements Named, Described, Prioritized {
     public static final Map<String,Flag> VALUES = Collections.unmodifiableMap($);
     public static final Flag Passthrough = new Flag("passthrough", 90, BOOLEAN, "Passthrough", "Enable to force WorldMod to not handle any events", false);
     public static final Flag Build = new Flag("build", 50, BOOLEAN, "Building", "Enable to force WorldMod to not handle any events", false);
+    public static final Flag Explode = new Flag("explode", 20, BOOLEAN, "Explosions", "Allow or Deny any kinds of Explosions", false);
+    public static final Flag Explode_Creeper = new Flag(Explode, "creeper", 20, BOOLEAN, "Creeper Explosions", "Allow or Deny Creeper Explosions", false);
 
+    @Nullable Flag parent;
     @NotNull String name;
     long priority;
     @NotNull ValueType<?> type;
     @Nullable String displayName;
     @Nullable String description;
-    @NotNull Object defaultValue;
+    @Nullable Object defaultValue;
 
-    public Flag(String name, long priority, ValueType<?> type, @Nullable String displayName, @Nullable String description, @NotNull Object defaultValue) {
+    public Flag(String name,
+                long priority,
+                ValueType<?> type,
+                @Nullable String displayName,
+                @Nullable String description,
+                @NotNull Object defaultValue) {
+        this(null, name, priority, type, displayName, description, defaultValue);
+    }
+
+    public Flag(@Nullable Flag parent,
+                String name,
+                long priority,
+                ValueType<?> type,
+                @Nullable String displayName,
+                @Nullable String description,
+                @Nullable Object defaultValue) {
+        this.parent = parent;
         this.name = name;
         this.priority = priority;
         this.type = type;
@@ -41,16 +60,20 @@ public class Flag implements Named, Described, Prioritized {
         this.description = description;
         this.defaultValue = defaultValue;
 
-        Constraint.decide($.containsKey(name), "cached Flag '" + getBestName() + "'")
+        Constraint.decide($.containsKey(getCanonicalName()), "cached Flag '" + getBestName() + "'")
                 .setExpected("nonexistent")
                 .setActual("exists already")
                 .invert().run();
-        $.put(name, this);
+        $.put(getCanonicalName(), this);
     }
 
     @Override
     public String getAlternateName() {
         return displayName;
+    }
+
+    public String getCanonicalName() {
+        return parent == null ? name : parent.getCanonicalName() + '.' + name;
     }
 
     @Data

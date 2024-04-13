@@ -54,11 +54,20 @@ public class Flag implements Named, Described, Prioritized {
     }
 
     @Data
+    @EqualsAndHashCode
     public static class Value implements Prioritized {
         @NotNull Flag flag;
         @NotNull TriState state;
         @Nullable String value = null;
+        @Nullable Target target = Target.Trusted;
         boolean force = false;
         long priority = 0;
+
+        public enum Target implements Named {
+            All,
+            Trusted,
+            Members,
+            Owners
+        }
     }
 }

@@ -39,6 +39,11 @@ public class Flag implements Named, Described, Prioritized {
     @Nullable String description;
     @Nullable Object defaultValue;
 
+    @SuppressWarnings({"LombokGetterMayBeUsed", "RedundantSuppression"}) // false-positive
+    public long getPriority() {
+        return priority;
+    }
+
     public Flag(String name,
                 long priority,
                 ValueType<?> type,

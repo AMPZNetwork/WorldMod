@@ -94,11 +94,12 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
 
     @Value
     private class EventDispatch implements Listener {
-        private boolean dependsOnFlag(Cancellable cancellable, Vector.N3 location, Flag... flagChain) {
-            return dependsOnFlag(cancellable, location, Streams.OP.LogicalAnd, flagChain);
+        private boolean dependsOnFlag(Cancellable cancellable, UUID playerId, Vector.N3 location, Flag... flagChain) {
+            return dependsOnFlag(cancellable, playerId, location, Streams.OP.LogicalAnd, flagChain);
         }
 
         private boolean dependsOnFlag(Cancellable cancellable,
+                                      UUID playerId,
                                       Vector.N3 location,
                                       @SuppressWarnings("SameParameterValue") Streams.OP chainOp_cancel,
                                       Flag... flagChain) {
@@ -109,6 +110,8 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
                 for (var flag : Arrays.stream(flagChain)
                         .flatMap(region::getFlagValues)
                         .toList()) {
+                    if (!flag.appliesToUser(region, playerId))
+                        continue;
                     var state = flag.getState();
                     if (state == TriState.NOT_SET)
                         continue;
@@ -131,22 +134,22 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
                     .isPresent();
         }
 
-        private void dispatchEvent(Cancellable cancellable, Vector.N3 location, Flag... flagChain) {
+        private void dispatchEvent(Cancellable cancellable, UUID playerId, Vector.N3 location, Flag... flagChain) {
             if (passthrough(location))
                 return;
-            dependsOnFlag(cancellable, location, flagChain);
+            dependsOnFlag(cancellable, playerId, location, flagChain);
         }
 
         @EventHandler(priority = EventPriority.HIGHEST)
         public void onBlockBreak(BlockBreakEvent event) {
             var location = vec(event.getBlock().getLocation());
-            dispatchEvent(event, location, Build);
+            dispatchEvent(event, event.getPlayer().getUniqueId(), location, Build);
         }
 
         @EventHandler(priority = EventPriority.HIGHEST)
         public void onBlockPlace(BlockPlaceEvent event) {
             var location = vec(event.getBlock().getLocation());
-            dispatchEvent(event, location, Build);
+            dispatchEvent(event, event.getPlayer().getUniqueId(), location, Build);
         }
 
         //region todo

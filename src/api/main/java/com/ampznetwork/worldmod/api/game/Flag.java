@@ -1,19 +1,22 @@
 package com.ampznetwork.worldmod.api.game;
 
+import com.ampznetwork.worldmod.api.model.mini.OwnedByParty;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Value;
+import com.ampznetwork.worldmod.api.model.region.FlagContainer;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.attr.Described;
 import org.comroid.api.attr.Named;
 import org.comroid.api.data.seri.type.ValueType;
+import org.comroid.api.func.util.Bitmask;
 import org.comroid.api.info.Constraint;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.comroid.api.data.seri.type.StandardValueType.BOOLEAN;
@@ -82,13 +85,21 @@ public class Flag implements Named, Described, Prioritized {
         @NotNull Flag flag;
         @NotNull TriState state;
         @Nullable String value = null;
-        @Nullable Target target = Target.Trusted;
+        long target = Bitmask.combine(Target.Guests, Target.Members);
         boolean force = false;
         long priority = 0;
 
-        public enum Target implements Named {
-            All,
-            Trusted,
+        public boolean appliesToUser(OwnedByParty target, UUID playerId) {
+            var owner = target.getOwnerIDs().contains(playerId);
+            var member = target.getOwnerIDs().contains(playerId);
+            var mask = this.target;
+            return owner ? Target.Owners.isFlagSet(mask)
+                    : member ? Target.Members.isFlagSet(mask)
+                    : Target.Guests.isFlagSet(mask);
+        }
+
+        public enum Target implements Named, Bitmask.Attribute<Target> {
+            Guests,
             Members,
             Owners
         }

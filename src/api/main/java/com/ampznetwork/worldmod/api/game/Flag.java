@@ -2,9 +2,9 @@ package com.ampznetwork.worldmod.api.game;
 
 import com.ampznetwork.worldmod.api.model.mini.OwnedByParty;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
-import com.ampznetwork.worldmod.api.model.region.FlagContainer;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Value;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.attr.Described;
 import org.comroid.api.attr.Named;
@@ -54,9 +54,9 @@ public class Flag implements Named, Described, Prioritized {
     }
 
     public Flag(@Nullable Flag parent,
-                String name,
+                @NotNull String name,
                 long priority,
-                ValueType<?> type,
+                @NotNull ValueType<?> type,
                 @Nullable String displayName,
                 @Nullable String description,
                 @Nullable Object defaultValue) {

@@ -32,33 +32,33 @@ public class EventDispatchBase {
     }
 
     public boolean dependsOnFlag(IPropagationAdapter cancellable, UUID playerId, Vector.N3 location, Flag... flagChain) {
-        return dependsOnFlag(cancellable, playerId, location, Streams.OP.LogicalAnd, flagChain);
+        return dependsOnFlag(cancellable, playerId, location, Streams.OP.LogicalAnd, Streams.OP.LogicalOr, flagChain);
     }
 
     public boolean dependsOnFlag(IPropagationAdapter adp,
                                  UUID playerId,
                                  Vector.N3 location,
-                                 @SuppressWarnings("SameParameterValue") Streams.OP chainOp,
+                                 Streams.OP chainOp_cancel,
+                                 Streams.OP chainOp_force,
                                  Flag... flagChain) {
         var iter = findRegions(location).iterator();
-        boolean cancel = true, force = false;
+        boolean cancel = false, force = false;
         while (iter.hasNext()) {
             var region = iter.next();
             for (var flag : Arrays.stream(flagChain)
                     .flatMap(region::getFlagValues)
                     .toList()) {
-                if (Region.GlobalRegionName.equals(region.getName())
-                        && flag.getFlag().equals(Build)
-                        && flag.getState() != TriState.FALSE
+                var global = Region.GlobalRegionName.equals(region.getName());
+                if (global && flag.getFlag().equals(Build) && flag.getState() != TriState.FALSE
                         || !flag.appliesToUser(region, playerId))
                     continue; // exception for build flag on global region
                 var state = flag.getState();
                 if (state == TriState.NOT_SET)
                     continue;
                 if (state == TriState.FALSE)
-                    cancel = chainOp.test(cancel, true);
+                    cancel = chainOp_cancel.test(cancel, true);
                 else if (state == TriState.TRUE && flag.isForce())
-                    force = chainOp.test(force, true);
+                    force = chainOp_force.test(force, true);
             }
         }
         if (force) adp.force();

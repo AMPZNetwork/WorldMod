@@ -38,6 +38,8 @@ public class EventDispatchTest {
                 new Vector.N3(0, 0, 0),
                 new Vector.N3(16, 0, 16)
         });
+        Region.getOwnerIDs().add(PlayerOwner);
+        Region.getMemberIDs().add(PlayerMember);
         //noinspection RedundantCollectionOperation
         Region.getDeclaredFlags().addAll(List.of(
                 Value.builder()

@@ -103,7 +103,7 @@ public class Flag implements Named, Described, Prioritized {
 
         public boolean appliesToUser(OwnedByParty target, UUID playerId) {
             var owner = target.getOwnerIDs().contains(playerId);
-            var member = target.getOwnerIDs().contains(playerId);
+            var member = target.getMemberIDs().contains(playerId);
             var mask = this.target;
             return owner ? Target.Owners.isFlagSet(mask)
                     : member ? Target.Members.isFlagSet(mask)

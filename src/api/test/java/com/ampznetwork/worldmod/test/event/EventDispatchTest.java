@@ -4,20 +4,21 @@ import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.event.EventDispatchBase;
 import com.ampznetwork.worldmod.api.event.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.math.Shape;
+import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
+import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Data;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 import static com.ampznetwork.worldmod.api.game.Flag.Build;
 import static com.ampznetwork.worldmod.api.game.Flag.Value;
-import static org.easymock.EasyMock.*;
 import static org.junit.Assert.assertEquals;
 
 public class EventDispatchTest {
@@ -50,18 +51,23 @@ public class EventDispatchTest {
 
     @Before
     public void setup() {
-        this.mod = mock(WorldMod.class);
+        this.mod = new WorldMod() {
+            @Override
+            public Collection<com.ampznetwork.worldmod.api.model.region.Region> getRegions() {
+                return List.of(Region);
+            }
+
+            @Override
+            public Collection<? extends Group> getGroups() {
+                return List.of();
+            }
+
+            @Override
+            public PlayerAdapter getPlayerAdapter() {
+                return null;
+            }
+        };
         this.dispatch = new EventDispatchBase(mod);
-
-        expect(mod.getRegions()).atLeastOnce().andReturn(List.of(Region));
-
-        replay(mod);
-    }
-
-    @After
-    public void teardown() {
-        verify(mod);
-        reset(mod);
     }
 
     private void testPropagate(UUID player, Vector.N3 location, int expect) {

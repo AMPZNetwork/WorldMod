@@ -4,6 +4,7 @@ import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.OwnedByParty;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
+import com.ampznetwork.worldmod.api.model.mini.PropagationController;
 import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.ampznetwork.worldmod.api.model.sel.Chunk;
 import lombok.Value;
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Stream.concat;
 
 @Value
-public class Region implements Area, OwnedByParty, Prioritized, FlagContainer, Named {
+public class Region implements Area, PropagationController, Prioritized, Named {
     private static final Map<String, Region> GlobalRegions = new ConcurrentHashMap<>();
     public static String GlobalRegionName = "#global";
     String name;

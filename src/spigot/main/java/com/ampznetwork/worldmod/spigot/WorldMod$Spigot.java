@@ -3,7 +3,7 @@ package com.ampznetwork.worldmod.spigot;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.WorldModCommands;
 import com.ampznetwork.worldmod.api.event.EventDispatchBase;
-import com.ampznetwork.worldmod.api.event.IPropagationAdapter;
+import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.region.Group;

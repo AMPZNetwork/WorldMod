@@ -3,6 +3,8 @@ package com.ampznetwork.worldmod.api.model.region;
 import com.ampznetwork.worldmod.api.game.Flag;
 import net.kyori.adventure.util.TriState;
 
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 public interface FlagContainer {

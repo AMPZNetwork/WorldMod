@@ -13,11 +13,13 @@ import org.comroid.api.attr.Named;
 import org.comroid.api.data.seri.type.ValueType;
 import org.comroid.api.func.util.Bitmask;
 import org.comroid.api.info.Constraint;
+import org.comroid.api.text.minecraft.Tellraw;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -94,13 +96,19 @@ public class Flag implements Named, Described, Prioritized {
         @NotNull TriState state;
         @Default
         @Nullable String value = null;
-        @Default
+        @Default @Deprecated
         long target = Bitmask.combine(Target.Guests, Target.Members);
+        @Default
+        Set<Tellraw.Selector> selectors = Set.of(Tellraw.Selector.builder()
+                .base(Tellraw.Selector.Base.NEAREST_PLAYER)
+                .type("guest")
+                .build());
         @Default
         boolean force = false;
         @Default
         long priority = 0;
 
+        @Deprecated
         public boolean appliesToUser(OwnedByParty target, UUID playerId) {
             var owner = target.getOwnerIDs().contains(playerId);
             var member = target.getMemberIDs().contains(playerId);
@@ -110,6 +118,7 @@ public class Flag implements Named, Described, Prioritized {
                     : Target.Guests.isFlagSet(mask);
         }
 
+        @Deprecated
         public enum Target implements Named, Bitmask.Attribute<Target> {
             Guests,
             Members,

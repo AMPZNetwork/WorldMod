@@ -1,4 +1,4 @@
-package com.ampznetwork.worldmod.api.event;
+package com.ampznetwork.worldmod.api.model.adp;
 
 public interface IPropagationAdapter {
     void cancel();

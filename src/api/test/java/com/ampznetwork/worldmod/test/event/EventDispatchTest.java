@@ -2,7 +2,7 @@ package com.ampznetwork.worldmod.test.event;
 
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.event.EventDispatchBase;
-import com.ampznetwork.worldmod.api.event.IPropagationAdapter;
+import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.region.Group;
@@ -40,13 +40,17 @@ public class EventDispatchTest {
         });
         Region.getOwnerIDs().add(PlayerOwner);
         Region.getMemberIDs().add(PlayerMember);
-        //noinspection RedundantCollectionOperation
         Region.getDeclaredFlags().addAll(List.of(
                 Value.builder()
                         .flag(Build)
                         .state(TriState.TRUE)
                         .force(true)
                         .target(Value.Target.Owners.getAsLong())
+                        .build(),
+                Value.builder()
+                        .flag(Build)
+                        .state(TriState.TRUE)
+                        .target(Value.Target.Members.getAsLong())
                         .build()
         ));
     }

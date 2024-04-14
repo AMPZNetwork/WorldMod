@@ -2,6 +2,7 @@ package com.ampznetwork.worldmod.api.event;
 
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Value;
@@ -46,11 +47,10 @@ public class EventDispatchBase {
         while (iter.hasNext()) {
             var region = iter.next();
             for (var flag : Arrays.stream(flagChain)
-                    .flatMap(region::getFlagValues)
+                    .map(flag -> region.getEffectiveFlagValueForPlayer(flag, playerId))
                     .toList()) {
-                var global = Region.GlobalRegionName.equals(region.getName());
-                if (global && flag.getFlag().equals(Build) && flag.getState() != TriState.FALSE
-                        || !flag.appliesToUser(region, playerId))
+                var isGlobal = Region.GlobalRegionName.equals(region.getName());
+                if (isGlobal && flag.getFlag().equals(Build) && flag.getState() != TriState.FALSE)
                     continue; // exception for build flag on global region
                 var state = flag.getState();
                 if (state == TriState.NOT_SET)

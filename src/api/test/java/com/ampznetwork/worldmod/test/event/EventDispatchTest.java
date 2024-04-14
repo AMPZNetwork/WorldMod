@@ -10,11 +10,13 @@ import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Data;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
+import org.comroid.api.text.minecraft.Tellraw;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.ampznetwork.worldmod.api.game.Flag.Build;
@@ -45,12 +47,18 @@ public class EventDispatchTest {
                         .flag(Build)
                         .state(TriState.TRUE)
                         .force(true)
-                        .target(Value.Target.Owners.getAsLong())
+                        .selectors(Set.of(Tellraw.Selector.builder()
+                                .base(Tellraw.Selector.Base.NEAREST_PLAYER)
+                                .type("owner")
+                                .build()))
                         .build(),
                 Value.builder()
                         .flag(Build)
                         .state(TriState.TRUE)
-                        .target(Value.Target.Members.getAsLong())
+                        .selectors(Set.of(Tellraw.Selector.builder()
+                                .base(Tellraw.Selector.Base.NEAREST_PLAYER)
+                                .type("member")
+                                .build()))
                         .build()
         ));
     }

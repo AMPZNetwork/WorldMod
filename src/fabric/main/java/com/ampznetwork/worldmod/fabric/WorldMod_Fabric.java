@@ -18,7 +18,7 @@ public class WorldMod_Fabric implements ModInitializer, WorldMod {
     }
 
     @Override
-    public Collection<? extends Region> getRegions() {
+    public Collection<Region> getRegions() {
         return null;
     }
 

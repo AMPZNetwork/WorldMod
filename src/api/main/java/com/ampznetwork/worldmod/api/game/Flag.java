@@ -2,6 +2,8 @@ package com.ampznetwork.worldmod.api.game;
 
 import com.ampznetwork.worldmod.api.model.mini.OwnedByParty;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
+import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
@@ -85,13 +87,18 @@ public class Flag implements Named, Described, Prioritized {
     }
 
     @Data
+    @Builder
     @EqualsAndHashCode
     public static class Value implements Prioritized {
         @NotNull Flag flag;
         @NotNull TriState state;
+        @Default
         @Nullable String value = null;
+        @Default
         long target = Bitmask.combine(Target.Guests, Target.Members);
+        @Default
         boolean force = false;
+        @Default
         long priority = 0;
 
         public boolean appliesToUser(OwnedByParty target, UUID playerId) {

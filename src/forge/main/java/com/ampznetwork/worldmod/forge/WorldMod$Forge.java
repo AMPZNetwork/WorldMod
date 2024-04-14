@@ -11,7 +11,7 @@ import java.util.Collection;
 @Mod(WorldMod.AddonName)
 public class WorldMod$Forge implements WorldMod {
     @Override
-    public Collection<? extends Region> getRegions() {
+    public Collection<Region> getRegions() {
         return null;
     }
 

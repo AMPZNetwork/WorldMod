@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static com.ampznetwork.worldmod.api.game.Flag.Build;
 import static com.ampznetwork.worldmod.api.game.Flag.Passthrough;
 import static java.util.Comparator.comparingLong;
 
@@ -23,10 +24,11 @@ public class EventDispatchBase {
     WorldMod worldMod;
 
     public Stream<? extends Region> findRegions(Vector.N3 location) {
-        return worldMod.getRegions().parallelStream()
-                .filter(region -> region.streamChunks().anyMatch(chunk -> chunk.isInside(location)))
-                .filter(region -> region.getShape().isPointInside(region.getSpatialAnchors(), location))
-                .sorted(comparingLong(Prioritized::getPriority).reversed());
+        return Stream.concat(worldMod.getRegions().parallelStream()
+                        .filter(region -> region.streamChunks().anyMatch(chunk -> chunk.isInside(location)))
+                        .filter(region -> region.getShape().isPointInside(region.getSpatialAnchors(), location))
+                        .sorted(comparingLong(Prioritized::getPriority).reversed()),
+                Stream.of(Region.global("world")));
     }
 
     public boolean dependsOnFlag(IPropagationAdapter cancellable, UUID playerId, Vector.N3 location, Flag... flagChain) {
@@ -45,8 +47,11 @@ public class EventDispatchBase {
             for (var flag : Arrays.stream(flagChain)
                     .flatMap(region::getFlagValues)
                     .toList()) {
-                if (!flag.appliesToUser(region, playerId))
-                    continue;
+                if (Region.GlobalRegionName.equals(region.getName())
+                        && flag.getFlag().equals(Build)
+                        && flag.getState() != TriState.FALSE
+                        || !flag.appliesToUser(region, playerId))
+                    continue; // exception for build flag on global region
                 var state = flag.getState();
                 if (state == TriState.NOT_SET)
                     continue;

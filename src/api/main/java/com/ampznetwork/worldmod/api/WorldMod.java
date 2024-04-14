@@ -10,7 +10,7 @@ public interface WorldMod {
     String AddonId = "worldmod";
     String AddonName = "WorldMod";
 
-    Collection<? extends Region> getRegions();
+    Collection<Region> getRegions();
     Collection<? extends Group> getGroups();
 
     PlayerAdapter getPlayerAdapter();

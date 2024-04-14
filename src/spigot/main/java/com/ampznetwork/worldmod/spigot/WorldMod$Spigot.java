@@ -2,14 +2,14 @@ package com.ampznetwork.worldmod.spigot;
 
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.WorldModCommands;
+import com.ampznetwork.worldmod.api.event.EventDispatchBase;
+import com.ampznetwork.worldmod.api.event.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
-import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Getter;
 import lombok.Value;
-import net.kyori.adventure.util.TriState;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.Cancellable;
@@ -22,18 +22,13 @@ import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Command;
-import org.comroid.api.func.util.Streams;
 import org.comroid.api.info.Constraint;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import static com.ampznetwork.worldmod.api.game.Flag.Build;
-import static com.ampznetwork.worldmod.api.game.Flag.Passthrough;
-import static java.util.Comparator.comparingLong;
 import static org.bukkit.Bukkit.getPluginManager;
 
 @Getter
@@ -64,13 +59,6 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
         getPluginManager().registerEvents(eventDispatch, this);
     }
 
-    private Stream<Region> findRegions(Vector.N3 location) {
-        return regions.parallelStream()
-                .filter(region -> region.streamChunks().anyMatch(chunk -> chunk.isInside(location)))
-                .filter(region -> region.getShape().isPointInside(region.getSpatialAnchors(), location))
-                .sorted(comparingLong(Prioritized::getPriority).reversed());
-    }
-
     @Value
     private class MyPlayerAdapter implements PlayerAdapter {
         @Override
@@ -93,51 +81,24 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
     }
 
     @Value
-    private class EventDispatch implements Listener {
-        private boolean dependsOnFlag(Cancellable cancellable, UUID playerId, Vector.N3 location, Flag... flagChain) {
-            return dependsOnFlag(cancellable, playerId, location, Streams.OP.LogicalAnd, flagChain);
+    private static class PropagationAdapter implements IPropagationAdapter {
+        Cancellable cancellable;
+
+        @Override
+        public void cancel() {
+            cancellable.setCancelled(true);
         }
 
-        private boolean dependsOnFlag(Cancellable cancellable,
-                                      UUID playerId,
-                                      Vector.N3 location,
-                                      @SuppressWarnings("SameParameterValue") Streams.OP chainOp_cancel,
-                                      Flag... flagChain) {
-            var iter = findRegions(location).iterator();
-            var cancel = true;
-            while (iter.hasNext()) {
-                var region = iter.next();
-                for (var flag : Arrays.stream(flagChain)
-                        .flatMap(region::getFlagValues)
-                        .toList()) {
-                    if (!flag.appliesToUser(region, playerId))
-                        continue;
-                    var state = flag.getState();
-                    if (state == TriState.NOT_SET)
-                        continue;
-                    if (state == TriState.FALSE)
-                        cancel = chainOp_cancel.test(cancel, true);
-                    else if (state == TriState.TRUE && flag.isForce())
-                        cancel = chainOp_cancel.test(cancel, false);
-                    cancellable.setCancelled(false);
-                }
-            }
-            cancellable.setCancelled(cancel);
-            return !cancel;
+        @Override
+        public void force() {
+            cancellable.setCancelled(false);
         }
+    }
 
-        private boolean passthrough(Vector.N3 location) {
-            return findRegions(location)
-                    .map(region -> region.getFlagState(Passthrough))
-                    .findFirst()
-                    .filter(state -> state == TriState.TRUE)
-                    .isPresent();
-        }
-
-        private void dispatchEvent(Cancellable cancellable, UUID playerId, Vector.N3 location, Flag... flagChain) {
-            if (passthrough(location))
-                return;
-            dependsOnFlag(cancellable, playerId, location, flagChain);
+    @Value
+    private class EventDispatch extends EventDispatchBase implements Listener {
+        public EventDispatch() {
+            super(WorldMod$Spigot.this);
         }
 
         @EventHandler(priority = EventPriority.HIGHEST)
@@ -173,5 +134,9 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
         public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
         }
         //endregion
+
+        private void dispatchEvent(Cancellable cancellable, UUID playerId, Vector.N3 location, Flag... flagChain) {
+            dispatchEvent(new PropagationAdapter(cancellable), playerId, location, flagChain);
+        }
     }
 }

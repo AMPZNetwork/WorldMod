@@ -21,40 +21,40 @@ public interface PropagationController extends OwnedByParty, FlagContainer, Name
         var me = getOwnerIDs().contains(playerId) ? OWNER
                 : getMemberIDs().contains(playerId) ? MEMBER
                 : GUEST;
-        var explicit = new TriState[4]; // indices: see PlayerRelation#ordinal()
+        var explicit = new Flag.Value[4]; // indices: see PlayerRelation#ordinal()
         var mask = 0;
 
         // scan all values for explicit states
         for (var value : values)
             for (var selector : value.getSelectors()) {
                 var tgt = find(selector.getBase(), selector.getType());
-                if ((explicit[tgt.ordinal()] = value.getState()) != NOT_SET)
+                if ((explicit[tgt.ordinal()] = value).getState() != NOT_SET)
                     mask |= (int) tgt.getAsLong();
             }
 
         // decide result state based upon explicit values
-        @Nullable TriState choice;
-        decision:
-        {
-            // fall back to own category if possible
-            if ((choice = explicit[me.ordinal()]) != null)
-                break decision;
+        @Nullable TriState choice = null;
+        // fall back to own if possible
+        var mine = explicit[me.ordinal()];
+        if (mine != null)
+            return mine;
             // if only owner is set; everyone below should get false
-            else if (mask == OWNER.getAsLong())
-                choice = me.ordinal() <= MEMBER.ordinal() ? FALSE : TRUE;
+        else if (mask == OWNER.getAsLong())
+            choice = me.ordinal() <= MEMBER.ordinal() ? FALSE : TRUE;
             // if only member is set; everyone below should get false; above should get true
-            else if (mask == MEMBER.getAsLong())
-                choice = me.ordinal() == GUEST.ordinal() ? FALSE : TRUE;
+        else if (mask == MEMBER.getAsLong())
+            choice = me.ordinal() == GUEST.ordinal() ? FALSE : TRUE;
 
-            // if there is no result yet and guest is set to false; everyone above should get true
-            if (choice == null
-                    && (choice = explicit[GUEST.ordinal()]) != null
-                    && choice == FALSE
-                    && me.ordinal() > GUEST.ordinal())
-                choice = TRUE;
-                // otherwise or if entity is set; return global decision
-            else choice = Region.GlobalRegionName.equals(getName()) ? NOT_SET : FALSE;
-        }
+        // if there is no result yet and guest is set to false; everyone above should get true
+        var guest = explicit[GUEST.ordinal()];
+        if (choice == null
+                && guest != null
+                && (choice = guest.getState()) != null
+                && choice == FALSE // choice used as a buffer
+                && me.ordinal() > GUEST.ordinal())
+            choice = TRUE;
+            // otherwise or if entity is set; return global decision
+        else choice = Region.GlobalRegionName.equals(getName()) ? NOT_SET : FALSE;
         return builder.state(choice).build();
     }
 }

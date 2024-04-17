@@ -7,7 +7,9 @@ import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Value;
 import lombok.experimental.NonFinal;
+import lombok.extern.java.Log;
 import net.kyori.adventure.util.TriState;
+import org.comroid.api.attr.Named;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Streams;
 
@@ -19,6 +21,7 @@ import static com.ampznetwork.worldmod.api.game.Flag.Build;
 import static com.ampznetwork.worldmod.api.game.Flag.Passthrough;
 import static java.util.Comparator.comparingLong;
 
+@Log
 @Value
 @NonFinal
 public class EventDispatchBase {
@@ -32,11 +35,11 @@ public class EventDispatchBase {
                 Stream.of(Region.global("world")));
     }
 
-    public boolean dependsOnFlag(IPropagationAdapter cancellable, UUID playerId, Vector.N3 location, Flag... flagChain) {
-        return dependsOnFlag(cancellable, playerId, location, Streams.OP.LogicalAnd, Streams.OP.LogicalOr, flagChain);
+    public EventState dependsOnFlag(IPropagationAdapter cancellable, UUID playerId, Vector.N3 location, Flag... flagChain) {
+        return dependsOnFlag(cancellable, playerId, location, Streams.OP.LogicalOr, Streams.OP.LogicalOr, flagChain);
     }
 
-    public boolean dependsOnFlag(IPropagationAdapter adp,
+    public EventState dependsOnFlag(IPropagationAdapter adp,
                                  UUID playerId,
                                  Vector.N3 location,
                                  Streams.OP chainOp_cancel,
@@ -61,9 +64,13 @@ public class EventDispatchBase {
                     force = chainOp_force.test(force, true);
             }
         }
-        if (force) adp.force();
-        else if (cancel) adp.cancel();
-        return force || !cancel;
+        if (force) {
+            adp.force();
+            return EventState.Forced;
+        } else if (cancel) {
+            adp.cancel();
+            return EventState.Cancelled;
+        } else return EventState.Unaffected;
     }
 
     public boolean passthrough(Vector.N3 location) {
@@ -77,6 +84,9 @@ public class EventDispatchBase {
     public void dispatchEvent(IPropagationAdapter cancellable, UUID playerId, Vector.N3 location, Flag... flagChain) {
         if (passthrough(location))
             return;
-        dependsOnFlag(cancellable, playerId, location, flagChain);
+        var result = dependsOnFlag(cancellable, playerId, location, flagChain);
+        log.finer(() -> "%s by %s at %s resulted in %s".formatted(cancellable, playerId, location, result));
     }
+
+    public enum EventState implements Named {Unaffected, Cancelled, Forced}
 }

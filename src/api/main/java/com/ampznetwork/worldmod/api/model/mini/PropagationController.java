@@ -2,7 +2,9 @@ package com.ampznetwork.worldmod.api.model.mini;
 
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.region.FlagContainer;
+import com.ampznetwork.worldmod.api.model.region.Region;
 import net.kyori.adventure.util.TriState;
+import org.comroid.api.attr.Named;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -10,7 +12,7 @@ import java.util.UUID;
 import static com.ampznetwork.worldmod.api.model.mini.PlayerRelation.*;
 import static net.kyori.adventure.util.TriState.*;
 
-public interface PropagationController extends OwnedByParty, FlagContainer {
+public interface PropagationController extends OwnedByParty, FlagContainer, Named {
     default Flag.Value getEffectiveFlagValueForPlayer(Flag flag, UUID playerId) {
         var values = getFlagValues(flag).toList();
         var builder = Flag.Value.builder().flag(flag).state(NOT_SET);
@@ -50,8 +52,8 @@ public interface PropagationController extends OwnedByParty, FlagContainer {
                     && choice == FALSE
                     && me.ordinal() > GUEST.ordinal())
                 choice = TRUE;
-            // otherwise or if entity is set; return unset
-            else choice = NOT_SET;
+                // otherwise or if entity is set; return global decision
+            else choice = Region.GlobalRegionName.equals(getName()) ? NOT_SET : FALSE;
         }
         return builder.state(choice).build();
     }

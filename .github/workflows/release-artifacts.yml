@@ -1,4 +1,4 @@
-name: Upload Files to Release
+name: Upload Artifacts to Release
 
 on:
   release:

@@ -30,10 +30,15 @@ import static org.comroid.api.data.seri.type.StandardValueType.BOOLEAN;
 public class Flag implements Named, Described, Prioritized {
     private static final Map<String, Flag> $ = new ConcurrentHashMap<>();
     public static final Map<String,Flag> VALUES = Collections.unmodifiableMap($);
-    public static final Flag Passthrough = new Flag("passthrough", 90, BOOLEAN, "Passthrough", "Enable to force WorldMod to not handle any events", false);
+    public static final Flag Passthrough = new Flag("passthrough", Long.MAX_VALUE, BOOLEAN, "Passthrough", "Enable to force WorldMod to not handle any events", false);
     public static final Flag Build = new Flag("build", 50, BOOLEAN, "Building", "Enable to force WorldMod to not handle any events", false);
+    public static final Flag Interact = new Flag("interact", 30, BOOLEAN, "Interactions", "Enable to allow users to interact with your claim", false);
+    public static final Flag Use = new Flag("use", 40, BOOLEAN, "Usage", "Enable to allow users to use items in your claim", false);
+    public static final Flag Craft = new Flag("craft", 20, BOOLEAN, "Craft Item", "Enable to allow users to craft specific items in your claim", false);
     public static final Flag Explode = new Flag("explode", 20, BOOLEAN, "Explosions", "Allow or Deny any kinds of Explosions", false);
     public static final Flag Explode_Creeper = new Flag(Explode, "creeper", 20, BOOLEAN, "Creeper Explosions", "Allow or Deny Creeper Explosions", false);
+    public static final Flag Enter = new Flag("enter", 70, BOOLEAN, "Enter Area", "Disable to disallow users from entering the area", false);
+    public static final Flag Leave = new Flag("leave", 70, BOOLEAN, "Leave Area", "Disable to disallow users from leaving the area", false);
 
     @Nullable Flag parent;
     @NotNull String name;
@@ -42,11 +47,6 @@ public class Flag implements Named, Described, Prioritized {
     @Nullable String displayName;
     @Nullable String description;
     @Nullable Object defaultValue;
-
-    @SuppressWarnings({"LombokGetterMayBeUsed", "RedundantSuppression"}) // false-positive
-    public long getPriority() {
-        return priority;
-    }
 
     public Flag(String name,
                 long priority,
@@ -107,6 +107,10 @@ public class Flag implements Named, Described, Prioritized {
         boolean force = false;
         @Default
         long priority = 0;
+
+        public long getPriority() {
+            return force ? Long.MAX_VALUE : priority;
+        }
 
         @Deprecated
         public boolean appliesToUser(OwnedByParty target, UUID playerId) {

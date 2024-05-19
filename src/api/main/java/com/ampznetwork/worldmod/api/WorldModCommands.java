@@ -3,6 +3,7 @@ package com.ampznetwork.worldmod.api;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.impl.BasicArea;
 import lombok.Value;
+import org.comroid.annotations.Alias;
 import org.comroid.api.func.util.Command;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,6 +20,7 @@ public class WorldModCommands {
         return selections.computeIfAbsent(playerId, $->new BasicArea.Builder());
     }
 
+    @Alias({"sel","select"})
     @Command(permission = WorldMod.Permission.Selection,ephemeral = true)
     public String selection(UUID playerId, @Command.Arg(required = false) @Nullable Shape type) {
         if (type==null) {
@@ -28,6 +30,7 @@ public class WorldModCommands {
         return "Now selecting as "+type.name();
     }
 
+    @Alias("pos")
     @Command(permission = WorldMod.Permission.Selection,ephemeral = true)
     public String position(UUID playerId, @Command.Arg int index) {
         var pos = worldMod.getPlayerAdapter().getPosition(playerId);

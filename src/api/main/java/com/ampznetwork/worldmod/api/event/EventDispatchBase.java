@@ -29,8 +29,8 @@ public class EventDispatchBase {
 
     public Stream<? extends Region> findRegions(Vector.N3 location) {
         return Stream.concat(worldMod.getRegions().parallelStream()
-                        .filter(region -> region.streamChunks().anyMatch(chunk -> chunk.isInside(location)))
-                        .filter(region -> region.getShape().isPointInside(region.getSpatialAnchors(), location))
+                        .filter(region -> region.streamChunks().anyMatch(chunk -> chunk.isPointInside(location)))
+                        .filter(region -> region.isPointInside(location))
                         .sorted(comparingLong(Prioritized::getPriority).reversed()),
                 Stream.of(Region.global("world")));
     }

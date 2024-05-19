@@ -2,9 +2,9 @@ package com.ampznetwork.worldmod.api.model.region;
 
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
-import com.ampznetwork.worldmod.api.model.mini.OwnedByParty;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.mini.PropagationController;
+import com.ampznetwork.worldmod.api.model.mini.ShapeCollider;
 import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.ampznetwork.worldmod.api.model.sel.Chunk;
 import com.ampznetwork.worldmod.impl.BasicArea;
@@ -24,12 +24,12 @@ import static java.util.stream.Stream.concat;
 
 @Value
 @Builder
-public class Region implements PropagationController, Prioritized, Named {
+public class Region implements PropagationController, ShapeCollider, Prioritized, Named, PointCollider {
     private static final Map<String, Region> GlobalRegions = new ConcurrentHashMap<>();
     public static String GlobalRegionName = "#global";
     String name;
     @Default @Nullable Group group = null;
-    String worldName;
+    @Default String worldName = "world";
     @Default long priority = 0;
     @Singular Set<Area> areas;
     @Singular Set<UUID> ownerIDs;
@@ -49,8 +49,14 @@ public class Region implements PropagationController, Prioritized, Named {
                         .build());
     }
 
+    @Override
     public Stream<Chunk> streamChunks() {
         return areas.stream().flatMap(Area::streamChunks);
+    }
+
+    @Override
+    public boolean isPointInside(Vector.N3 point) {
+        return areas.stream().anyMatch(area -> area.isPointInside(point));
     }
 
     @Override

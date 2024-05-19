@@ -1,15 +1,17 @@
 package com.ampznetwork.worldmod.api.model.sel;
 
+import com.ampznetwork.worldmod.api.model.region.PointCollider;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.comroid.api.data.Vector;
 
 @Value
 @EqualsAndHashCode(of = "id")
-public class Chunk {
+public class Chunk implements PointCollider {
     Vector.N2 id;
 
-    public boolean isInside(Vector.N3 location) {
+    @Override
+    public boolean isPointInside(Vector.N3 location) {
         var chunkX = id.getX() * 16; // Calculate the X coordinate of the chunk's corner
         var chunkZ = id.getZ() * 16; // Calculate the Z coordinate of the chunk's corner
 

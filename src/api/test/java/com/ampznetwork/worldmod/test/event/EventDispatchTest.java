@@ -7,6 +7,7 @@ import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
+import com.ampznetwork.worldmod.impl.BasicArea;
 import lombok.Data;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
@@ -36,10 +37,13 @@ public class EventDispatchTest {
     public EventDispatchTest() {
         LocationInside = new Vector.N3(8, 0, 8);
         LocationOutside = new Vector.N3(-1, 0, -1);
-        Region = new Region("testregion", null, "world", 0, Shape.Cuboid, new Vector[]{
-                new Vector.N3(0, 0, 0),
-                new Vector.N3(16, 0, 16)
-        });
+        Region = com.ampznetwork.worldmod.api.model.region.Region.builder()
+                .name("testregion")
+                .area(new BasicArea(Shape.Cuboid, List.of(
+                        new Vector.N3(0, 0, 0),
+                        new Vector.N3(16, 0, 16)
+                )))
+                .build();
         Region.getOwnerIDs().add(PlayerOwner);
         Region.getMemberIDs().add(PlayerMember);
         Region.getDeclaredFlags().addAll(List.of(

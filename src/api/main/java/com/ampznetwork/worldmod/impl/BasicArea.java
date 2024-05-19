@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class BasicArea implements Area {
     private final Shape shape;
     private final List<Vector> spatialAnchors;

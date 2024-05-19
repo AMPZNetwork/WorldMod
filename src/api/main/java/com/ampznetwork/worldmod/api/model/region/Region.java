@@ -20,6 +20,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
+import static java.lang.Long.MAX_VALUE;
+import static java.lang.Long.MIN_VALUE;
 import static java.util.stream.Stream.concat;
 
 @Value
@@ -43,8 +45,8 @@ public class Region implements PropagationController, ShapeCollider, Prioritized
                         .worldName(worldName)
                         .priority(Long.MIN_VALUE)
                         .area(new BasicArea(Shape.Cuboid, List.of(
-                                new Vector.N3(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE),
-                                new Vector.N3(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE)
+                                new Vector.N3(MIN_VALUE, MIN_VALUE, MIN_VALUE),
+                                new Vector.N3(MAX_VALUE, MAX_VALUE, MAX_VALUE)
                         )))
                         .build());
     }

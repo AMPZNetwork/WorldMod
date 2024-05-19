@@ -12,6 +12,7 @@ import net.kyori.adventure.util.TriState;
 import org.comroid.api.attr.Named;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Streams;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.UUID;
@@ -27,25 +28,33 @@ import static java.util.Comparator.comparingLong;
 public class EventDispatchBase {
     WorldMod worldMod;
 
+    @Deprecated(forRemoval = true)
     public Stream<? extends Region> findRegions(Vector.N3 location) {
-        return Stream.concat(worldMod.getRegions().parallelStream()
-                        .filter(region -> region.streamChunks().anyMatch(chunk -> chunk.isPointInside(location)))
+        return findRegions(location, "world");
+    }
+
+    public Stream<? extends Region> findRegions(@NotNull Vector.N3 location, @NotNull String worldName) {
+        return Stream.concat(
+                worldMod.getRegions().parallelStream()
+                        .filter(region -> region.getWorldName().equals(worldName))
+                        //.filter(region -> region.streamChunks().anyMatch(chunk -> chunk.isPointInside(location)))
                         .filter(region -> region.isPointInside(location))
                         .sorted(comparingLong(Prioritized::getPriority).reversed()),
                 Stream.of(Region.global("world")));
     }
 
-    public EventState dependsOnFlag(IPropagationAdapter cancellable, UUID playerId, Vector.N3 location, Flag... flagChain) {
-        return dependsOnFlag(cancellable, playerId, location, Streams.OP.LogicalOr, Streams.OP.LogicalOr, flagChain);
+    public EventState dependsOnFlag(IPropagationAdapter cancellable, UUID playerId, Vector.N3 location, String worldName, Flag... flagChain) {
+        return dependsOnFlag(cancellable, playerId, location, worldName, Streams.OP.LogicalOr, Streams.OP.LogicalOr, flagChain);
     }
 
     public EventState dependsOnFlag(IPropagationAdapter adp,
-                                 UUID playerId,
-                                 Vector.N3 location,
-                                 Streams.OP chainOp_cancel,
-                                 Streams.OP chainOp_force,
-                                 Flag... flagChain) {
-        var iter = findRegions(location).iterator();
+                                    UUID playerId,
+                                    Vector.N3 location,
+                                    String worldName,
+                                    Streams.OP chainOp_cancel,
+                                    Streams.OP chainOp_force,
+                                    Flag... flagChain) {
+        var iter = findRegions(location, worldName).iterator();
         boolean cancel = false, force = false;
         while (iter.hasNext()) {
             var region = iter.next();
@@ -73,18 +82,18 @@ public class EventDispatchBase {
         } else return EventState.Unaffected;
     }
 
-    public boolean passthrough(Vector.N3 location) {
-        return findRegions(location)
+    public boolean passthrough(Vector.N3 location, String worldName) {
+        return findRegions(location, worldName)
                 .map(region -> region.getFlagState(Passthrough))
                 .findFirst()
                 .filter(state -> state == TriState.TRUE)
                 .isPresent();
     }
 
-    public void dispatchEvent(IPropagationAdapter cancellable, UUID playerId, Vector.N3 location, Flag... flagChain) {
-        if (passthrough(location))
+    public void dispatchEvent(IPropagationAdapter cancellable, UUID playerId, Vector.N3 location, String worldName, Flag... flagChain) {
+        if (passthrough(location, worldName))
             return;
-        var result = dependsOnFlag(cancellable, playerId, location, flagChain);
+        var result = dependsOnFlag(cancellable, playerId, location, worldName, flagChain);
         log.finer(() -> "%s by %s at %s resulted in %s".formatted(cancellable, playerId, location, result));
     }
 

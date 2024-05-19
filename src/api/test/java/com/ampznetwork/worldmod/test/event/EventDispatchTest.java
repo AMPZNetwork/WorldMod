@@ -90,7 +90,7 @@ public class EventDispatchTest {
 
     private void testPropagate(UUID player, Vector.N3 location, int expect) {
         var propAdp = new PropagationAdapter();
-        dispatch.dispatchEvent(propAdp, player, location, Build);
+        dispatch.dispatchEvent(propAdp, player, location, "world", Build);
         assertEquals("Invalid Event cancellation state", expect, propAdp.state());
     }
 

@@ -24,6 +24,6 @@ public interface WorldMod {
 
     interface Permission {
         String Selection = "worldmod.area.selection";
-        String Claiming = "worldmod.area.claim";
+        String Claiming = "worldmod.region.claim";
     }
 }

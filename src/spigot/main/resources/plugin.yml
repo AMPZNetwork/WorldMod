@@ -7,5 +7,19 @@ load: STARTUP
 website: https://github.com/AMPZNetwork/WorldMod
 commands:
   reload:
-    permission: worldmod.reload
     description: Reloads Configuration
+    permission: worldmod.reload
+  select:
+    aliases: sel
+    description: Modify selected Area
+    permission: worldmod.selection
+  position:
+    aliases: pos
+    description: Modify selected Area
+    permission: worldmod.selection
+  claim:
+    description: Interact with your Claim
+    permission: worldmod.claim
+  region:
+    description: Interact with Regions
+    permission: worldmod.region

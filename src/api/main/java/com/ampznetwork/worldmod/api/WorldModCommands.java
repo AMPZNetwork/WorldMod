@@ -21,12 +21,12 @@ public class WorldModCommands {
         return selections.computeIfAbsent(playerId, $ -> new BasicArea.Builder());
     }
 
-    @Alias({"sel", "select"})
+    @Alias("sel")
     @Command(permission = WorldMod.Permission.Selection, ephemeral = true)
-    public String selection(UUID playerId, @Command.Arg(required = false) @Nullable Shape type) {
+    public String select(UUID playerId, @Command.Arg(required = false) @Nullable Shape type) {
         if (type == null) {
             selections.remove(playerId);
-            return "";
+            return "Selection cleared";
         }
         sel(playerId).setShape(type);
         return "Now selecting as " + type.name();

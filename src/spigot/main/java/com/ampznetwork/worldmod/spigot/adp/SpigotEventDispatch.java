@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
 import org.comroid.api.data.Vector;
 
@@ -236,26 +237,64 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     }
     //endregion
 
-    //region todo
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerMove(PlayerMoveEvent event) {
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerTeleport(PlayerTeleportEvent event) {
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerInteract(PlayerInteractEvent event) {
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
-    }
+    //region Entity Events
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(AreaEffectCloudApplyEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Lingering_Apply);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(CreatureSpawnEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Spawn_Mobs);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(CreeperPowerEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Charge_Creeper);}
+    //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityAirChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Chat_Send);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityBreakDoorEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, MobGriefing);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityBreedEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Breeding);}
+    //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityChangeBlockEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Chat_Send);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityCombustEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Combust);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityCombustByBlockEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Combust_ByBlock);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityCombustByEntityEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Combust_ByEntity);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityDamageEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Damage);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityDamageByBlockEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Damage_ByBlock);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityDamageByEntityEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Damage_ByEntity);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityDropItemEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Drop);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityEnterBlockEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Hide);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityEnterLoveModeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Romance);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityExhaustionEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Exhaust);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityExplodeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Explode);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityInteractEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Interact);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityPickupItemEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Pickup);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityPortalEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Portal);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityRegainHealthEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Regenerate);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityResurrectEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Resurrect);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityShootBowEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Combat_Ranged);}
+    //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntitySpawnEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Spawn);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntitySpellCastEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, SpellCast);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityTameEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Tame);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityTargetEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Target);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityTargetLivingEntityEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Target_Living);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityTeleportEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Teleport);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityToggleGlideEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Glide);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityToggleSwimEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Swim);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityTransformEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Transform);}
+    //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityUnleashEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Chat_Send);}
+    //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(ExpBottleEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Chat_Send);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(ExplosionPrimeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Explode);}
+    //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(FoodLevelChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, );}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(HorseJumpEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, HorseJump);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(ItemDespawnEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Despawn);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(ItemSpawnEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Spawn);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(LingeringPotionSplashEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Lingering);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(PiglinBarterEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Barter);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(PigZapEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Charge);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(PigZombieAngerEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Anger);}
+    //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(PlayerDeathEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Chat_Send);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(PlayerLeashEntityEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Leash);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(PotionSplashEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Splash);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(ProjectileLaunchEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Combat_Ranged);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(ProjectileHitEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Combat_Ranged);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(SheepDyeWoolEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Dye);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(SheepRegrowWoolEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Regrow);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(SlimeSplitEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, SlimeSplit);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(SpawnerSpawnEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Spawn);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(StriderTemperatureChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, TemperatureChange);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(VillagerAcquireTradeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Villager_Acquire);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(VillagerCareerChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Villager_Career);}
+    @EventHandler(priority = EventPriority.HIGHEST) public void dispatch(VillagerReplenishTradeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Villager_Replenish);}
     //endregion
 
     private void dispatchEvent(Cancellable cancellable, UUID playerId, Vector.N3 location, Flag... flagChain) {

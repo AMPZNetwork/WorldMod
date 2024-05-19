@@ -2,6 +2,7 @@ package com.ampznetwork.worldmod.api.model.region;
 
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
+import com.ampznetwork.worldmod.api.model.mini.PointCollider;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.mini.PropagationController;
 import com.ampznetwork.worldmod.api.model.mini.ShapeCollider;

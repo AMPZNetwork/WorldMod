@@ -1,6 +1,6 @@
 package com.ampznetwork.worldmod.api.model.sel;
 
-import com.ampznetwork.worldmod.api.model.region.PointCollider;
+import com.ampznetwork.worldmod.api.model.mini.PointCollider;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.comroid.api.data.Vector;

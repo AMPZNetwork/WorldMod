@@ -1,4 +1,4 @@
-package com.ampznetwork.worldmod.api.model.region;
+package com.ampznetwork.worldmod.api.model.mini;
 
 import org.comroid.api.data.Vector;
 

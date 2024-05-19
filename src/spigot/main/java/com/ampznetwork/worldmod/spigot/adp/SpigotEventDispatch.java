@@ -5,6 +5,7 @@ import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.spigot.WorldMod$Spigot;
 import lombok.Value;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -107,7 +108,10 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void dispatch(BlockIgniteEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, Fire);
+        var player = event.getPlayer();
+        if (player == null)
+            return;
+        dispatchEvent(event, player.getUniqueId(), location, Fire);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

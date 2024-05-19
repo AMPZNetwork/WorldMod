@@ -1,5 +1,6 @@
-package com.ampznetwork.worldmod.api;
+package com.ampznetwork.worldmod.core;
 
+import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.impl.BasicArea;

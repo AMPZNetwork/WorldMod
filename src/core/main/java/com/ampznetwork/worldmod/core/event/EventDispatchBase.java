@@ -1,4 +1,4 @@
-package com.ampznetwork.worldmod.api.event;
+package com.ampznetwork.worldmod.core.event;
 
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;

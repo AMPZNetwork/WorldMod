@@ -1,0 +1,57 @@
+plugins {
+    id 'java-library'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+ext {
+    artifactName = 'worldmod-core'
+    projectDescription = 'Minecraft World Protection Mod'
+    userbase = 'AMPZNetwork'
+}
+
+group = 'com.ampznetwork.worldmod'
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+sourceSets {
+    main.java.srcDirs = files(parent.projectDir.toString() + "/src/core/main/java")
+    main.resources.srcDirs = files(parent.projectDir.toString() + "/src/core/main/resources")
+    test.java.srcDirs = files(parent.projectDir.toString() + "/src/core/test/java")
+    test.resources.srcDirs = files(parent.projectDir.toString() + "/src/core/test/java")
+}
+
+apply from: "$rootDir/gradle/publishing.gradle"
+
+repositories {
+    maven { url 'https://maven.comroid.org' }
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    // worldmod api
+    api project(':api')
+
+    // database
+    implementation 'org.hibernate:hibernate-core:5.6.0.Final'
+    implementation 'org.hibernate:hibernate-entitymanager:5.6.0.Final'
+    implementation 'javax.persistence:javax.persistence-api:2.2'
+    runtimeOnly 'com.mysql:mysql-connector-j:8.4.0'
+    runtimeOnly 'com.h2database:h2:2.2.224'
+
+    // logger
+    compileOnly 'org.apache.logging.log4j:log4j-core:2.+'
+
+    // utility
+    compileOnly 'org.projectlombok:lombok:+'
+    annotationProcessor 'org.projectlombok:lombok:+'
+}
+
+task simplifyArtifact(type: Copy) {
+    // api module should be slim, and only contain worldmod's own api
+    dependsOn test, jar
+    from jar.outputs.files.singleFile
+    into "$rootDir/build/libs/"
+    rename { n -> "WorldMod-api.jar" }
+}

@@ -1,7 +1,7 @@
 package com.ampznetwork.worldmod.spigot.adp;
 
-import com.ampznetwork.worldmod.api.event.EventDispatchBase;
 import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import com.ampznetwork.worldmod.spigot.WorldMod$Spigot;
 import lombok.Value;
 import org.bukkit.Location;

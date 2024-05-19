@@ -1,10 +1,10 @@
 package com.ampznetwork.worldmod.spigot;
 
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.api.WorldModCommands;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
+import com.ampznetwork.worldmod.core.WorldModCommands;
 import com.ampznetwork.worldmod.spigot.adp.SpigotEventDispatch;
 import com.ampznetwork.worldmod.spigot.adp.SpigotPlayerAdapter;
 import lombok.Getter;

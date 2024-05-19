@@ -79,7 +79,7 @@ dependencies {
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
 	// worldmod api
-	implementation project(':api') // todo: include as shadowjar
+	implementation project(':core') // todo: include as shadowjar
 }
 
 processResources {

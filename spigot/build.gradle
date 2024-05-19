@@ -69,7 +69,7 @@ dependencies {
     implementation 'org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT'
 
     // worldmod api
-    implementation project(':api')
+    implementation project(':core')
 
     // rabbit
     runtimeOnly 'com.rabbitmq:amqp-client:5.+'

@@ -20,6 +20,7 @@ plugins {
 rootProject.name = 'WorldMod'
 
 include('api')
+include('core')
 
 include('spigot')
 include('forge')

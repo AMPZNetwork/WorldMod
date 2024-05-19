@@ -68,6 +68,7 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
                              @NotNull String[] args) {
         try {
             cmdr.execute(command.getName() + ' ' + String.join(" ", args),
+                    this,
                     sender,
                     command,
                     sender instanceof Player plr ? plr.getUniqueId() : null);

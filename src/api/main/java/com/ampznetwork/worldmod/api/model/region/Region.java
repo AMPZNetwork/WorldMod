@@ -34,9 +34,9 @@ public class Region implements PropagationController, ShapeCollider, Prioritized
     @Default String worldName = "world";
     @Default long priority = 0;
     @Singular Set<Area> areas;
-    @Singular Set<UUID> ownerIDs;
-    @Singular Set<UUID> memberIDs;
-    @Singular Set<Flag.Value> declaredFlags;
+    @Singular("owner") Set<UUID> ownerIDs;
+    @Singular("member") Set<UUID> memberIDs;
+    @Singular("flag") Set<Flag.Value> declaredFlags;
 
     public static Region global(String worldName) {
         return GlobalRegions.computeIfAbsent(worldName,

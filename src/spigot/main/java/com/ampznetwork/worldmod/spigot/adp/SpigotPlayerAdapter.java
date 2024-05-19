@@ -29,4 +29,9 @@ public class SpigotPlayerAdapter implements PlayerAdapter {
         var location = player.getLocation();
         return new Vector.N3(location.getX(), location.getY(), location.getZ());
     }
+
+    @Override
+    public String getWorldName(UUID playerId) {
+        return worldMod.getServer().getPlayer(playerId).getWorld().getName();
+    }
 }

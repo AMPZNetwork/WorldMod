@@ -11,11 +11,19 @@ public interface WorldMod {
     String AddonName = "WorldMod";
 
     Collection<Region> getRegions();
+
     Collection<? extends Group> getGroups();
 
     PlayerAdapter getPlayerAdapter();
 
+    default boolean addRegion(Region region) {
+        var regions = getRegions();
+        regions.add(region);
+        return regions.contains(region);
+    }
+
     interface Permission {
         String Selection = "worldmod.area.selection";
+        String Claiming = "worldmod.area.claim";
     }
 }

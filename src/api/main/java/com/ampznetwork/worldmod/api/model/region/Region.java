@@ -25,7 +25,7 @@ import static java.lang.Long.MIN_VALUE;
 import static java.util.stream.Stream.concat;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class Region implements PropagationController, ShapeCollider, Prioritized, Named, PointCollider {
     private static final Map<String, Region> GlobalRegions = new ConcurrentHashMap<>();
     public static String GlobalRegionName = "#global";

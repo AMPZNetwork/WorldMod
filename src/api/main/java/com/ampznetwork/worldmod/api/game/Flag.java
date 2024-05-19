@@ -53,7 +53,7 @@ public class Flag implements Named, Described, Prioritized {
     public static final Flag Chat_Send = new Flag(Chat, "send", 40, BOOLEAN, "", "", false);
     public static final Flag Chat_Command = new Flag(Chat, "command", 40, BOOLEAN, "", "", false);
     public static final Flag Move = new Flag("move", 20, BOOLEAN, "", "", false);
-    public static final Flag Teleport = new Flag("move", 20, BOOLEAN, "", "", false);
+    public static final Flag Teleport = new Flag("teleport", 20, BOOLEAN, "", "", false);
     public static final Flag Join = new Flag("join", 20, BOOLEAN, "", "", false);
     public static final Flag Respawn = new Flag("respawn", 20, BOOLEAN, "", "", false);
     public static final Flag Sleep = new Flag("sleep", 20, BOOLEAN, "", "", false);

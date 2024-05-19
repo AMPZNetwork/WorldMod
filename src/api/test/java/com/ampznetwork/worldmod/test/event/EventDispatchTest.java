@@ -43,28 +43,28 @@ public class EventDispatchTest {
                         new Vector.N3(0, 0, 0),
                         new Vector.N3(16, 0, 16)
                 )))
+                .owner(PlayerOwner)
+                .member(PlayerMember)
+                .declaredFlags(List.of(
+                        Value.builder()
+                                .flag(Build)
+                                .state(TriState.TRUE)
+                                .force(true)
+                                .selectors(Set.of(Tellraw.Selector.builder()
+                                        .base(Tellraw.Selector.Base.NEAREST_PLAYER)
+                                        .type("owner")
+                                        .build()))
+                                .build(),
+                        Value.builder()
+                                .flag(Build)
+                                .state(TriState.TRUE)
+                                .selectors(Set.of(Tellraw.Selector.builder()
+                                        .base(Tellraw.Selector.Base.NEAREST_PLAYER)
+                                        .type("member")
+                                        .build()))
+                                .build()
+                ))
                 .build();
-        Region.getOwnerIDs().add(PlayerOwner);
-        Region.getMemberIDs().add(PlayerMember);
-        Region.getDeclaredFlags().addAll(List.of(
-                Value.builder()
-                        .flag(Build)
-                        .state(TriState.TRUE)
-                        .force(true)
-                        .selectors(Set.of(Tellraw.Selector.builder()
-                                .base(Tellraw.Selector.Base.NEAREST_PLAYER)
-                                .type("owner")
-                                .build()))
-                        .build(),
-                Value.builder()
-                        .flag(Build)
-                        .state(TriState.TRUE)
-                        .selectors(Set.of(Tellraw.Selector.builder()
-                                .base(Tellraw.Selector.Base.NEAREST_PLAYER)
-                                .type("member")
-                                .build()))
-                        .build()
-        ));
     }
 
     @Before

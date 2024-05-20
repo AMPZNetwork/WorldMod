@@ -5,6 +5,9 @@
     <option name="PROGRAM_PARAMETERS" value="nogui" />
     <option name="WORKING_DIRECTORY" value="\dev\minecraft\WorldMod\spigot\run\" />
     <option name="ALTERNATIVE_JRE_PATH" />
+    <envs>
+      <env name="DEBUG" value="true" />
+    </envs>
     <method v="2">
       <option name="Gradle.BeforeRunTask" enabled="false" tasks=":spigot:testPlugin" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />
     </method>

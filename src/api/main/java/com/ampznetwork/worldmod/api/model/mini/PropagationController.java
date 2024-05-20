@@ -13,15 +13,15 @@ import static com.ampznetwork.worldmod.api.model.mini.PlayerRelation.*;
 import static net.kyori.adventure.util.TriState.*;
 
 public interface PropagationController extends OwnedByParty, FlagContainer, Named {
-    default Flag.Value getEffectiveFlagValueForPlayer(Flag flag, UUID playerId) {
+    default Flag.Usage getEffectiveFlagValueForPlayer(Flag flag, UUID playerId) {
         var values = getFlagValues(flag).toList();
-        var builder = Flag.Value.builder().flag(flag).state(NOT_SET);
+        var builder = Flag.Usage.builder().flag(flag).state(NOT_SET);
         if (values.isEmpty())
             return builder.build();
         var me = getOwnerIDs().contains(playerId) ? OWNER
                 : getMemberIDs().contains(playerId) ? MEMBER
                 : GUEST;
-        var explicit = new Flag.Value[4]; // indices: see PlayerRelation#ordinal()
+        var explicit = new Flag.Usage[4]; // indices: see PlayerRelation#ordinal()
         var mask = 0;
 
         // scan all values for explicit states

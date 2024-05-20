@@ -3,7 +3,7 @@ package com.ampznetwork.worldmod.core;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.region.Region;
-import com.ampznetwork.worldmod.impl.BasicArea;
+import com.ampznetwork.worldmod.api.model.sel.Area;
 import lombok.Value;
 import org.comroid.annotations.Alias;
 import org.comroid.api.func.util.Command;
@@ -16,10 +16,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Value
 public class WorldModCommands {
     WorldMod worldMod;
-    Map<UUID, BasicArea.Builder> selections = new ConcurrentHashMap<>();
+    Map<UUID, Area.Builder> selections = new ConcurrentHashMap<>();
 
-    private BasicArea.Builder sel(UUID playerId) {
-        return selections.computeIfAbsent(playerId, $ -> new BasicArea.Builder());
+    private Area.Builder sel(UUID playerId) {
+        return selections.computeIfAbsent(playerId, $ -> new Area.Builder());
     }
 
     @Alias("sel")
@@ -52,7 +52,7 @@ public class WorldModCommands {
         var rg = Region.builder()
                 .area(sel)
                 .worldName(world)
-                .owner(playerId);
+                .claimOwner(playerId);
         if (!worldMod.addRegion(rg.build()))
             throw new Command.Error("Could not create claim");
         return "Area claimed!";

@@ -1,13 +1,15 @@
 package com.ampznetwork.worldmod.test.event;
 
 import com.ampznetwork.worldmod.api.WorldMod;
+import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.internal.EntityService;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.core.event.EventDispatchBase;
-import com.ampznetwork.worldmod.impl.BasicArea;
+import com.ampznetwork.worldmod.api.model.sel.Area;
 import lombok.Data;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
@@ -21,7 +23,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.ampznetwork.worldmod.api.game.Flag.Build;
-import static com.ampznetwork.worldmod.api.game.Flag.Value;
+
 import static org.junit.Assert.assertEquals;
 
 public class EventDispatchTest {
@@ -39,14 +41,14 @@ public class EventDispatchTest {
         LocationOutside = new Vector.N3(-1, 0, -1);
         Region = com.ampznetwork.worldmod.api.model.region.Region.builder()
                 .name("testregion")
-                .area(new BasicArea(Shape.Cuboid, List.of(
+                .area(new Area(Shape.Cuboid, List.of(
                         new Vector.N3(0, 0, 0),
                         new Vector.N3(16, 0, 16)
                 )))
                 .owner(PlayerOwner)
                 .member(PlayerMember)
                 .declaredFlags(List.of(
-                        Value.builder()
+                        Flag.Usage.builder()
                                 .flag(Build)
                                 .state(TriState.TRUE)
                                 .force(true)
@@ -55,7 +57,7 @@ public class EventDispatchTest {
                                         .type("owner")
                                         .build()))
                                 .build(),
-                        Value.builder()
+                        Flag.Usage.builder()
                                 .flag(Build)
                                 .state(TriState.TRUE)
                                 .selectors(Set.of(Tellraw.Selector.builder()
@@ -78,6 +80,11 @@ public class EventDispatchTest {
             @Override
             public Collection<? extends Group> getGroups() {
                 return List.of();
+            }
+
+            @Override
+            public EntityService getEntityService() {
+                return null;
             }
 
             @Override

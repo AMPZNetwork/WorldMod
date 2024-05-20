@@ -23,7 +23,7 @@ include('api')
 include('core')
 
 include('spigot')
-include('forge')
+//include('forge')
 include('fabric')
 
 var dirApi = file('../../java/japi/')

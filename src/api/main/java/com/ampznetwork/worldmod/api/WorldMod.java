@@ -1,5 +1,6 @@
 package com.ampznetwork.worldmod.api;
 
+import com.ampznetwork.worldmod.api.internal.EntityService;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
@@ -14,6 +15,7 @@ public interface WorldMod {
 
     Collection<? extends Group> getGroups();
 
+    EntityService getEntityService();
     PlayerAdapter getPlayerAdapter();
 
     default boolean addRegion(Region region) {

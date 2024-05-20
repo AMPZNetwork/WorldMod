@@ -1,14 +1,7 @@
-mcsd:
-  # base url of the mcsd hub instance you want to use
-  # default requires registration
-  # set to "null" to run without hub
-  hubBaseUrl: https://mc.comroid.org
-  # uri for rabbitmq connection
-  # default uses comroid mcsd hub; see mcsd.hubBaseUrl for reference
-  rabbitMqUri: amqp://anonymous:anonymous@rabbitmq.comroid.org:5672/mcsd
-  # logging level for console module
-  # changing this finer than INFO (e.g. WARN, ERROR or FATAL) affects how other mcsd modules work
-  consoleLevel: INFO
-  # server configuration
-  server:
-    id: <server id here>
+worldmod:
+  database:
+    type: h2 # h2 or MySQL
+    url: jdbc:h2:mem:db
+    username: sa
+    password:
+  entity_service: SpringHibernate # SpringHibernate or (wip) File

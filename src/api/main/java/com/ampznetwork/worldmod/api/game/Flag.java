@@ -2,11 +2,9 @@ package com.ampznetwork.worldmod.api.game;
 
 import com.ampznetwork.worldmod.api.model.mini.OwnedByParty;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
-import lombok.Builder;
-import lombok.Builder.Default;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Value;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.AttributeConverter;
+import lombok.*;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.attr.Described;
 import org.comroid.api.attr.Named;
@@ -165,21 +163,21 @@ public class Flag implements Named, Described, Prioritized {
     @Data
     @Builder
     @EqualsAndHashCode
-    public static class Value implements Prioritized {
+    public static class Usage implements Prioritized {
         @NotNull Flag flag;
         @NotNull TriState state;
-        @Default
+        @lombok.Builder.Default
         @Nullable String value = null;
-        @Default @Deprecated
-        long target = Bitmask.combine(Value.Target.Guests, Value.Target.Members);
-        @Default
+        @lombok.Builder.Default
+        @Deprecated long target = Bitmask.combine(Usage.Target.Guests, Usage.Target.Members);
+        @lombok.Builder.Default
         Set<Tellraw.Selector> selectors = Set.of(Tellraw.Selector.builder()
                 .base(Tellraw.Selector.Base.NEAREST_PLAYER)
                 .type("guest")
                 .build());
-        @Default
+        @lombok.Builder.Default
         boolean force = false;
-        @Default
+        @lombok.Builder.Default
         long priority = 0;
 
         public long getPriority() {
@@ -191,16 +189,32 @@ public class Flag implements Named, Described, Prioritized {
             var owner = target.getOwnerIDs().contains(playerId);
             var member = target.getMemberIDs().contains(playerId);
             var mask = this.target;
-            return owner ? Value.Target.Owners.isFlagSet(mask)
-                    : member ? Value.Target.Members.isFlagSet(mask)
-                    : Value.Target.Guests.isFlagSet(mask);
+            return owner ? Usage.Target.Owners.isFlagSet(mask)
+                    : member ? Usage.Target.Members.isFlagSet(mask)
+                    : Usage.Target.Guests.isFlagSet(mask);
         }
 
         @Deprecated
-        public enum Target implements Named, Bitmask.Attribute<Target> {
+        public enum Target implements Named, Bitmask.Attribute<Usage.Target> {
             Guests,
             Members,
             Owners
+        }
+
+        @Value
+        @jakarta.persistence.Converter(autoApply = true)
+        public static class Converter implements AttributeConverter<Usage, String> {
+            @Override
+            @SneakyThrows
+            public String convertToDatabaseColumn(Usage attribute) {
+                return new ObjectMapper().writeValueAsString(attribute);
+            }
+
+            @Override
+            @SneakyThrows
+            public Usage convertToEntityAttribute(String dbData) {
+                return new ObjectMapper().readValue(dbData, Usage.class);
+            }
         }
     }
 }

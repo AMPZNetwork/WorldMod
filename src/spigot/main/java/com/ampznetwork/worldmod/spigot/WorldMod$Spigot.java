@@ -1,10 +1,13 @@
 package com.ampznetwork.worldmod.spigot;
 
 import com.ampznetwork.worldmod.api.WorldMod;
+import com.ampznetwork.worldmod.api.internal.EntityService;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.core.WorldModCommands;
+import com.ampznetwork.worldmod.core.database.file.LocalEntityService;
+import com.ampznetwork.worldmod.core.database.spring.SpringEntityService;
 import com.ampznetwork.worldmod.spigot.adp.SpigotEventDispatch;
 import com.ampznetwork.worldmod.spigot.adp.SpigotPlayerAdapter;
 import lombok.Getter;
@@ -31,11 +34,26 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
     private final Collection<Region> regions = new HashSet<>();
     private final Collection<Group> groups = new HashSet<>();
     private FileConfiguration config;
+    private EntityService entityService;
     private Command.Manager cmdr;
 
     @Override
     public void onLoad() {
-        this.config = getConfig();
+        this.config = super.getConfig();
+
+        var dbImpl = config.getString("worldmod.entity-service", "spring");
+        this.entityService = switch (dbImpl.toLowerCase()) {
+            case "spring", "springhibernate", "database" -> {
+                var dbType = EntityService.DatabaseType.valueOf(config.getString("worldmod.database.type", "h2"));
+                var dbUrl = config.getString("worldmod.database.url", "jdbc:h2:mem:db");
+                var dbUser = config.getString("worldmod.database.username", "sa");
+                var dbPass = config.getString("worldmod.database.password", "");
+                yield SpringEntityService.init(this, dbType, dbUrl, dbUser, dbPass);
+            }
+            case "file", "local" -> new LocalEntityService(this);
+            default -> throw new IllegalStateException("Unexpected value: " + dbImpl.toLowerCase());
+        };
+
         this.cmdr = new Command.Manager();
         cmdr.new Adapter$Spigot(this);
         cmdr.register(new WorldModCommands(this));

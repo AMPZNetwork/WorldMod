@@ -6,11 +6,11 @@ import com.ampznetwork.worldmod.api.model.mini.RegionCompositeKey;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.zaxxer.hikari.HikariDataSource;
+import jakarta.persistence.EntityManager;
 import org.comroid.api.data.Vector;
 import org.comroid.api.info.Constraint;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 
-import javax.persistence.EntityManager;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,8 +42,9 @@ public class HibernateEntityService implements EntityService {
             setPassword(pass);
         }};
         var unit = new WorldModPersistenceUnit(dataSource);
-        var factory = provider.createContainerEntityManagerFactory(unit, config);
-        this.manager = factory.createEntityManager();
+        try (var factory = provider.createContainerEntityManagerFactory(unit, config)) {
+            this.manager = factory.createEntityManager();
+        }
     }
 
     @Override

@@ -48,8 +48,8 @@ public class Region implements PropagationController, ShapeCollider, Prioritized
                         .worldName(worldName)
                         .priority(Long.MIN_VALUE)
                         .area(new Area(Shape.Cuboid, List.of(
-                                new Vector.N3(MIN_VALUE, MIN_VALUE, MIN_VALUE),
-                                new Vector.N3(MAX_VALUE, MAX_VALUE, MAX_VALUE)
+                                new Vector.N4(MIN_VALUE, MIN_VALUE, MIN_VALUE, MIN_VALUE),
+                                new Vector.N4(MAX_VALUE, MAX_VALUE, MAX_VALUE, MAX_VALUE)
                         )))
                         .build());
     }

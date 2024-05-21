@@ -1,15 +1,15 @@
 package com.ampznetwork.worldmod.test.event;
 
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.database.EntityService;
+import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
-import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import com.ampznetwork.worldmod.api.model.sel.Area;
+import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import lombok.Data;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.ampznetwork.worldmod.api.game.Flag.Build;
-
 import static org.junit.Assert.assertEquals;
 
 public class EventDispatchTest {
@@ -42,8 +41,8 @@ public class EventDispatchTest {
         Region = com.ampznetwork.worldmod.api.model.region.Region.builder()
                 .name("testregion")
                 .area(new Area(Shape.Cuboid, List.of(
-                        new Vector.N3(0, 0, 0),
-                        new Vector.N3(16, 0, 16)
+                        new Vector.N4(0, 0, 0, 0),
+                        new Vector.N4(16, 0, 16, 0)
                 )))
                 .owner(PlayerOwner)
                 .member(PlayerMember)

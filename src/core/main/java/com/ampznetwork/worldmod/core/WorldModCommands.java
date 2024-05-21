@@ -37,7 +37,7 @@ public class WorldModCommands {
     @Command(permission = WorldMod.Permission.Selection, ephemeral = true)
     public String position(UUID playerId, @Command.Arg int index) {
         var pos = worldMod.getPlayerAdapter().getPosition(playerId);
-        sel(playerId).getSpatialAnchors().set(index, pos);
+        sel(playerId).getSpatialAnchors().set(index, pos.to4(0));
         return "Set position " + index;
     }
 

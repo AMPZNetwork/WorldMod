@@ -4,7 +4,6 @@ import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.ShapeCollider;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
 import lombok.*;
 import org.comroid.api.data.Vector;
 
@@ -15,14 +14,14 @@ import java.util.stream.Stream;
 
 @Data
 @AllArgsConstructor
-public class Area implements ShapeCollider {
+public final class Area implements ShapeCollider {
     private final Shape shape;
-    private final List<Vector> spatialAnchors;
+    private final List<Vector.N4> spatialAnchors;
 
-    public Vector[] getSpatialAnchors() {
+    public Vector.N4[] getSpatialAnchors() {
         return spatialAnchors.stream()
                 .filter(Objects::nonNull)
-                .toArray(Vector[]::new);
+                .toArray(Vector.N4[]::new);
     }
 
     @Override
@@ -40,7 +39,7 @@ public class Area implements ShapeCollider {
     @AllArgsConstructor
     public static final class Builder implements org.comroid.api.func.ext.Builder<Area> {
         private Shape shape = Shape.Cuboid;
-        private List<Vector> spatialAnchors = new ArrayList<>() {{
+        private List<Vector.N4> spatialAnchors = new ArrayList<>() {{
             for(int i=0;i<8;i++)add(null);
         }};
 

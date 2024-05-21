@@ -1,7 +1,8 @@
 package com.ampznetwork.worldmod.core.database.file;
 
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.api.internal.EntityService;
+import com.ampznetwork.worldmod.api.database.EntityService;
+import com.ampznetwork.worldmod.api.model.mini.RegionCompositeKey;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Value;
@@ -18,18 +19,13 @@ public class LocalEntityService implements EntityService {
     // todo
 
     @Override
-    public Optional<Region> findRegion(String name, String worldName) {
+    public Optional<Region> findRegion(RegionCompositeKey key) {
         return Optional.empty();
     }
 
     @Override
     public Optional<Region> findRegion(Vector.N3 location, String worldName) {
         return Optional.empty();
-    }
-
-    @Override
-    public Stream<Region> findRegions(UUID participantId) {
-        return null;
     }
 
     @Override
@@ -40,5 +36,15 @@ public class LocalEntityService implements EntityService {
     @Override
     public Optional<Group> findGroup(String name) {
         return Optional.empty();
+    }
+
+    @Override
+    public <T> T save(T it) {
+        return null;
+    }
+
+    @Override
+    public <T> T refresh(T it) {
+        return null;
     }
 }

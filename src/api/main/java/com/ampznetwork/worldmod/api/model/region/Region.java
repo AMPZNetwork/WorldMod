@@ -2,12 +2,9 @@ package com.ampznetwork.worldmod.api.model.region;
 
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
-import com.ampznetwork.worldmod.api.model.mini.PointCollider;
-import com.ampznetwork.worldmod.api.model.mini.Prioritized;
-import com.ampznetwork.worldmod.api.model.mini.PropagationController;
-import com.ampznetwork.worldmod.api.model.mini.ShapeCollider;
-import com.ampznetwork.worldmod.api.model.sel.Chunk;
+import com.ampznetwork.worldmod.api.model.mini.*;
 import com.ampznetwork.worldmod.api.model.sel.Area;
+import com.ampznetwork.worldmod.api.model.sel.Chunk;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.Builder.Default;
@@ -30,6 +27,7 @@ import static java.util.stream.Stream.concat;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @NoArgsConstructor(force = true)
+@IdClass(RegionCompositeKey.class)
 public class Region implements PropagationController, ShapeCollider, Prioritized, Named, PointCollider {
     private static final Map<String, Region> GlobalRegions = new ConcurrentHashMap<>();
     public static String GlobalRegionName = "#global";

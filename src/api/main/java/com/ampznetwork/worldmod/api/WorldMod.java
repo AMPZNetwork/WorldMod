@@ -1,6 +1,6 @@
 package com.ampznetwork.worldmod.api;
 
-import com.ampznetwork.worldmod.api.internal.EntityService;
+import com.ampznetwork.worldmod.api.database.EntityService;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;

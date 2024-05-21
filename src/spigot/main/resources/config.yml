@@ -1,7 +1,7 @@
 worldmod:
   database:
     type: h2 # h2 or MySQL
-    url: jdbc:h2:mem:db
+    url: jdbc:h2:mem:db # default is a local h2 database
     username: sa
     password:
-  entity_service: SpringHibernate # SpringHibernate or (wip) File
+  entity_service: database # database or file

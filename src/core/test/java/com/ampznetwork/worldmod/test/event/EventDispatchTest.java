@@ -2,7 +2,7 @@ package com.ampznetwork.worldmod.test.event;
 
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
-import com.ampznetwork.worldmod.api.internal.EntityService;
+import com.ampznetwork.worldmod.api.database.EntityService;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;

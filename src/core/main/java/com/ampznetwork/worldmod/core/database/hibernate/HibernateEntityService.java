@@ -9,6 +9,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManager;
 import org.comroid.api.data.Vector;
 import org.comroid.api.info.Constraint;
+import org.comroid.api.tree.Container;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 
 import java.util.Map;
@@ -18,7 +19,7 @@ import java.util.stream.Stream;
 
 import static org.comroid.api.func.util.Debug.isDebug;
 
-public class HibernateEntityService implements EntityService {
+public class HibernateEntityService extends Container.Base implements EntityService {
     private final WorldMod worldMod;
     private final EntityManager manager;
 
@@ -42,9 +43,10 @@ public class HibernateEntityService implements EntityService {
             setPassword(pass);
         }};
         var unit = new WorldModPersistenceUnit(dataSource);
-        try (var factory = provider.createContainerEntityManagerFactory(unit, config)) {
-            this.manager = factory.createEntityManager();
-        }
+        var factory = provider.createContainerEntityManagerFactory(unit, config);
+        this.manager = factory.createEntityManager();
+
+        addChildren(dataSource, factory, manager);
     }
 
     @Override

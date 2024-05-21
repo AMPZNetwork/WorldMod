@@ -31,8 +31,8 @@ public enum Shape {
             final var a = spatialAnchors[A];
             final var b = spatialAnchors[B];
 
-            Constraint.equals(a.n(), 3, "Vector A Dimension").run();
-            Constraint.equals(b.n(), 3, "Vector B Dimension").run();
+            //Constraint.equals(a.n(), 3, "Vector A Dimension").run();
+            //Constraint.equals(b.n(), 3, "Vector B Dimension").run();
 
             // AABB (Axis-Aligned Bounding Box) check
             for (int n = 0; n < 3; n++)

@@ -11,6 +11,7 @@ import com.ampznetwork.worldmod.core.database.hibernate.HibernateEntityService;
 import com.ampznetwork.worldmod.spigot.adp.SpigotEventDispatch;
 import com.ampznetwork.worldmod.spigot.adp.SpigotPlayerAdapter;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -44,6 +45,16 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
             saveDefaultConfig();
         this.config = super.getConfig();
 
+        this.cmdr = new Command.Manager();
+        cmdr.new Adapter$Spigot(this);
+        cmdr.register(new WorldModCommands(this));
+        cmdr.register(this);
+        cmdr.initialize();
+    }
+
+    @Override
+    @SneakyThrows
+    public void onEnable() {
         var dbImpl = config.getString("worldmod.entity-service", "database");
         var dbType = EntityService.DatabaseType.valueOf(config.getString("worldmod.database.type", "h2"));
         var dbUrl = config.getString("worldmod.database.url", "jdbc:h2:file:./worldmod.h2");
@@ -55,16 +66,13 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
             default -> throw new IllegalStateException("Unexpected value: " + dbImpl.toLowerCase());
         };
 
-        this.cmdr = new Command.Manager();
-        cmdr.new Adapter$Spigot(this);
-        cmdr.register(new WorldModCommands(this));
-        cmdr.register(this);
-        cmdr.initialize();
+        getPluginManager().registerEvents(eventDispatch, this);
     }
 
     @Override
-    public void onEnable() {
-        getPluginManager().registerEvents(eventDispatch, this);
+    @SneakyThrows
+    public void onDisable() {
+        this.entityService.terminate();
     }
 
     @Nullable

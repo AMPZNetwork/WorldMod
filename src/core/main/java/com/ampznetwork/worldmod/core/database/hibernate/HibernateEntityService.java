@@ -7,7 +7,9 @@ import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.comroid.api.data.Vector;
+import org.comroid.api.func.util.Command;
 import org.comroid.api.info.Constraint;
 import org.comroid.api.tree.Container;
 import org.hibernate.jpa.HibernatePersistenceProvider;
@@ -19,6 +21,7 @@ import java.util.stream.Stream;
 
 import static org.comroid.api.func.util.Debug.isDebug;
 
+@Slf4j
 public class HibernateEntityService extends Container.Base implements EntityService {
     private final WorldMod worldMod;
     private final EntityManager manager;
@@ -74,8 +77,19 @@ public class HibernateEntityService extends Container.Base implements EntityServ
     @Override
     public <T> T save(T it) {
         Constraint.notNull(it, "entity");
-        manager.persist(it);
-        manager.flush();
+        var transaction = manager.getTransaction();
+        synchronized (transaction) {
+            try {
+                transaction.begin();
+                manager.persist(it);
+                manager.flush();
+                transaction.commit();
+            } catch (Throwable t) {
+                transaction.rollback();
+                log.warn("Could not save entity " + it, t);
+                throw new Command.Error("Could not save " + it + ": "+t);
+            }
+        }
         return it;
     }
 

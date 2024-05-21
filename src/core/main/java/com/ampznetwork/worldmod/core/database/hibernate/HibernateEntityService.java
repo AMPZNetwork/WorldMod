@@ -14,6 +14,7 @@ import org.comroid.api.info.Constraint;
 import org.comroid.api.tree.Container;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -75,22 +76,22 @@ public class HibernateEntityService extends Container.Base implements EntityServ
     }
 
     @Override
-    public <T> T save(T it) {
-        Constraint.notNull(it, "entity");
+    public boolean save(Object... entities) {
         var transaction = manager.getTransaction();
         synchronized (transaction) {
             try {
                 transaction.begin();
-                manager.persist(it);
+                for (Object each : entities)
+                    manager.persist(each);
                 manager.flush();
                 transaction.commit();
             } catch (Throwable t) {
                 transaction.rollback();
-                log.warn("Could not save entity " + it, t);
-                throw new Command.Error("Could not save " + it + ": "+t);
+                log.warn("Could not save all entities\n\tEntities: "+ Arrays.toString(entities), t);
+                return false;
             }
         }
-        return it;
+        return true;
     }
 
     @Override

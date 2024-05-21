@@ -39,8 +39,8 @@ public class LocalEntityService implements EntityService {
     }
 
     @Override
-    public <T> T save(T it) {
-        return null;
+    public boolean save(Object... entities) {
+        return false;
     }
 
     @Override

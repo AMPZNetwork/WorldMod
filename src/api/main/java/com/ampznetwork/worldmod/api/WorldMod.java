@@ -19,10 +19,8 @@ public interface WorldMod {
     PlayerAdapter getPlayerAdapter();
 
     default boolean addRegion(Region region) {
-        var regions = getRegions();
-        regions.add(region);
-        getEntityService().save(region);
-        return regions.contains(region);
+        getRegions().add(region);
+        return getEntityService().save(region);
     }
 
     interface Permission {

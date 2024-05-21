@@ -29,10 +29,9 @@ public interface EntityService extends LifeCycle {
 
     Optional<Group> findGroup(String name);
 
-    @Contract("!null->param1")
-    <T> T save(T it);
+    boolean save(Object... it);
 
-    @Contract("!null->param1")
+    @Contract("!null -> param1")
     <T> T refresh(T it);
 
     @Getter

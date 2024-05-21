@@ -2,6 +2,9 @@ package com.ampznetwork.worldmod.core.database.spring;
 
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.internal.EntityService;
+import com.ampznetwork.worldmod.api.model.region.Group;
+import com.ampznetwork.worldmod.api.model.region.Region;
+import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Debug;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -16,6 +19,9 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import javax.sql.DataSource;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 @SpringBootApplication
 @EnableJpaRepositories
@@ -56,5 +62,32 @@ public class SpringEntityService implements EntityService {
                 .username(dbUsername)
                 .password(dbPassword)
                 .build();
+    }
+
+    // todo
+
+    @Override
+    public Optional<Region> findRegion(String name, String worldName) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Region> findRegion(Vector.N3 location, String worldName) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Stream<Region> findRegions(UUID participantId) {
+        return null;
+    }
+
+    @Override
+    public Stream<Region> findClaims(UUID claimOwnerId) {
+        return null;
+    }
+
+    @Override
+    public Optional<Group> findGroup(String name) {
+        return Optional.empty();
     }
 }

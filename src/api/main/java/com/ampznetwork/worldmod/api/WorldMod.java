@@ -21,6 +21,7 @@ public interface WorldMod {
     default boolean addRegion(Region region) {
         var regions = getRegions();
         regions.add(region);
+        getEntityService().save(region);
         return regions.contains(region);
     }
 

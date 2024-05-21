@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import static org.bukkit.Bukkit.getPluginManager;
+import static org.comroid.api.func.util.Debug.isDebug;
 
 @Getter
 public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
@@ -39,12 +40,13 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
 
     @Override
     public void onLoad() {
-        saveDefaultConfig();
+        if (!isDebug())
+            saveDefaultConfig();
         this.config = super.getConfig();
 
         var dbImpl = config.getString("worldmod.entity-service", "database");
         var dbType = EntityService.DatabaseType.valueOf(config.getString("worldmod.database.type", "h2"));
-        var dbUrl = config.getString("worldmod.database.url", "jdbc:h2:mem:db");
+        var dbUrl = config.getString("worldmod.database.url", "jdbc:h2:file:./worldmod.h2");
         var dbUser = config.getString("worldmod.database.username", "sa");
         var dbPass = config.getString("worldmod.database.password", "");
         this.entityService = switch (dbImpl.toLowerCase()) {

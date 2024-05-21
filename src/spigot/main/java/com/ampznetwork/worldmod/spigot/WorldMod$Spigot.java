@@ -45,9 +45,11 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
             saveDefaultConfig();
         this.config = super.getConfig();
 
+        WorldModCommands.worldMod = this;
+
         this.cmdr = new Command.Manager();
         cmdr.new Adapter$Spigot(this);
-        cmdr.register(new WorldModCommands(this));
+        cmdr.register(WorldModCommands.class);
         cmdr.register(this);
         cmdr.initialize();
     }

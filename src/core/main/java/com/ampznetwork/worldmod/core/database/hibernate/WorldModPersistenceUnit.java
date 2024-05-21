@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 @Value
 public class WorldModPersistenceUnit implements PersistenceUnitInfo {
     HikariDataSource dataSource;
-    URL jarUrl = getClass().getProtectionDomain().getCodeSource().getLocation();
+    URL jarUrl = WorldMod.class.getProtectionDomain().getCodeSource().getLocation();
     List<String> classes = Stream.<Class<?>>of(Region.class, Group.class)
             .map(Class::getCanonicalName)
             .toList();
@@ -58,7 +58,7 @@ public class WorldModPersistenceUnit implements PersistenceUnitInfo {
 
     @Override
     public List<URL> getJarFileUrls() {
-        return List.of(jarUrl);
+        return List.of();
     }
 
     @Override

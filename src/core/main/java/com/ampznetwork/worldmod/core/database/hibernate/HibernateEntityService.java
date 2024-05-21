@@ -30,7 +30,7 @@ public class HibernateEntityService implements EntityService {
                 "hibernate.connection.url", url,
                 "hibernate.connection.username", user,
                 "hibernate.connection.password", pass,
-                //"hibernate.dialect", "org.hibernate.dialect.H2Dialect",
+                "hibernate.dialect", type.getDialect(),
                 "hibernate.hbm2ddl.auto", "update",
                 "hibernate.show_sql", String.valueOf(isDebug())
         );

@@ -39,9 +39,10 @@ public interface EntityService extends LifeCycle {
     @AllArgsConstructor
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
     enum DatabaseType implements Named {
-        h2(org.h2.Driver.class),
-        MySQL(com.mysql.jdbc.Driver.class);
+        h2(org.h2.Driver.class, "org.hibernate.dialect.H2Dialect"),
+        MySQL(com.mysql.jdbc.Driver.class, "org.hibernate.dialect.MySQL57Dialect");
 
         Class<?> driverClass;
+        String dialect;
     }
 }

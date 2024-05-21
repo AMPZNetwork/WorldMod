@@ -38,7 +38,7 @@ public class WorldModPersistenceUnit implements PersistenceUnitInfo {
 
     @Override
     public PersistenceUnitTransactionType getTransactionType() {
-        return PersistenceUnitTransactionType.JTA;
+        return PersistenceUnitTransactionType.RESOURCE_LOCAL;
     }
 
     @Override

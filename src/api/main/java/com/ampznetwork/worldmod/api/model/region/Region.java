@@ -13,7 +13,10 @@ import org.comroid.api.data.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,7 +39,9 @@ public class Region implements PropagationController, ShapeCollider, Prioritized
     @OneToOne @Default @Nullable Group group = null;
     @Default long priority = 0;
     @Default@Nullable UUID claimOwner=null;
-    @ElementCollection(fetch = FetchType.EAGER) @Singular @Convert(converter = Area.Converter.class) Set<Area> areas;
+    @OneToMany
+    @Singular
+    Set<Area> areas;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("owner") Set<UUID> ownerIDs;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("member") Set<UUID> memberIDs;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class) Set<Flag.Usage> declaredFlags;
@@ -47,9 +52,9 @@ public class Region implements PropagationController, ShapeCollider, Prioritized
                         .name(GlobalRegionName)
                         .worldName(worldName)
                         .priority(Long.MIN_VALUE)
-                        .area(new Area(Shape.Cuboid, List.of(
-                                new Vector.N4(MIN_VALUE, MIN_VALUE, MIN_VALUE, MIN_VALUE),
-                                new Vector.N4(MAX_VALUE, MAX_VALUE, MAX_VALUE, MAX_VALUE)
+                        .area(new Area(Shape.Cuboid, Map.of(
+                                1, new Vector.N4(MIN_VALUE, MIN_VALUE, MIN_VALUE, MIN_VALUE),
+                                2, new Vector.N4(MAX_VALUE, MAX_VALUE, MAX_VALUE, MAX_VALUE)
                         )))
                         .build());
     }

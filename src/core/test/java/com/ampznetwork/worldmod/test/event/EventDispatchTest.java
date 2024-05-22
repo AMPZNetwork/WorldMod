@@ -17,10 +17,7 @@ import org.comroid.api.text.minecraft.Tellraw;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static com.ampznetwork.worldmod.api.game.Flag.Build;
 import static org.junit.Assert.assertEquals;
@@ -40,9 +37,9 @@ public class EventDispatchTest {
         LocationOutside = new Vector.N3(-1, 0, -1);
         Region = com.ampznetwork.worldmod.api.model.region.Region.builder()
                 .name("testregion")
-                .area(new Area(Shape.Cuboid, List.of(
-                        new Vector.N4(0, 0, 0, 0),
-                        new Vector.N4(16, 0, 16, 0)
+                .area(new Area(Shape.Cuboid, Map.of(
+                        1, new Vector.N4(0, 0, 0, 0),
+                        2, new Vector.N4(16, 0, 16, 0)
                 )))
                 .owner(PlayerOwner)
                 .member(PlayerMember)

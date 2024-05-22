@@ -3,6 +3,7 @@ package com.ampznetwork.worldmod.core.database.hibernate;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
+import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.SharedCacheMode;
 import jakarta.persistence.ValidationMode;
@@ -22,7 +23,7 @@ import java.util.stream.Stream;
 public class WorldModPersistenceUnit implements PersistenceUnitInfo {
     HikariDataSource dataSource;
     URL jarUrl = WorldMod.class.getProtectionDomain().getCodeSource().getLocation();
-    List<String> classes = Stream.<Class<?>>of(Region.class, Group.class)
+    List<String> classes = Stream.of(Region.class, Group.class, Area.class)
             .map(Class::getCanonicalName)
             .toList();
 

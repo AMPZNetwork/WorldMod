@@ -19,7 +19,7 @@ public class WorldModCommands {
     Map<UUID, Area.Builder> selections = new ConcurrentHashMap<>();
 
     private Area.Builder sel(UUID playerId) {
-        return selections.computeIfAbsent(playerId, $ -> new Area.Builder());
+        return selections.computeIfAbsent(playerId, $ -> Area.builder());
     }
 
     @Alias("sel")
@@ -29,7 +29,7 @@ public class WorldModCommands {
             selections.remove(playerId);
             return "Selection cleared";
         }
-        sel(playerId).setShape(type);
+        sel(playerId).shape(type);
         return "Now selecting as " + type.name();
     }
 
@@ -37,7 +37,7 @@ public class WorldModCommands {
     @Command(permission = WorldMod.Permission.Selection, ephemeral = true)
     public String position(UUID playerId, @Command.Arg int index) {
         var pos = worldMod.getPlayerAdapter().getPosition(playerId);
-        sel(playerId).getSpatialAnchors().set(index, pos.to4(0));
+        sel(playerId).spatialAnchor(index, pos.to4(0));
         return "Set position " + index;
     }
 

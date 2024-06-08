@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Spigot Test Server" type="JarApplication">
-    <option name="JAR_PATH" value="/dev/minecraft/WorldMod/spigot/run/server.jar" />
+    <option name="JAR_PATH" value="$PROJECT_DIR$/spigot/run/server.jar"/>
     <option name="VM_PARAMETERS" value="-Xmx2G" />
     <option name="PROGRAM_PARAMETERS" value="nogui" />
-    <option name="WORKING_DIRECTORY" value="\dev\minecraft\WorldMod\spigot\run\" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/spigot/run/"/>
     <option name="ALTERNATIVE_JRE_PATH" />
     <envs>
       <env name="DEBUG" value="true" />

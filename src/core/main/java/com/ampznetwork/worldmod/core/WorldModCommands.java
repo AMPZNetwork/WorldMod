@@ -9,6 +9,7 @@ import org.comroid.annotations.Alias;
 import org.comroid.api.func.util.Command;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,23 +24,39 @@ public class WorldModCommands {
         return selections.computeIfAbsent(playerId, $ -> new Area.Builder());
     }
 
+    private void clearSel(UUID playerId) {
+        sel(playerId).setSpatialAnchors(new ArrayList<>() {{
+            for (int i = 0; i < 8; i++) add(null);
+        }});
+    }
+
     @Alias("sel")
     @Command(permission = WorldMod.Permission.Selection, ephemeral = true)
-    public static String select(UUID playerId, @Command.Arg @Nullable Shape type) {
+    public String select(UUID playerId, @Command.Arg @Nullable Shape type) {
         if (type == null) {
             selections.remove(playerId);
             return "Selection cleared";
         }
         sel(playerId).setShape(type);
+        clearSel(playerId);
         return "Now selecting as " + type.name();
     }
 
     @Alias("pos")
     @Command(permission = WorldMod.Permission.Selection, ephemeral = true)
-    public static String position(UUID playerId, @Command.Arg int index) {
-        var pos = worldMod.getPlayerAdapter().getPosition(playerId);
-        sel(playerId).getSpatialAnchors().set(index, pos.to4(0));
-        return "Set position " + index;
+    public static class position {
+        @Command
+        public static String $(UUID playerId, @Command.Arg(autoFill = {"1", "2"}) int index) {
+            var pos = worldMod.getPlayerAdapter().getPosition(playerId);
+            sel(playerId).getSpatialAnchors().set(index - 1, pos.to4(0));
+            return "Set position " + index;
+        }
+
+        @Command
+        public static String clear(UUID playerId) {
+            clearSel(playerId);
+            return "Selection cleared";
+        }
     }
 
     @Command

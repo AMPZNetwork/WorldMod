@@ -23,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 import static org.bukkit.Bukkit.getPluginManager;
@@ -86,7 +85,7 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
         return cmdr.autoComplete(alias + ' ' + String.join(" ", args),
                         String.valueOf(args.length),
                         args[args.length-1])
-                .map(Map.Entry::getKey)
+                .map(Command.AutoCompletionOption::key)
                 .toList();
     }
 

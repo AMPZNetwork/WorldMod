@@ -4,7 +4,6 @@ import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.api.model.sel.Area;
-import lombok.Value;
 import lombok.experimental.UtilityClass;
 import org.comroid.annotations.Alias;
 import org.comroid.api.func.util.Command;
@@ -26,7 +25,7 @@ public class WorldModCommands {
 
     @Alias("sel")
     @Command(permission = WorldMod.Permission.Selection, ephemeral = true)
-    public static String select(UUID playerId, @Command.Arg(required = false) @Nullable Shape type) {
+    public static String select(UUID playerId, @Command.Arg @Nullable Shape type) {
         if (type == null) {
             selections.remove(playerId);
             return "Selection cleared";
@@ -46,7 +45,7 @@ public class WorldModCommands {
     @Command
     public static class claim {
         @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
-        public static String _(UUID playerId) {
+        public static String $(UUID playerId) {
             if (!selections.containsKey(playerId))
                 throw new Command.Error("No area selected!");
             var sel = sel(playerId).build();

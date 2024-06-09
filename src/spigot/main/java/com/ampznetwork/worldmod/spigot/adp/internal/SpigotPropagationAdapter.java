@@ -1,4 +1,4 @@
-package com.ampznetwork.worldmod.spigot.adp;
+package com.ampznetwork.worldmod.spigot.adp.internal;
 
 import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import lombok.Value;

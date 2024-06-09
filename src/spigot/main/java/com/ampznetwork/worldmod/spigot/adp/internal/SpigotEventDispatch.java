@@ -1,4 +1,4 @@
-package com.ampznetwork.worldmod.spigot.adp;
+package com.ampznetwork.worldmod.spigot.adp.internal;
 
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.core.event.EventDispatchBase;

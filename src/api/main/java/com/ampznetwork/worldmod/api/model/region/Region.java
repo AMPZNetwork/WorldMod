@@ -55,7 +55,9 @@ public class Region implements PropagationController, ShapeCollider, Prioritized
     }
 
     public Set<UUID> getOwnerIDs() {
-        return Stream.concat(Stream.of(claimOwner), ownerIDs.stream()).collect(Collectors.toUnmodifiableSet());
+        return Stream.concat(Stream.of(claimOwner), ownerIDs.stream())
+                .filter(Objects::nonNull)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     @Override

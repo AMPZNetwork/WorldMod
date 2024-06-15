@@ -35,17 +35,18 @@ public class ClaimMenuBook implements BookAdapter {
         return new Component[]{text("""
                 %s Menu
                 %s by %s
+                \s
                 \s""".formatted(
                 region.getClaimOwner() == null ? "Region" : "Claim",
                 region.getName(),
                 region.getClaimOwner() == null
                         ? region.getWorldName()
                         : worldMod.getPlayerAdapter().getName(region.getClaimOwner()))),
-                text("2 ... Claim Details")
+                text("2 ... Claim Details\n")
                         .clickEvent(changePage(2)),
-                text("3 ... Claim Members")
+                text("3 ... Claim Members\n")
                         .clickEvent(changePage(3)),
-                text(pgFlags + " ... Flags")
+                text(pgFlags + " ... Flags\n")
                         .clickEvent(changePage(pgFlags))
         };
     }

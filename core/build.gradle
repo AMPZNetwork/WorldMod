@@ -52,5 +52,5 @@ task simplifyArtifact(type: Copy) {
     dependsOn test, jar
     from jar.outputs.files.singleFile
     into "$rootDir/build/libs/"
-    rename { n -> "WorldMod-api.jar" }
+    rename { n -> "WorldMod-core.jar" }
 }

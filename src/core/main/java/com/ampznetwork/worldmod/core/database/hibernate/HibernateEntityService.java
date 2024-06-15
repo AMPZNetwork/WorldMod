@@ -9,15 +9,11 @@ import com.zaxxer.hikari.HikariDataSource;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.comroid.api.data.Vector;
-import org.comroid.api.func.util.Command;
 import org.comroid.api.info.Constraint;
 import org.comroid.api.tree.Container;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.comroid.api.func.util.Debug.isDebug;
@@ -60,7 +56,12 @@ public class HibernateEntityService extends Container.Base implements EntityServ
 
     @Override
     public Optional<Region> findRegion(Vector.N3 location, String worldName) {
-        return Optional.empty(); // todo: query, needs area in db
+        // todo: query, needs area in db
+        return manager.createQuery("SELECT r FROM Region r", Region.class)
+                .getResultStream()
+                .sorted(Comparator.comparingLong(Region::getPriority))
+                .filter(region -> region.isPointInside(location))
+                .findFirst();
     }
 
     @Override

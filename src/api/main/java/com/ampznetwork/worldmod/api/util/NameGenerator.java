@@ -1,4 +1,4 @@
-package com.ampznetwork.worldmod.core.util;
+package com.ampznetwork.worldmod.api.util;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,10 +26,10 @@ public enum NameGenerator implements Supplier<String> {
     @SneakyThrows
     NameGenerator() {
         try (
-                var advIs = new URL("https://raw.githubusercontent.com/AMPZNetwork/WorldMod/main/src/core/main/resources/adverbs.txt").openStream();
+                var advIs = new URL("https://raw.githubusercontent.com/AMPZNetwork/WorldMod/main/src/api/main/resources/adverbs.txt").openStream();
                 var advIsr = new InputStreamReader(advIs);
                 var advBr = new BufferedReader(advIsr);
-                var nounIs = new URL("https://raw.githubusercontent.com/AMPZNetwork/WorldMod/main/src/core/main/resources/nouns.txt").openStream();
+                var nounIs = new URL("https://raw.githubusercontent.com/AMPZNetwork/WorldMod/main/src/api/main/resources/nouns.txt").openStream();
                 var nounIsr = new InputStreamReader(nounIs);
                 var nounBr = new BufferedReader(nounIsr)
         ) {

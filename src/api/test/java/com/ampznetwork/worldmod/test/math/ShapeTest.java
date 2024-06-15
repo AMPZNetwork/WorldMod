@@ -3,8 +3,8 @@ package com.ampznetwork.worldmod.test.math;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.sel.Chunk;
 import org.comroid.api.data.Vector;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -28,7 +28,7 @@ public class ShapeTest {
         };
         final var result = Shape.Cuboid.streamChunks(anchors).toList();
 
-        Assert.assertTrue("Too many or invalid chunks streamed", result.stream().allMatch(control::remove));
-        Assert.assertTrue("Not enough chunks streamed", control.isEmpty());
+        Assertions.assertTrue(result.stream().allMatch(control::remove), "Too many or invalid chunks streamed");
+        Assertions.assertTrue(control.isEmpty(), "Not enough chunks streamed");
     }
 }

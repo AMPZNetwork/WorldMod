@@ -49,7 +49,11 @@ subprojects {
         annotationProcessor 'org.projectlombok:lombok:+'
 
         // tests
-        testImplementation 'junit:junit:+'
+        testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.10.2'
         testImplementation 'org.easymock:easymock:+'
+    }
+
+    test {
+        useJUnitPlatform()
     }
 }

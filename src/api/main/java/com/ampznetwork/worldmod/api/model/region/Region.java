@@ -5,6 +5,7 @@ import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.*;
 import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.ampznetwork.worldmod.api.model.sel.Chunk;
+import com.ampznetwork.worldmod.api.util.NameGenerator;
 import lombok.*;
 import lombok.Builder.Default;
 import org.comroid.api.attr.Named;
@@ -31,7 +32,10 @@ import static java.util.stream.Stream.concat;
 public class Region implements PropagationController, ShapeCollider, Prioritized, Named, PointCollider {
     private static final Map<String, Region> GlobalRegions = new ConcurrentHashMap<>();
     public static String GlobalRegionName = "#global";
-    @Id @Default @NotNull String name = UUID.randomUUID().toString();
+    @Id
+    @Default
+    @NotNull
+    String name = NameGenerator.INSTANCE.get();
     @Id @Default String worldName = "world";
     @OneToOne @Default @Nullable Group group = null;
     @Default long priority = 0;

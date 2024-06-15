@@ -6,13 +6,13 @@ import com.ampznetwork.worldmod.api.model.mini.RegionCompositeKey;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.zaxxer.hikari.HikariDataSource;
-import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.comroid.api.data.Vector;
 import org.comroid.api.info.Constraint;
 import org.comroid.api.tree.Container;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 
+import javax.persistence.EntityManager;
 import java.util.*;
 import java.util.stream.Stream;
 

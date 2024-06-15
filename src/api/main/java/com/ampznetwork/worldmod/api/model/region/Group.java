@@ -3,13 +3,13 @@ package com.ampznetwork.worldmod.api.model.region;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.mini.PropagationController;
-import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Singular;
 import lombok.Value;
 import org.comroid.api.attr.Named;
 
+import javax.persistence.*;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;

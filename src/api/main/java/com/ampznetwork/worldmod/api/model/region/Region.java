@@ -5,7 +5,6 @@ import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.*;
 import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.ampznetwork.worldmod.api.model.sel.Chunk;
-import jakarta.persistence.*;
 import lombok.*;
 import lombok.Builder.Default;
 import org.comroid.api.attr.Named;
@@ -13,6 +12,7 @@ import org.comroid.api.data.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.persistence.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;

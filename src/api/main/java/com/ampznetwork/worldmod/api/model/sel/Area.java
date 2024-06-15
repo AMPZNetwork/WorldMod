@@ -3,10 +3,10 @@ package com.ampznetwork.worldmod.api.model.sel;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.ShapeCollider;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.AttributeConverter;
 import lombok.*;
 import org.comroid.api.data.Vector;
 
+import javax.persistence.AttributeConverter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +50,7 @@ public final class Area implements ShapeCollider {
     }
 
     @Value
-    @jakarta.persistence.Converter(autoApply = true)
+    @javax.persistence.Converter(autoApply = true)
     public static class Converter implements AttributeConverter<Area, String> {
         @Override
         @SneakyThrows

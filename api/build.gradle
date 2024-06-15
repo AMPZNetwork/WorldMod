@@ -34,7 +34,7 @@ dependencies {
     api 'com.fasterxml.jackson.core:jackson-databind:2.+'
 
     // database
-    implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+    implementation 'javax.persistence:javax.persistence-api:2.2'
     compileOnly 'com.mysql:mysql-connector-j:8.4.0'
     compileOnly 'com.h2database:h2:2.2.224'
 

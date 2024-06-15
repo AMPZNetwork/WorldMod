@@ -3,7 +3,6 @@ package com.ampznetwork.worldmod.api.game;
 import com.ampznetwork.worldmod.api.model.mini.OwnedByParty;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.AttributeConverter;
 import lombok.*;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.attr.Described;
@@ -15,6 +14,7 @@ import org.comroid.api.text.minecraft.Tellraw;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.persistence.AttributeConverter;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -202,7 +202,7 @@ public class Flag implements Named, Described, Prioritized {
         }
 
         @Value
-        @jakarta.persistence.Converter(autoApply = true)
+        @javax.persistence.Converter(autoApply = true)
         public static class Converter implements AttributeConverter<Usage, String> {
             @Override
             @SneakyThrows

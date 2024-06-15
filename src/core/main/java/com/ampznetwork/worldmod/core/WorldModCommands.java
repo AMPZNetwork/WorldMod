@@ -95,8 +95,8 @@ public class WorldModCommands {
 
         @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
         public static void menu(WorldMod worldMod, UUID playerId, @Nullable Region region) {
-            //var region = region(worldMod, playerId)
-            //        .orElseThrow(() -> new Command.Error("This area is not claimed"));
+            if (region == null)
+                throw new Command.Error("This area is not claimed");
             var menu = new ClaimMenuBook(worldMod, region, playerId);
             worldMod.getPlayerAdapter().openBook(playerId, menu);
         }

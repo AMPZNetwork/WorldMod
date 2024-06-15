@@ -1,17 +1,20 @@
 package com.ampznetwork.worldmod.spigot.adp.internal;
 
+import com.ampznetwork.worldmod.api.model.adp.BookAdapter;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.spigot.WorldMod$Spigot;
-import com.ampznetwork.worldmod.spigot.adp.game.SpigotBookAdapter;
 import lombok.Value;
-import net.kyori.adventure.text.EntityNBTComponent;
-import org.bukkit.Bukkit;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.comroid.api.data.Vector;
 import org.comroid.api.info.Constraint;
 
+import java.util.Arrays;
 import java.util.UUID;
+
+import static net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer.get;
 
 @Value
 public class SpigotPlayerAdapter implements PlayerAdapter {
@@ -40,10 +43,17 @@ public class SpigotPlayerAdapter implements PlayerAdapter {
         return worldMod.getServer().getPlayer(playerId).getWorld().getName();
     }
 
-    public void openBook(UUID playerId, EntityNBTComponent nbt) {
+    public void openBook(UUID playerId, BookAdapter book) {
+        if (!isOnline(playerId))
+            throw new AssertionError("Target player is not online");
         var stack = new ItemStack(Material.WRITTEN_BOOK, 1);
-        var meta = new SpigotBookAdapter();
-        stack.setItemMeta(meta);
-        Bukkit.getServer().getPlayer(playerId).openBook(stack);
+        var meta = (BookMeta) stack.getItemMeta();
+        meta.spigot().setPages(book.getPages().stream()
+                .map(page -> Arrays.stream(page)
+                        .map(component -> get().serialize(component))
+                        .flatMap(Arrays::stream)
+                        .toArray(BaseComponent[]::new))
+                .toList());
+        worldMod.getServer().getPlayer(playerId).openBook(stack);
     }
 }

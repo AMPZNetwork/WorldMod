@@ -66,7 +66,9 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT'
+    // spigot
+    implementation 'org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT'
+    implementation 'net.kyori:adventure-platform-bungeecord:4.3.3'
 
     // worldmod api
     implementation project(':core')

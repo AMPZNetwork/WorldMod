@@ -12,6 +12,10 @@ def getCommitTimestampSeconds() {
     return timestampSeconds
 }
 
+allprojects {
+    apply plugin: 'idea'
+}
+
 subprojects {
     apply plugin: 'java-library'
 

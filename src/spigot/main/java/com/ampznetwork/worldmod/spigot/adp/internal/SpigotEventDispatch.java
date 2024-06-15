@@ -20,11 +20,11 @@ import static com.ampznetwork.worldmod.api.game.Flag.*;
 
 @Value
 public class SpigotEventDispatch extends EventDispatchBase implements Listener {
-    WorldMod$Spigot worldMod$Spigot;
+    WorldMod$Spigot worldMod;
 
-    public SpigotEventDispatch(WorldMod$Spigot worldMod$Spigot) {
-        super(worldMod$Spigot);
-        this.worldMod$Spigot = worldMod$Spigot;
+    public SpigotEventDispatch(WorldMod$Spigot worldMod) {
+        super(worldMod);
+        this.worldMod = worldMod;
     }
 
     private static Vector.N3 vec(Location location) {

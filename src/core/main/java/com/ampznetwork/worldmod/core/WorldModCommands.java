@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -81,21 +82,22 @@ public class WorldModCommands {
         }
 
         @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
-        public static String info(WorldMod worldMod, UUID playerId) {
-            var pos = worldMod.getPlayerAdapter().getPosition(playerId);
+        public static String info(WorldMod worldMod, @Nullable Region region) {
             var players = worldMod.getPlayerAdapter();
-            return worldMod.getEntityService().findRegion(pos, players.getWorldName(playerId))
-                    .map(region -> region.getClaimOwner() != null
-                            ? "Claimed by " + players.getName(region.getClaimOwner())
-                            : "This area belongs to " + region.getOwnerIDs().stream()
+            return Optional.ofNullable(region)
+                    .map(rg -> rg.getClaimOwner() != null
+                            ? "Claimed by " + players.getName(rg.getClaimOwner())
+                            : "This area belongs to " + rg.getOwnerIDs().stream()
                             .map(players::getName)
                             .collect(Collectors.joining(", ")))
                     .orElse("This area is not claimed");
         }
 
         @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
-        public static void menu(WorldMod worldMod, UUID playerId) {
-            var menu = new ClaimMenuBook(worldMod, playerId);
+        public static void menu(WorldMod worldMod, UUID playerId, @Nullable Region region) {
+            //var region = region(worldMod, playerId)
+            //        .orElseThrow(() -> new Command.Error("This area is not claimed"));
+            var menu = new ClaimMenuBook(worldMod, region, playerId);
             worldMod.getPlayerAdapter().openBook(playerId, menu);
         }
     }

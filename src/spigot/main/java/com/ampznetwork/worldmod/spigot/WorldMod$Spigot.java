@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.comroid.api.func.util.Command;
 import org.jetbrains.annotations.NotNull;
@@ -48,8 +49,12 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
         this.adapter = cmdr.new Adapter$Spigot(this) {
             @Override
             protected Stream<Object> collectExtraArgs(@NotNull CommandSender sender) {
+                if (!(sender instanceof Player player))
+                    throw new Command.Error("Cannot be used from console");
+                var pos = playerAdapter.getPosition(player.getUniqueId());
                 return super.collectExtraArgs(sender)
-                        .collect(append(WorldMod$Spigot.this));
+                        .collect(append(WorldMod$Spigot.this, entityService.findRegion(pos,
+                                playerAdapter.getWorldName(player.getUniqueId())).orElse(null)));
             }
         };
         cmdr.register(WorldModCommands.class);

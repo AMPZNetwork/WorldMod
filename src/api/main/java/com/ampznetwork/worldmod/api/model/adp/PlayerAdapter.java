@@ -9,4 +9,6 @@ public interface PlayerAdapter {
     boolean isOnline(UUID playerId);
     Vector.N3 getPosition(UUID playerId);
     String getWorldName(UUID playerId);
+
+    void openBook(UUID playerId, BookAdapter book);
 }

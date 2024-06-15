@@ -43,6 +43,7 @@ public class SpigotPlayerAdapter implements PlayerAdapter {
         return worldMod.getServer().getPlayer(playerId).getWorld().getName();
     }
 
+    @Override
     public void openBook(UUID playerId, BookAdapter book) {
         if (!isOnline(playerId))
             throw new AssertionError("Target player is not online");

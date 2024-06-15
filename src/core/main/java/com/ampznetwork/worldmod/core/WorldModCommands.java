@@ -92,5 +92,11 @@ public class WorldModCommands {
                             .collect(Collectors.joining(", ")))
                     .orElse("This area is not claimed");
         }
+
+        @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
+        public static void menu(WorldMod worldMod, UUID playerId) {
+            var menu = new ClaimMenuBook(worldMod, playerId);
+            worldMod.getPlayerAdapter().openBook(playerId, menu);
+        }
     }
 }

@@ -20,6 +20,7 @@ import org.comroid.api.java.StackTraceUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -52,6 +53,13 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
 
         this.cmdr = new Command.Manager();
         this.adapter = cmdr.new Adapter$Spigot(this) {
+            @Override
+            public String handleThrowable(Throwable throwable) {
+                return throwable instanceof InvocationTargetException ITEx
+                        ? handleThrowable(ITEx.getCause())
+                        : super.handleThrowable(new Command.Error(throwable));
+            }
+
             @Override
             protected Stream<Object> collectExtraArgs(@NotNull CommandSender sender) {
                 if (!(sender instanceof Player player))

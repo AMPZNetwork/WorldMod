@@ -4,6 +4,7 @@ import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.api.model.sel.Area;
+import com.ampznetwork.worldmod.core.ui.ClaimMenuBook;
 import lombok.experimental.UtilityClass;
 import org.comroid.annotations.Alias;
 import org.comroid.api.func.util.Command;
@@ -17,7 +18,6 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class WorldModCommands {
-    public WorldMod worldMod;
     private final Map<UUID, Area.Builder> selections = new ConcurrentHashMap<>();
 
     private Area.Builder sel(UUID playerId) {
@@ -46,7 +46,7 @@ public class WorldModCommands {
     @Command(permission = WorldMod.Permission.Selection, ephemeral = true)
     public static class position {
         @Command
-        public static String $(UUID playerId, @Command.Arg(autoFill = {"1", "2"}) int index) {
+        public static String $(WorldMod worldMod, UUID playerId, @Command.Arg(autoFill = {"1", "2"}) int index) {
             var pos = worldMod.getPlayerAdapter().getPosition(playerId);
             sel(playerId).getSpatialAnchors().set(index - 1, pos.to4(0));
             return "Set position " + index;
@@ -63,7 +63,7 @@ public class WorldModCommands {
     @Alias("claim")
     public static class region {
         @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
-        public static String $(UUID playerId) {
+        public static String $(WorldMod worldMod, UUID playerId) {
             if (!selections.containsKey(playerId))
                 throw new Command.Error("No area selected!");
             var sel = sel(playerId).build();
@@ -81,7 +81,7 @@ public class WorldModCommands {
         }
 
         @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
-        public static String info(UUID playerId) {
+        public static String info(WorldMod worldMod, UUID playerId) {
             var pos = worldMod.getPlayerAdapter().getPosition(playerId);
             var players = worldMod.getPlayerAdapter();
             return worldMod.getEntityService().findRegion(pos, players.getWorldName(playerId))

@@ -21,9 +21,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.bukkit.Bukkit.getPluginManager;
 import static org.comroid.api.func.util.Debug.isDebug;
+import static org.comroid.api.func.util.Streams.append;
 
 @Getter
 public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
@@ -42,10 +44,14 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
             saveDefaultConfig();
         this.config = super.getConfig();
 
-        WorldModCommands.worldMod = this;
-
         this.cmdr = new Command.Manager();
-        this.adapter = cmdr.new Adapter$Spigot(this);
+        this.adapter = cmdr.new Adapter$Spigot(this) {
+            @Override
+            protected Stream<Object> collectExtraArgs(@NotNull CommandSender sender) {
+                return super.collectExtraArgs(sender)
+                        .collect(append(WorldMod$Spigot.this));
+            }
+        };
         cmdr.register(WorldModCommands.class);
         cmdr.register(this);
         cmdr.initialize();

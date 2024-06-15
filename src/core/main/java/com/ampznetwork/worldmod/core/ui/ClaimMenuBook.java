@@ -32,17 +32,15 @@ public class ClaimMenuBook implements BookAdapter {
 
     private Component[] toc() {
         var pgFlags = 3 + (int) members().count();
-        return new Component[]{
-                text("""
-                        %s Menu
-                        %s by %s
-                                                
-                        """.formatted(
-                        region.getClaimOwner() == null ? "Region" : "Claim",
-                        region.getName(),
-                        region.getClaimOwner() == null
-                                ? region.getWorldName()
-                                : worldMod.getPlayerAdapter().getName(region.getClaimOwner()))),
+        return new Component[]{text("""
+                %s Menu
+                %s by %s
+                \s""".formatted(
+                region.getClaimOwner() == null ? "Region" : "Claim",
+                region.getName(),
+                region.getClaimOwner() == null
+                        ? region.getWorldName()
+                        : worldMod.getPlayerAdapter().getName(region.getClaimOwner()))),
                 text("2 ... Claim Details")
                         .clickEvent(changePage(2)),
                 text("3 ... Claim Members")
@@ -53,7 +51,20 @@ public class ClaimMenuBook implements BookAdapter {
     }
 
     private Component[] details() {
-        return new Component[]{text("details (wip)")};
+        return new Component[]{text("""
+                %s Details
+                \s
+                Name: %s
+                World: %s
+                \s
+                Group: %s
+                Owner: %s""".formatted(
+                region.getClaimOwner() == null ? "Region" : "Claim",
+                region.getBestName(),
+                region.getWorldName(),
+                region.getGroup() == null ? "none" : region.getGroup().getBestName(),
+                region.getClaimOwner() == null ? "none" : worldMod.getPlayerAdapter().getName(region.getClaimOwner())
+        ))};
     }
 
     private Stream<Component[]> members() {

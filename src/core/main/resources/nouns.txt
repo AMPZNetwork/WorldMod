@@ -1,0 +1,8 @@
+cave
+dwelling
+house
+castle
+treasure
+jewel
+gem
+flower

@@ -29,6 +29,7 @@ public class Flag implements Named, Described, Prioritized {
     private static final Map<String, Flag> $ = new ConcurrentHashMap<>();
     public static final Map<String,Flag> VALUES = Collections.unmodifiableMap($);
     public static final Flag Passthrough = new Flag("passthrough", Long.MAX_VALUE, BOOLEAN, "Passthrough", "Enable to force WorldMod to not handle any events", false);
+    public static final Flag Manage = new Flag("manage", 10, BOOLEAN, "Manage", "Enable to allow players to manage claim", false);
     public static final Flag Build = new Flag("build", 50, BOOLEAN, "Building", "Enable to force WorldMod to not handle any events", false);
     public static final Flag Spawn = new Flag("spawn", 20, BOOLEAN, "", "", false);
     public static final Flag Spawn_Mobs = new Flag(Spawn, "mobs", 20, BOOLEAN, "", "", false);

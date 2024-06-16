@@ -4,6 +4,8 @@ import com.ampznetwork.worldmod.api.database.EntityService;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
+import org.comroid.api.func.util.Command;
+import org.jetbrains.annotations.Contract;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +13,17 @@ import java.util.Collections;
 public interface WorldMod {
     String AddonId = "worldmod";
     String AddonName = "WorldMod";
+
+    @Contract("->fail")
+    static void notPermitted() {
+        throw new Command.Error("You are not permitted to perform this action");
+    }
+
+    @Contract("null->fail")
+    static void isClaimed(Region region) {
+        if (region == null)
+            throw new Command.Error("This area is not claimed");
+    }
 
     @Deprecated(forRemoval = true)
     default Collection<Region> getRegions() {

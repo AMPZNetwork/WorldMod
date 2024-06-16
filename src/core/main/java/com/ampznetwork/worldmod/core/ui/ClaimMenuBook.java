@@ -78,6 +78,7 @@ public class ClaimMenuBook implements BookAdapter {
     }
 
     private Stream<Component[]> members() {
+        //ClickEvent.suggestCommand("\u0001 64") <- move cursor to position
         return of((Object) new Component[]{text("members (wip)")}).flatMap(cast(Component[].class));
     }
 

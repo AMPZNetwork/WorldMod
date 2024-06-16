@@ -83,4 +83,8 @@ public class Region implements PropagationController, ShapeCollider, Prioritized
                 .sorted(Comparator.<Flag.Usage>comparingLong(value -> -value.getFlag().getPriority())
                         .thenComparingLong(value -> -value.getPriority()));
     }
+
+    public RegionCompositeKey key() {
+        return new RegionCompositeKey(name, worldName);
+    }
 }

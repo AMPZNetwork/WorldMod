@@ -6,6 +6,7 @@ import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
+import com.ampznetwork.worldmod.api.model.mini.RegionCompositeKey;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.api.model.sel.Area;
@@ -18,10 +19,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static com.ampznetwork.worldmod.api.game.Flag.Build;
 
@@ -72,18 +74,40 @@ public class EventDispatchTest {
     public void setup() {
         this.mod = new WorldMod() {
             @Override
-            public Collection<com.ampznetwork.worldmod.api.model.region.Region> getRegions() {
-                return List.of(Region);
-            }
-
-            @Override
-            public Collection<? extends Group> getGroups() {
-                return List.of();
-            }
-
-            @Override
             public EntityService getEntityService() {
-                return null;
+                return new EntityService() {
+                    @Override
+                    public Optional<com.ampznetwork.worldmod.api.model.region.Region> findRegion(RegionCompositeKey key) {
+                        return key.equals(Region.key()) ? Optional.of(Region) : Optional.empty();
+                    }
+
+                    @Override
+                    public Stream<com.ampznetwork.worldmod.api.model.region.Region> findRegions(Vector.N3 location, String worldName) {
+                        return Stream.of(Region)
+                                .filter(rg -> rg.getWorldName().equals(worldName) && rg.isPointInside(location));
+                    }
+
+                    @Override
+                    public Stream<com.ampznetwork.worldmod.api.model.region.Region> findClaims(UUID claimOwnerId) {
+                        return Stream.of(Region)
+                                .filter(rg -> claimOwnerId.equals(rg.getClaimOwner()));
+                    }
+
+                    @Override
+                    public Optional<Group> findGroup(String name) {
+                        return Optional.empty();
+                    }
+
+                    @Override
+                    public boolean save(Object... it) {
+                        return false;
+                    }
+
+                    @Override
+                    public <T> T refresh(T it) {
+                        return it;
+                    }
+                };
             }
 
             @Override

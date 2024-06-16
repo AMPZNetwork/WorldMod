@@ -16,8 +16,6 @@ import javax.persistence.EntityManager;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static org.comroid.api.func.util.Debug.isDebug;
-
 @Slf4j
 public class HibernateEntityService extends Container.Base implements EntityService {
     private final WorldMod worldMod;
@@ -32,8 +30,8 @@ public class HibernateEntityService extends Container.Base implements EntityServ
                 "hibernate.connection.username", user,
                 "hibernate.connection.password", pass,
                 "hibernate.dialect", type.getDialect(),
-                "hibernate.hbm2ddl.auto", "update",
-                "hibernate.show_sql", String.valueOf(isDebug())
+                //"hibernate.show_sql", String.valueOf(isDebug()),
+                "hibernate.hbm2ddl.auto", "update"
         );
         var provider = new HibernatePersistenceProvider();
         var dataSource = new HikariDataSource() {{

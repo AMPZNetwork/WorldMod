@@ -3,7 +3,6 @@ package com.ampznetwork.worldmod.core.event;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
-import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Value;
 import lombok.experimental.NonFinal;
@@ -20,7 +19,6 @@ import java.util.stream.Stream;
 
 import static com.ampznetwork.worldmod.api.game.Flag.Build;
 import static com.ampznetwork.worldmod.api.game.Flag.Passthrough;
-import static java.util.Comparator.comparingLong;
 
 @Log
 @Value
@@ -35,11 +33,7 @@ public class EventDispatchBase {
 
     public Stream<? extends Region> findRegions(@NotNull Vector.N3 location, @NotNull String worldName) {
         return Stream.concat(
-                worldMod.getRegions().parallelStream()
-                        .filter(region -> region.getWorldName().equals(worldName))
-                        //.filter(region -> region.streamChunks().anyMatch(chunk -> chunk.isPointInside(location)))
-                        .filter(region -> region.isPointInside(location))
-                        .sorted(comparingLong(Prioritized::getPriority).reversed()),
+                worldMod.getEntityService().findRegions(location, worldName),
                 Stream.of(Region.global("world")));
     }
 

@@ -23,7 +23,11 @@ public interface EntityService extends LifeCycle {
 
     Optional<Region> findRegion(RegionCompositeKey key);
 
-    Optional<Region> findRegion(Vector.N3 location, String worldName);
+    default Optional<Region> findRegion(Vector.N3 location, String worldName) {
+        return findRegions(location, worldName).findFirst();
+    }
+
+    Stream<Region> findRegions(Vector.N3 location, String worldName);
 
     Stream<Region> findClaims(UUID claimOwnerId);
 

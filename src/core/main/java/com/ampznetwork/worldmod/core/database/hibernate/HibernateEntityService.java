@@ -55,13 +55,13 @@ public class HibernateEntityService extends Container.Base implements EntityServ
     }
 
     @Override
-    public Optional<Region> findRegion(Vector.N3 location, String worldName) {
+    public Stream<Region> findRegions(Vector.N3 location, String worldName) {
         // todo: query, needs area in db
         return manager.createQuery("SELECT r FROM Region r", Region.class)
                 .getResultStream()
-                .sorted(Comparator.comparingLong(Region::getPriority))
-                .filter(region -> region.isPointInside(location))
-                .findFirst();
+                .filter(region -> region.getWorldName().equals(worldName))
+                .sorted(Comparator.comparingLong(Region::getPriority).reversed())
+                .filter(region -> region.isPointInside(location));
     }
 
     @Override

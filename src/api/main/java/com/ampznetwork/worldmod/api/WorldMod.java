@@ -6,20 +6,27 @@ import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 
 import java.util.Collection;
+import java.util.Collections;
 
 public interface WorldMod {
     String AddonId = "worldmod";
     String AddonName = "WorldMod";
 
-    Collection<Region> getRegions();
+    @Deprecated(forRemoval = true)
+    default Collection<Region> getRegions() {
+        return Collections.emptyList();
+    }
 
-    Collection<? extends Group> getGroups();
+    @Deprecated(forRemoval = true)
+    default Collection<? extends Group> getGroups() {
+        return Collections.emptyList();
+    }
 
     EntityService getEntityService();
     PlayerAdapter getPlayerAdapter();
 
     default boolean addRegion(Region region) {
-        getRegions().add(region);
+        //getRegions().add(region);
         return getEntityService().save(region);
     }
 

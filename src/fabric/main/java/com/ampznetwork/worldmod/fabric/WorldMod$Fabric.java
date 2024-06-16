@@ -35,10 +35,10 @@ public class WorldMod$Fabric implements ModInitializer, WorldMod {
     private final Collection<Region> regions = new HashSet<>();
     private final Collection<Group> groups = new HashSet<>();
     private final Config config = Config.createAndLoad();
-    private EntityService entityService;
+    private MinecraftServer server;
     private Command.Manager cmdr;
     private Command.Manager.Adapter$Fabric adapter;
-    private MinecraftServer server;
+    private EntityService entityService;
 
     @Override
     public void onInitialize() {

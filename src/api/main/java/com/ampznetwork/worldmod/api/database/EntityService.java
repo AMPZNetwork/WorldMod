@@ -48,4 +48,12 @@ public interface EntityService extends LifeCycle {
         Class<?> driverClass;
         String dialect;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+    enum Type implements Named {
+        Database,
+        File
+    }
 }

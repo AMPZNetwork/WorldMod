@@ -49,8 +49,8 @@ public class SpigotPlayerAdapter implements PlayerAdapter {
             throw new AssertionError("Target player is not online");
         var stack = new ItemStack(Material.WRITTEN_BOOK, 1);
         var meta = (BookMeta) stack.getItemMeta();
-        meta.setTitle("Interactive WorldMod Menu");
-        meta.setAuthor("kaleidox@ampznetwork");
+        meta.setTitle(BookAdapter.TITLE);
+        meta.setAuthor(BookAdapter.AUTHOR);
         meta.spigot().setPages(book.getPages().stream()
                 .map(page -> Arrays.stream(page)
                         .map(component -> get().serialize(component))

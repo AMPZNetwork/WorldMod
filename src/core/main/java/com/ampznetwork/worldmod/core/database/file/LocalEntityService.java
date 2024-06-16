@@ -24,8 +24,8 @@ public class LocalEntityService implements EntityService {
     }
 
     @Override
-    public Optional<Region> findRegion(Vector.N3 location, String worldName) {
-        return Optional.empty();
+    public Stream<Region> findRegions(Vector.N3 location, String worldName) {
+        return Stream.empty();
     }
 
     @Override

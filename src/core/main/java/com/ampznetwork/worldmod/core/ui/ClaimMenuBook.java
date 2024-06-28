@@ -100,7 +100,8 @@ public class ClaimMenuBook implements BookAdapter {
                     .append(text("#")
                             .color(DARK_AQUA)
                             .clickEvent(suggestCommand("/region owner set "))
-                            .hoverEvent(showText(text("Change Owner"))));
+                            .hoverEvent(showText(text("Transfer Ownership")
+                                    .color(RED))));
         }
         compName = compName.append(text("\n"));
         compGroup = compGroup.append(text("\n"));

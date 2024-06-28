@@ -1,6 +1,7 @@
 package com.ampznetwork.worldmod.core.ui;
 
 import com.ampznetwork.worldmod.api.WorldMod;
+import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.adp.BookAdapter;
 import com.ampznetwork.worldmod.api.model.mini.PlayerRelation;
 import com.ampznetwork.worldmod.api.model.region.Region;
@@ -8,7 +9,8 @@ import lombok.Value;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.util.TriState;
+import org.comroid.api.data.RegExpUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.AbstractMap;
@@ -22,6 +24,8 @@ import static java.util.stream.Stream.of;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.event.ClickEvent.*;
 import static net.kyori.adventure.text.event.HoverEvent.showText;
+import static net.kyori.adventure.text.format.TextDecoration.ITALIC;
+import static net.kyori.adventure.text.format.TextDecoration.UNDERLINED;
 import static org.comroid.api.func.util.Streams.atLeastOneOrElseGet;
 import static org.comroid.api.func.util.Streams.cast;
 import static org.comroid.api.text.Capitalization.Title_Case;
@@ -54,35 +58,64 @@ public class ClaimMenuBook implements BookAdapter {
                         ? region.getWorldName()
                         : worldMod.getPlayerAdapter().getName(region.getClaimOwner()))),
                 text("2 ... Claim Details\n")
-                        .decorate(TextDecoration.UNDERLINED)
+                        .decorate(UNDERLINED)
                         .hoverEvent(showText(text("Jump to page")))
                         .clickEvent(changePage(2)),
                 text("3 ... Claim Members\n")
-                        .decorate(TextDecoration.UNDERLINED)
+                        .decorate(UNDERLINED)
                         .hoverEvent(showText(text("Jump to page")))
                         .clickEvent(changePage(3)),
                 text(pgFlags + " ... Flags\n")
-                        .decorate(TextDecoration.UNDERLINED)
+                        .decorate(UNDERLINED)
                         .hoverEvent(showText(text("Jump to page")))
                         .clickEvent(changePage(pgFlags))
         };
     }
 
     private Component[] details() {
-        return new Component[]{text("""
-                %s Details
-                \s
-                Name: %s
-                World: %s
-                \s
-                Group: %s
-                Owner: %s""".formatted(
-                region.getClaimOwner() == null ? "Region" : "Claim",
-                region.getBestName(),
-                region.getWorldName(),
-                region.getGroup() == null ? "none" : region.getGroup().getBestName(),
-                region.getClaimOwner() == null ? "none" : worldMod.getPlayerAdapter().getName(region.getClaimOwner())
-        ))};
+        var claimOwner = region.getClaimOwner();
+        var bestName = region.getBestName();
+        var group = region.getGroup();
+        var canManage = region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() == TriState.TRUE;
+
+        var compName = text("Name: %s".formatted(bestName.matches(RegExpUtil.UUID4_PATTERN) ? "<not set>" : bestName));
+        var compGroup = text("Group: %s".formatted(group == null ? "none" : group.getBestName()));
+        var compOwner = text("Owner: %s".formatted(claimOwner == null ? "none" : worldMod.getPlayerAdapter().getName(claimOwner)));
+
+        if (canManage) {
+            compName = compName
+                    .append(text(" "))
+                    .append(text("#")
+                            .color(NamedTextColor.DARK_AQUA)
+                            .clickEvent(suggestCommand("/region name set "))
+                            .hoverEvent(showText(text("Change Name"))));
+            compGroup = compGroup
+                    .append(text(" "))
+                    .append(text("#")
+                            .color(NamedTextColor.DARK_AQUA)
+                            .clickEvent(suggestCommand("/region group set "))
+                            .hoverEvent(showText(text("Change Group"))));
+            compOwner = compOwner
+                    .append(text(" "))
+                    .append(text("#")
+                            .color(NamedTextColor.DARK_AQUA)
+                            .clickEvent(suggestCommand("/region owner set "))
+                            .hoverEvent(showText(text("Change Owner"))));
+        }
+        compName = compName.append(text("\n"));
+        compGroup = compGroup.append(text("\n"));
+        compOwner = compOwner.append(text("\n"));
+
+        return new Component[]{
+                text("%s Details\n".formatted(claimOwner == null ? "Region" : "Claim"))
+                        .decorate(UNDERLINED),
+                text("\n"),
+                compName,
+                text("World: %s\n".formatted(region.getWorldName())),
+                text("\n"),
+                compGroup,
+                compOwner
+        };
     }
 
     private Stream<Component[]> members() {
@@ -95,9 +128,10 @@ public class ClaimMenuBook implements BookAdapter {
                                 .color(NamedTextColor.GREEN)
                                 .hoverEvent(showText(text("Add " + typeNameTitleCase)))
                                 .clickEvent(suggestCommand("/region member add \u0001 " + type.name().toLowerCase())))
-                        .append(text(" %s List\n".formatted(typeNameTitleCase))
-                                .color(NamedTextColor.BLACK))
-                        .decorate(TextDecoration.UNDERLINED)
+                        .append(text(" "))
+                        .append(text("%s List\n".formatted(typeNameTitleCase))
+                                .color(NamedTextColor.BLACK)
+                                .decorate(UNDERLINED))
                         .build();
             }
 
@@ -120,7 +154,7 @@ public class ClaimMenuBook implements BookAdapter {
                                     .build();
                         })
                         .collect(atLeastOneOrElseGet(() -> text("- no %ss -".formatted(type.name().toLowerCase()))
-                                .decorate(TextDecoration.ITALIC)))
+                                .decorate(ITALIC)))
                         .toList();
             }
         };

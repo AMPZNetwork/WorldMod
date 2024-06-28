@@ -14,6 +14,13 @@ import static net.kyori.adventure.util.TriState.*;
 
 public interface PropagationController extends OwnedByParty, FlagContainer, Named {
     default Flag.Usage getEffectiveFlagValueForPlayer(Flag flag, UUID playerId) {
+        if (this instanceof Region rg && playerId.equals(rg.getClaimOwner()))
+            return Flag.Usage.builder()
+                    .flag(flag)
+                    .state(TRUE)
+                    .force(true)
+                    .priority(999)
+                    .build();
         var values = getFlagValues(flag).toList();
         var builder = Flag.Usage.builder().flag(flag).state(NOT_SET);
         if (values.isEmpty())

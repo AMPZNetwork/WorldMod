@@ -46,29 +46,33 @@ public class ClaimMenuBook implements BookAdapter {
 
     private Component[] toc() {
         var pgFlags = 3 + (int) members().count();
-        return new Component[]{text("""
-                %s Menu
-                %s by %s
-                \s
-                \s
-                """.formatted(
-                region.getClaimOwner() == null ? "Region" : "Claim",
-                region.getName(),
-                region.getClaimOwner() == null
-                        ? region.getWorldName()
-                        : worldMod.getPlayerAdapter().getName(region.getClaimOwner()))),
-                text("2 ... Claim Details\n")
+        var claimOwner = region.getClaimOwner();
+        var bestName = region.getBestName();
+        var rcTitle = region.getClaimOwner() == null ? "Region" : "Claim";
+
+        return new Component[]{
+                text("%s Menu\n".formatted(rcTitle))
+                        .decorate(UNDERLINED),
+                text("%s by %s\n".formatted(bestName.matches(RegExpUtil.UUID4_PATTERN)
+                        ? "Unnamed " + rcTitle
+                        : bestName, worldMod.getPlayerAdapter().getName(claimOwner))),
+                text("\n"),
+                text("\n"),
+                text("2 ... ")
+                        .append(text("Claim Details\n")
                         .decorate(UNDERLINED)
                         .hoverEvent(showText(text("Jump to page")))
-                        .clickEvent(changePage(2)),
-                text("3 ... Claim Members\n")
+                        .clickEvent(changePage(2))),
+                text("3 ... ")
+                        .append(text("Claim Members\n")
                         .decorate(UNDERLINED)
                         .hoverEvent(showText(text("Jump to page")))
-                        .clickEvent(changePage(3)),
-                text(pgFlags + " ... Flags\n")
+                        .clickEvent(changePage(3))),
+                text(pgFlags + " ... ")
+                        .append(text("Flags\n")
                         .decorate(UNDERLINED)
                         .hoverEvent(showText(text("Jump to page")))
-                        .clickEvent(changePage(pgFlags))
+                        .clickEvent(changePage(pgFlags)))
         };
     }
 
@@ -78,28 +82,31 @@ public class ClaimMenuBook implements BookAdapter {
         var group = region.getGroup();
         var canManage = region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() == TriState.TRUE;
 
-        var compName = text("Name: %s".formatted(bestName.matches(RegExpUtil.UUID4_PATTERN) ? "<not set>" : bestName));
-        var compGroup = text("Group: %s".formatted(group == null ? "none" : group.getBestName()));
-        var compOwner = text("Owner: %s".formatted(claimOwner == null ? "none" : worldMod.getPlayerAdapter().getName(claimOwner)));
+        var compName = text("Name: %s".formatted(bestName.matches(RegExpUtil.UUID4_PATTERN)
+                ? "<not set>" : bestName));
+        var compGroup = text("Group: %s".formatted(group == null
+                ? "none" : group.getBestName()));
+        var compOwner = text("Owner: %s".formatted(claimOwner == null
+                ? "none" : worldMod.getPlayerAdapter().getName(claimOwner)));
 
         if (canManage) {
             compName = compName
                     .append(text(" "))
                     .append(text("#")
                             .color(DARK_AQUA)
-                            .clickEvent(suggestCommand("/region name set "))
+                            .clickEvent(suggestCommand("/region name "))
                             .hoverEvent(showText(text("Change Name"))));
             compGroup = compGroup
                     .append(text(" "))
                     .append(text("#")
                             .color(DARK_AQUA)
-                            .clickEvent(suggestCommand("/region group set "))
+                            .clickEvent(suggestCommand("/region group "))
                             .hoverEvent(showText(text("Change Group"))));
             compOwner = compOwner
                     .append(text(" "))
                     .append(text("#")
                             .color(DARK_AQUA)
-                            .clickEvent(suggestCommand("/region owner set "))
+                            .clickEvent(suggestCommand("/region owner "))
                             .hoverEvent(showText(text("Transfer Ownership")
                                     .color(RED))));
         }

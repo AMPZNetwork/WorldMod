@@ -142,7 +142,7 @@ public class WorldModCommands {
                 var targetId = worldMod.getPlayerAdapter().getId(player);
                 (switch (type) {
                     case MEMBER -> region.getMemberIDs();
-                    case OWNER -> region.getOwnerIDs();
+                    case ADMIN -> region.getOwnerIDs();
                     default -> throw new Command.ArgumentError("type", "cannot add member of this type");
                 }).add(targetId);
                 return "%s was added to the list of %ss".formatted(player, type.name().toLowerCase());
@@ -160,7 +160,7 @@ public class WorldModCommands {
                 var wasOwner = region.getOwnerIDs().remove(targetId);
                 var wasMember = region.getMemberIDs().remove(targetId);
                 return "%s was removed from the list of %s".formatted(player, concat(
-                        wasOwner ? of(PlayerRelation.OWNER) : empty(),
+                        wasOwner ? of(PlayerRelation.ADMIN) : empty(),
                         wasMember ? of(PlayerRelation.MEMBER) : empty())
                         .map(Named::getName)
                         .map(String::toLowerCase)

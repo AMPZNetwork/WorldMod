@@ -9,7 +9,7 @@ public enum PlayerRelation implements Named, Bitmask.Attribute<PlayerRelation> {
     ENTITY,
     GUEST,
     MEMBER,
-    OWNER;
+    ADMIN;
 
     public static PlayerRelation find(Tellraw.Selector.Base base, @Nullable String type) {
         return switch (base) {

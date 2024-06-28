@@ -8,7 +8,6 @@ import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Value;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.RegExpUtil;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +23,7 @@ import static java.util.stream.Stream.of;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.event.ClickEvent.*;
 import static net.kyori.adventure.text.event.HoverEvent.showText;
+import static net.kyori.adventure.text.format.NamedTextColor.*;
 import static net.kyori.adventure.text.format.TextDecoration.ITALIC;
 import static net.kyori.adventure.text.format.TextDecoration.UNDERLINED;
 import static org.comroid.api.func.util.Streams.atLeastOneOrElseGet;
@@ -86,19 +86,19 @@ public class ClaimMenuBook implements BookAdapter {
             compName = compName
                     .append(text(" "))
                     .append(text("#")
-                            .color(NamedTextColor.DARK_AQUA)
+                            .color(DARK_AQUA)
                             .clickEvent(suggestCommand("/region name set "))
                             .hoverEvent(showText(text("Change Name"))));
             compGroup = compGroup
                     .append(text(" "))
                     .append(text("#")
-                            .color(NamedTextColor.DARK_AQUA)
+                            .color(DARK_AQUA)
                             .clickEvent(suggestCommand("/region group set "))
                             .hoverEvent(showText(text("Change Group"))));
             compOwner = compOwner
                     .append(text(" "))
                     .append(text("#")
-                            .color(NamedTextColor.DARK_AQUA)
+                            .color(DARK_AQUA)
                             .clickEvent(suggestCommand("/region owner set "))
                             .hoverEvent(showText(text("Change Owner"))));
         }
@@ -125,12 +125,12 @@ public class ClaimMenuBook implements BookAdapter {
                 var typeNameTitleCase = Title_Case.convert(type.name());
                 return text()
                         .append(text("[+]")
-                                .color(NamedTextColor.GREEN)
+                                .color(GREEN)
                                 .hoverEvent(showText(text("Add " + typeNameTitleCase)))
                                 .clickEvent(suggestCommand("/region member add \u0001 " + type.name().toLowerCase())))
                         .append(text(" "))
                         .append(text("%s List\n".formatted(typeNameTitleCase))
-                                .color(NamedTextColor.BLACK)
+                                .color(BLACK)
                                 .decorate(UNDERLINED))
                         .build();
             }
@@ -139,18 +139,18 @@ public class ClaimMenuBook implements BookAdapter {
                 var typeNameTitleCase = Title_Case.convert(type.name());
                 return (switch (type) {
                     case MEMBER -> region.getMemberIDs();
-                    case OWNER -> region.getOwnerIDs();
+                    case ADMIN -> region.getOwnerIDs();
                     default -> throw new IllegalStateException("Unexpected value: " + type);
                 }).stream()
                         .map(id -> {
                             var name = worldMod.getPlayerAdapter().getName(id);
                             return text()
                                     .append(text("[-]")
-                                            .color(NamedTextColor.RED)
+                                            .color(RED)
                                             .hoverEvent(showText(text("Remove %s '%s'".formatted(typeNameTitleCase, name))))
                                             .clickEvent(runCommand("/region member remove " + name)))
                                     .append(text(" %s\n".formatted(name))
-                                            .color(NamedTextColor.BLACK))
+                                            .color(BLACK))
                                     .build();
                         })
                         .collect(atLeastOneOrElseGet(() -> text("- no %ss -".formatted(type.name().toLowerCase()))
@@ -162,7 +162,7 @@ public class ClaimMenuBook implements BookAdapter {
         var pages = new ArrayList<TextComponent>();
         TextComponent page = null;
         int pageSize = 0;
-        var categories = of(PlayerRelation.OWNER, PlayerRelation.MEMBER)
+        var categories = of(PlayerRelation.ADMIN, PlayerRelation.MEMBER)
                 .map(type -> new AbstractMap.SimpleImmutableEntry<>(type, helper.entries(type).iterator()))
                 .iterator();
 

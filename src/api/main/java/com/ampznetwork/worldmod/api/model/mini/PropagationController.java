@@ -25,7 +25,7 @@ public interface PropagationController extends OwnedByParty, FlagContainer, Name
         var builder = Flag.Usage.builder().flag(flag).state(NOT_SET);
         if (values.isEmpty())
             return builder.build();
-        var me = getOwnerIDs().contains(playerId) ? OWNER
+        var me = getOwnerIDs().contains(playerId) ? ADMIN
                 : getMemberIDs().contains(playerId) ? MEMBER
                 : GUEST;
         var explicit = new Flag.Usage[4]; // indices: see PlayerRelation#ordinal()
@@ -46,7 +46,7 @@ public interface PropagationController extends OwnedByParty, FlagContainer, Name
         if (mine != null)
             return mine;
             // if only owner is set; everyone below should get false
-        else if (mask == OWNER.getAsLong())
+        else if (mask == ADMIN.getAsLong())
             choice = me.ordinal() <= MEMBER.ordinal() ? FALSE : TRUE;
             // if only member is set; everyone below should get false; above should get true
         else if (mask == MEMBER.getAsLong())

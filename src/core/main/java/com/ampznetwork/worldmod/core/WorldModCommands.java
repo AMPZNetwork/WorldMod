@@ -6,6 +6,7 @@ import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.PlayerRelation;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.api.model.sel.Area;
+import com.ampznetwork.worldmod.api.util.NameGenerator;
 import com.ampznetwork.worldmod.core.ui.ClaimMenuBook;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.util.TriState;
@@ -112,6 +113,38 @@ public class WorldModCommands {
         }
 
         @Command
+        public static String name(WorldMod worldMod, UUID playerId, @Nullable Region region, @Nullable @Command.Arg String arg) {
+            isClaimed(region);
+            if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
+                notPermitted();
+            if (arg == null)
+                arg = NameGenerator.INSTANCE.name();
+            region.setName(arg);
+            worldMod.getEntityService().save(region);
+            return "Name was changed to " + arg;
+        }
+
+        @Command
+        public static String group(WorldMod worldMod, UUID playerId, @Nullable Region region, @Nullable @Command.Arg String arg) {
+            throw new Command.Error("Not implemented");
+        }
+
+        @Command
+        public static String owner(WorldMod worldMod, UUID playerId, @Nullable Region region, @Nullable @Command.Arg String arg) {
+            isClaimed(region);
+            if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
+                notPermitted();
+            if (arg == null) {
+                region.setClaimOwner(null);
+                return "Owner removed";
+            }
+            var targetId = worldMod.getPlayerAdapter().getId(arg);
+            region.setClaimOwner(targetId);
+            worldMod.getEntityService().save(region);
+            return arg + " is now owner of " + region.getBestName();
+        }
+
+        @Command
         public static class member {
             @Command
             public static String list(WorldMod worldMod, @Nullable Region region) {
@@ -166,6 +199,18 @@ public class WorldModCommands {
                         .map(String::toLowerCase)
                         .map(str -> str + 's')
                         .collect(joining(" and ")));
+            }
+        }
+
+        @Command
+        public static class flag {
+            @Command
+            public static String set(WorldMod worldMod,
+                                     UUID playerId,
+                                     @Nullable Region region,
+                                     @Command.Arg String name,
+                                     @Command.Arg String value) {
+                throw new Command.Error("Not implemented");
             }
         }
     }

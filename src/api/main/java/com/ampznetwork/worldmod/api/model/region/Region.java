@@ -8,6 +8,7 @@ import com.ampznetwork.worldmod.api.model.sel.Chunk;
 import com.ampznetwork.worldmod.api.util.NameGenerator;
 import lombok.*;
 import lombok.Builder.Default;
+import lombok.experimental.NonFinal;
 import org.comroid.api.attr.Named;
 import org.comroid.api.data.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +26,7 @@ import static java.util.stream.Stream.concat;
 
 @Value
 @Entity
+@Setter
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @NoArgsConstructor(force = true)
@@ -34,16 +36,38 @@ public class Region implements PropagationController, ShapeCollider, Prioritized
     public static String GlobalRegionName = "#global";
     @Id
     @Default
+    String worldName = "world";
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Singular
+    @Convert(converter = Area.Converter.class)
+    Set<Area> areas;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Singular("owner")
+    Set<UUID> ownerIDs;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Singular("member")
+    Set<UUID> memberIDs;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Singular("flag")
+    @Convert(converter = Flag.Usage.Converter.class)
+    Set<Flag.Usage> declaredFlags;
+    @Id
+    @Default
     @NotNull
+    @NonFinal
     String name = NameGenerator.INSTANCE.get();
-    @Id @Default String worldName = "world";
-    @OneToOne @Default @Nullable Group group = null;
-    @Default long priority = 0;
-    @Default@Nullable UUID claimOwner=null;
-    @ElementCollection(fetch = FetchType.EAGER) @Singular @Convert(converter = Area.Converter.class) Set<Area> areas;
-    @ElementCollection(fetch = FetchType.EAGER) @Singular("owner") Set<UUID> ownerIDs;
-    @ElementCollection(fetch = FetchType.EAGER) @Singular("member") Set<UUID> memberIDs;
-    @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class) Set<Flag.Usage> declaredFlags;
+    @OneToOne
+    @Default
+    @Nullable
+    @NonFinal
+    Group group = null;
+    @Default
+    @NonFinal
+    long priority = 0;
+    @Default
+    @Nullable
+    @NonFinal
+    UUID claimOwner = null;
 
     public static Region global(String worldName) {
         return GlobalRegions.computeIfAbsent(worldName,

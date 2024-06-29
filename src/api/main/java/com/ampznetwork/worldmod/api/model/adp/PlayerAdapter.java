@@ -2,8 +2,10 @@ package com.ampznetwork.worldmod.api.model.adp;
 
 import org.comroid.api.data.Vector;
 import org.comroid.api.net.REST;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface PlayerAdapter {
     default UUID getId(String name) {
@@ -20,4 +22,6 @@ public interface PlayerAdapter {
     String getWorldName(UUID playerId);
 
     void openBook(UUID playerId, BookAdapter book);
+
+    CompletableFuture<String> anvilTextInput(UUID playerId, String title, @Nullable String value);
 }

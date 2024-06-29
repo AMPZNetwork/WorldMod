@@ -15,9 +15,12 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.comroid.api.data.Vector;
+import org.comroid.api.func.util.Command;
 import org.comroid.api.net.REST;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Value
 public class FabricPlayerAdapter implements PlayerAdapter {
@@ -88,5 +91,10 @@ public class FabricPlayerAdapter implements PlayerAdapter {
         buf.writeItemStack(stack);
 
         ServerPlayNetworking.send(plr, new Identifier("minecraft", "book_open"), buf);
+    }
+
+    @Override
+    public CompletableFuture<String> anvilTextInput(UUID playerId, String title, @Nullable String value) {
+        throw new Command.Error("unimplemented");
     }
 }

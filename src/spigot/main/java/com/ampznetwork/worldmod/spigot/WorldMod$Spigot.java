@@ -90,6 +90,7 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
         };
 
         getPluginManager().registerEvents(eventDispatch, this);
+        getPluginManager().registerEvents(playerAdapter, this);
     }
 
     @Override

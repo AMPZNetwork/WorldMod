@@ -168,5 +168,12 @@ public class WorldModCommands {
                         .collect(joining(" and ")));
             }
         }
+
+        @Command
+        public static void anviltest(WorldMod worldMod, UUID playerId) {
+            worldMod.getPlayerAdapter()
+                    .anvilTextInput(playerId, "Hello who?", null)
+                    .thenAcceptAsync(System.out::println);
+        }
     }
 }

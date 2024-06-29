@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.util.stream.Stream.*;
+import static java.util.stream.Stream.concat;
+import static java.util.stream.Stream.of;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.event.ClickEvent.*;
 import static net.kyori.adventure.text.event.HoverEvent.showText;
@@ -29,6 +30,7 @@ import static net.kyori.adventure.text.format.TextDecoration.UNDERLINED;
 import static org.comroid.api.func.util.Streams.atLeastOneOrElseGet;
 import static org.comroid.api.func.util.Streams.groupingEvery;
 import static org.comroid.api.text.Capitalization.Title_Case;
+import static org.comroid.api.text.Capitalization.lower_case;
 
 @Value
 public class ClaimMenuBook implements BookAdapter {
@@ -202,15 +204,7 @@ public class ClaimMenuBook implements BookAdapter {
     }
 
     private Stream<Component[]> flags$toc() {
-        record FlagEntry(Flag flag, int level) {
-            public static Stream<FlagEntry> expand(Flag flag, int i) {
-                return concat(
-                        of(new FlagEntry(flag, i)),
-                        flag.getChildren().stream()
-                                .flatMap(child -> expand(child, i + 1)));
-            }
-        }
-        final var header = text("Flags Menu\n\n")
+        final var header = text("Flag List\n\n")
                 .decorate(UNDERLINED);
         final var entriesPerPage = 10;
         final var pgFlags = (int) members().count();
@@ -220,30 +214,66 @@ public class ClaimMenuBook implements BookAdapter {
         return Flag.VALUES.values().stream()
                 .filter(flag -> flag.getParent() == null) // only root flags here
                 .sorted(Flag.COMPARATOR)
+                .flatMap(flag -> FlagEntry.expand(flag, 0))
                 .collect(groupingEvery(entriesPerPage)).stream()
-                .map(page -> {
-                    var comp = text().append(header);
-                    page.stream()
-                            .flatMap(flag -> FlagEntry.expand(flag, 0))
-                            .sorted(Comparator.comparing(FlagEntry::flag, Flag.COMPARATOR))
-                            .forEach(entry -> {
-                                var pageNo = flagPageOffset + pageOffsetCounter.getAndIncrement();
-
-                                comp.append(text("%03d ".formatted(pageNo) + IntStream.range(1, entry.level + 2)
-                                        .mapToObj($ -> "- ")
-                                        .collect(Collectors.joining()))
-                                        .append(text(entry.flag.getBestName())
-                                                .decorate(UNDERLINED)
-                                                .clickEvent(changePage(pageNo))
-                                                .font(Key.key("minecraft", "uniform"))
-                                                .hoverEvent(showText(text("Jump to Page " + pageNo))))
-                                        .append(text("\n")));
-                            });
-                    return new Component[]{comp.build()};
-                });
+                .map(page -> concat(
+                                of(header),
+                                page.stream()
+                                        .map(entry -> {
+                                            var pageNo = flagPageOffset + pageOffsetCounter.getAndIncrement();
+                                            return text("%03d ".formatted(pageNo) + IntStream.range(1, entry.level + 2)
+                                                    .mapToObj($ -> "- ")
+                                                    .collect(Collectors.joining()))
+                                                    .append(text(entry.flag.getBestName())
+                                                            .decorate(UNDERLINED)
+                                                            .clickEvent(changePage(pageNo))
+                                                            .font(Key.key("minecraft", "uniform"))
+                                                            .hoverEvent(showText(text("Jump to Page " + pageNo))))
+                                                    .append(text("\n"));
+                                        })
+                        ).toArray(Component[]::new)
+                );
     }
 
     private Stream<Component[]> flags$pages() {
-        return empty();
+        return Flag.VALUES.values().stream()
+                .filter(flag -> flag.getParent() == null) // only root flags here
+                .sorted(Flag.COMPARATOR)
+                .flatMap(flag -> FlagEntry.expand(flag, 0))
+                //.filter(entry -> entry.flag.getType().equals(StandardValueType.BOOLEAN)) // todo: autotype
+                .map(entry -> concat(
+                        of(
+                                text("Flag Menu - %s\n\n".formatted(entry.flag.getCanonicalName()))
+                                        .decorate(UNDERLINED),
+                                text("Name: %s\n".formatted(entry.flag.getBestName()))
+                        ),
+                        region.getFlagValues(entry.flag)
+                                .flatMap(usage -> usage.getSelectors().stream()
+                                        .map(selector -> {
+                                            var state = usage.getState();
+                                            return text("- ")
+                                                    .append(text(lower_case.convert(state.name()))
+                                                            .color(switch (state) {
+                                                                case NOT_SET -> AQUA;
+                                                                case FALSE -> RED;
+                                                                case TRUE -> GREEN;
+                                                            }))
+                                                    .append(text(" for "))
+                                                    .append(text(Title_Case.convert(PlayerRelation.valueOf(
+                                                            Objects.requireNonNull(selector.getType(),
+                                                                    "selector type").toUpperCase()).name())))
+                                                    .append(text("\n"));
+                                        })))
+                        .toArray(Component[]::new)
+                );
+    }
+
+    record FlagEntry(Flag flag, int level) {
+        public static Stream<FlagEntry> expand(Flag flag, int i) {
+            return concat(
+                    of(new FlagEntry(flag, i)),
+                    flag.getChildren().stream()
+                            .flatMap(child -> expand(child, i + 1)));
+        }
     }
 }

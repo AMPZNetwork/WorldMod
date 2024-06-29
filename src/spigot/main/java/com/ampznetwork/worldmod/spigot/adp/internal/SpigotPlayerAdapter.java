@@ -12,6 +12,7 @@ import org.comroid.api.data.Vector;
 import org.comroid.api.info.Constraint;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.UUID;
 
 import static net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer.get;
@@ -48,7 +49,7 @@ public class SpigotPlayerAdapter implements PlayerAdapter {
         if (!isOnline(playerId))
             throw new AssertionError("Target player is not online");
         var stack = new ItemStack(Material.WRITTEN_BOOK, 1);
-        var meta = (BookMeta) stack.getItemMeta();
+        var meta = Objects.requireNonNull((BookMeta) stack.getItemMeta(), "item meta");
         meta.setTitle(BookAdapter.TITLE);
         meta.setAuthor(BookAdapter.AUTHOR);
         meta.spigot().setPages(book.getPages().stream()

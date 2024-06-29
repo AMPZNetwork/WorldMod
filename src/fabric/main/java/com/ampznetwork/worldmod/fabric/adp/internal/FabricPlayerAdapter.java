@@ -12,12 +12,15 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.comroid.api.data.Vector;
 import org.comroid.api.net.REST;
 
+import java.util.Collection;
 import java.util.UUID;
+
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson;
 
 @Value
 public class FabricPlayerAdapter implements PlayerAdapter {
@@ -65,22 +68,18 @@ public class FabricPlayerAdapter implements PlayerAdapter {
         var tag = new NbtCompound();
         tag.putString("title", BookAdapter.TITLE);
         tag.putString("author", BookAdapter.AUTHOR);
-        var pages = new NbtList();
 
-        // todo: book needs to be serialized
-//        book.getPages().stream()
-//                .map(page -> {
-//                    Arrays.stream(page)
-//                            .map(comp -> NbtString.of(""))
-//                            .toList();
-//                })
-//                .forEach(ls->pages.add(ls));
+        var pages = book.getPages().stream()
+                .map(page -> {
+                    var text = text();
+                    for (var comp : page)
+                        text.append(comp);
+                    return text.build();
+                })
+                .map(page -> NbtString.of(gson().serialize(page)))
+                .collect(NbtList::new, Collection::add, Collection::addAll);
 
-
-        pages.add(NbtString.of(Text.Serializer.toJson(Text.of("Page 1 text"))));
-        pages.add(NbtString.of(Text.Serializer.toJson(Text.of("Page 2 text"))));
         tag.put("pages", pages);
-
         stack.setNbt(tag);
 
         // Create a PacketByteBuf and write the stack item stack to it

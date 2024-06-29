@@ -6,20 +6,20 @@ import com.ampznetwork.worldmod.api.model.adp.BookAdapter;
 import com.ampznetwork.worldmod.api.model.mini.PlayerRelation;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Value;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.RegExpUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.util.stream.Stream.concat;
-import static java.util.stream.Stream.of;
+import static java.util.stream.Stream.*;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.event.ClickEvent.*;
 import static net.kyori.adventure.text.event.HoverEvent.showText;
@@ -27,7 +27,7 @@ import static net.kyori.adventure.text.format.NamedTextColor.*;
 import static net.kyori.adventure.text.format.TextDecoration.ITALIC;
 import static net.kyori.adventure.text.format.TextDecoration.UNDERLINED;
 import static org.comroid.api.func.util.Streams.atLeastOneOrElseGet;
-import static org.comroid.api.func.util.Streams.cast;
+import static org.comroid.api.func.util.Streams.groupingEvery;
 import static org.comroid.api.text.Capitalization.Title_Case;
 
 @Value
@@ -40,7 +40,8 @@ public class ClaimMenuBook implements BookAdapter {
     public List<Component[]> getPages() {
         return concat(
                 of(toc(), details()),
-                concat(members(), flags()))
+                concat(members(),
+                        concat(flags$toc(), flags$pages())))
                 .toList();
     }
 
@@ -200,7 +201,49 @@ public class ClaimMenuBook implements BookAdapter {
         return pages.stream().map(comp -> new Component[]{comp});
     }
 
-    private Stream<Component[]> flags() {
-        return of((Object) new Component[]{text("flags (wip)")}).flatMap(cast(Component[].class));
+    private Stream<Component[]> flags$toc() {
+        record FlagEntry(Flag flag, int level) {
+            public static Stream<FlagEntry> expand(Flag flag, int i) {
+                return concat(
+                        of(new FlagEntry(flag, i)),
+                        flag.getChildren().stream()
+                                .flatMap(child -> expand(child, i + 1)));
+            }
+        }
+        final var header = text("Flags Menu\n\n")
+                .decorate(UNDERLINED);
+        final var entriesPerPage = 10;
+        final var pgFlags = (int) members().count();
+        final var lenFlagToc = Flag.VALUES.size() / entriesPerPage;
+        final var flagPageOffset = pgFlags + lenFlagToc;
+        final var pageOffsetCounter = new AtomicInteger(0);
+        return Flag.VALUES.values().stream()
+                .filter(flag -> flag.getParent() == null) // only root flags here
+                .sorted(Flag.COMPARATOR)
+                .collect(groupingEvery(entriesPerPage)).stream()
+                .map(page -> {
+                    var comp = text().append(header);
+                    page.stream()
+                            .flatMap(flag -> FlagEntry.expand(flag, 0))
+                            .sorted(Comparator.comparing(FlagEntry::flag, Flag.COMPARATOR))
+                            .forEach(entry -> {
+                                var pageNo = flagPageOffset + pageOffsetCounter.getAndIncrement();
+
+                                comp.append(text("%03d ".formatted(pageNo) + IntStream.range(1, entry.level + 2)
+                                        .mapToObj($ -> "- ")
+                                        .collect(Collectors.joining()))
+                                        .append(text(entry.flag.getBestName())
+                                                .decorate(UNDERLINED)
+                                                .clickEvent(changePage(pageNo))
+                                                .font(Key.key("minecraft", "uniform"))
+                                                .hoverEvent(showText(text("Jump to Page " + pageNo))))
+                                        .append(text("\n")));
+                            });
+                    return new Component[]{comp.build()};
+                });
+    }
+
+    private Stream<Component[]> flags$pages() {
+        return empty();
     }
 }

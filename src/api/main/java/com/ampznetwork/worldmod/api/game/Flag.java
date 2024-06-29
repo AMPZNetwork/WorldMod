@@ -15,10 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.AttributeConverter;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.comroid.api.data.seri.type.StandardValueType.BOOLEAN;
@@ -28,6 +25,7 @@ import static org.comroid.api.data.seri.type.StandardValueType.BOOLEAN;
 public class Flag implements Named, Described, Prioritized {
     private static final Map<String, Flag> $ = new ConcurrentHashMap<>();
     public static final Map<String,Flag> VALUES = Collections.unmodifiableMap($);
+    public static final Comparator<? super Flag> COMPARATOR = Comparator.<Flag>comparingLong(Prioritized::getPriority).reversed();
     public static final Flag Passthrough = new Flag("passthrough", Long.MAX_VALUE, BOOLEAN, "Passthrough", "Enable to force WorldMod to not handle any events", false);
     public static final Flag Manage = new Flag("manage", 10, BOOLEAN, "Manage", "Enable to allow players to manage claim", false);
     public static final Flag Build = new Flag("build", 50, BOOLEAN, "Building", "Enable to force WorldMod to not handle any events", false);
@@ -120,6 +118,8 @@ public class Flag implements Named, Described, Prioritized {
     @Nullable String displayName;
     @Nullable String description;
     @Nullable Object defaultValue;
+    @NotNull
+    List<Flag> children = new ArrayList<>();
 
     public Flag(String name,
                 long priority,
@@ -144,6 +144,9 @@ public class Flag implements Named, Described, Prioritized {
         this.displayName = displayName;
         this.description = description;
         this.defaultValue = defaultValue;
+
+        if (parent != null)
+            parent.children.add(this);
 
         Constraint.decide($.containsKey(getCanonicalName()), "cached Flag '" + getBestName() + "'")
                 .setExpected("nonexistent")

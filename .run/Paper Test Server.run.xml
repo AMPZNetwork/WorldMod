@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="Paper Test Server" type="JarApplication">
+        <option name="JAR_PATH" value="$PROJECT_DIR$/spigot/run/paper.jar"/>
+        <option name="VM_PARAMETERS" value="-Xmx2G"/>
+        <option name="PROGRAM_PARAMETERS" value="nogui"/>
+        <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/spigot/run/"/>
+        <option name="ALTERNATIVE_JRE_PATH"/>
+        <envs>
+            <env name="DEBUG" value="true"/>
+        </envs>
+        <method v="2">
+            <option name="Gradle.BeforeRunTask" enabled="false" tasks=":spigot:testPlugin"
+                    externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters=""/>
+        </method>
+    </configuration>
+</component>

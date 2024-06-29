@@ -13,17 +13,19 @@ sourceSets {
     test.resources.srcDirs  = files(parent.projectDir.toString() + "/src/spigot/test/java")
 }
 
-tasks.register('dlServerJar', Download).configure {
-    src 'https://github.com/IzzelAliz/Arclight/releases/download/Trials%2F1.0.5/arclight-forge-1.20.1-1.0.5.jar'
-    //src 'https://serverjars.com/api/fetchJar/servers/paper/1.19.4'
-    dest "${buildDir}/libs/server.jar"
+tasks.register('dlSpigotServerJar', Download).configure {
+    src 'https://download.getbukkit.org/spigot/spigot-1.20.1.jar'
+    dest "$projectDir/run/spigot.jar"
 }
 
-tasks.register('serverJar', Copy) {
-    dependsOn dlServerJar
-    from dlServerJar.outputs.files.singleFile
-    into "$projectDir/run"
-    rename { n -> "server.jar" }
+tasks.register('dlPaperServerJar', Download).configure {
+    src 'https://api.papermc.io/v2/projects/paper/versions/1.20.1/builds/196/downloads/paper-1.20.1-196.jar'
+    dest "$projectDir/run/paper.jar"
+}
+
+tasks.register('dlArclightServerJar', Download).configure {
+    src 'https://github.com/IzzelAliz/Arclight/releases/download/Trials%2F1.0.5/arclight-forge-1.20.1-1.0.5.jar'
+    dest "$projectDir/run/arclight.jar"
 }
 
 shadowJar {
@@ -31,7 +33,7 @@ shadowJar {
 }
 
 tasks.register('testPlugin', Copy) {
-    dependsOn shadowJar, serverJar
+    dependsOn shadowJar, dlArclightServerJar, dlPaperServerJar, dlSpigotServerJar
     from shadowJar.outputs.files.singleFile
     into "${projectDir}/run/plugins"
     rename { n -> "WorldMod-spigot.jar" }

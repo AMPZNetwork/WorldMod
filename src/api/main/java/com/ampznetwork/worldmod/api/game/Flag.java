@@ -162,11 +162,15 @@ public class Flag implements Named, Described, Prioritized {
     }
 
     @Data
+    @With
     @Builder
     @EqualsAndHashCode
+    @RequiredArgsConstructor
     public static class Usage implements Prioritized {
         @NotNull Flag flag;
-        @NotNull TriState state;
+        @lombok.Builder.Default
+        @NotNull
+        TriState state = TriState.NOT_SET;
         @lombok.Builder.Default
         @Nullable String value = null;
         @lombok.Builder.Default

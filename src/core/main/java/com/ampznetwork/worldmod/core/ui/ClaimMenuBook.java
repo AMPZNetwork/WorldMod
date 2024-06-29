@@ -59,17 +59,17 @@ public class ClaimMenuBook implements BookAdapter {
                         : bestName, worldMod.getPlayerAdapter().getName(claimOwner))),
                 text("\n"),
                 text("\n"),
-                text("2 ... ")
+                text("2 - ")
                         .append(text("Claim Details\n")
                         .decorate(UNDERLINED)
                         .hoverEvent(showText(text("Jump to page")))
                         .clickEvent(changePage(2))),
-                text("3 ... ")
+                text("3 - ")
                         .append(text("Claim Members\n")
                         .decorate(UNDERLINED)
                         .hoverEvent(showText(text("Jump to page")))
                         .clickEvent(changePage(3))),
-                text(pgFlags + " ... ")
+                text(pgFlags + " - ")
                         .append(text("Flags\n")
                         .decorate(UNDERLINED)
                         .hoverEvent(showText(text("Jump to page")))

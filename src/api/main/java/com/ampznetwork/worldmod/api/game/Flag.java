@@ -165,6 +165,7 @@ public class Flag implements Named, Described, Prioritized {
     @With
     @Builder
     @EqualsAndHashCode
+    @AllArgsConstructor
     @RequiredArgsConstructor
     public static class Usage implements Prioritized {
         @NotNull Flag flag;

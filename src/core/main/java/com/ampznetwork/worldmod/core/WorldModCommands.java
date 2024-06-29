@@ -75,7 +75,7 @@ public class WorldModCommands {
     @Alias("claim")
     public static class region {
         @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
-        public static String $(WorldMod worldMod, UUID playerId) {
+        public static String $(WorldMod worldMod, UUID playerId, @Nullable @Command.Arg String name) {
             if (!selections.containsKey(playerId))
                 throw new Command.Error("No area selected!");
             var sel = sel(playerId).build();
@@ -87,6 +87,8 @@ public class WorldModCommands {
                     //.name(UUID.randomUUID().toString())
                     .worldName(world)
                     .claimOwner(playerId);
+            if (name != null)
+                rg.name(name);
             if (!worldMod.addRegion(rg.build()))
                 throw new Command.Error("Could not create claim");
             return "Area claimed!";

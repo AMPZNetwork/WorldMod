@@ -228,8 +228,7 @@ public class ClaimMenuBook implements BookAdapter {
                                             .font(key("minecraft", "uniform"))
                                             .hoverEvent(showText(text("Jump to Page " + pageNo))))
                                     .append(text("\n"));
-                        })
-                        ).toArray(Component[]::new)
+                        })).toArray(Component[]::new)
                 );
     }
 

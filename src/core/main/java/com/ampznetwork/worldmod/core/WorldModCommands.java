@@ -84,7 +84,6 @@ public class WorldModCommands {
             var world = worldMod.getPlayerAdapter().getWorldName(playerId);
             var rg = Region.builder()
                     .area(sel)
-                    //.name(UUID.randomUUID().toString())
                     .worldName(world)
                     .claimOwner(playerId);
             if (name != null)
@@ -120,7 +119,7 @@ public class WorldModCommands {
             if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
                 notPermitted();
             if (arg == null)
-                arg = NameGenerator.INSTANCE.name();
+                arg = NameGenerator.INSTANCE.get();
             region.setName(arg);
             worldMod.getEntityService().save(region);
             return "Name was changed to " + arg;

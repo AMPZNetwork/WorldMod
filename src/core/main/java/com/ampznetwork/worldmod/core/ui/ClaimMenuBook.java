@@ -6,7 +6,6 @@ import com.ampznetwork.worldmod.api.model.adp.BookAdapter;
 import com.ampznetwork.worldmod.api.model.mini.PlayerRelation;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Value;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.util.TriState;
@@ -21,6 +20,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
+import static net.kyori.adventure.key.Key.key;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.event.ClickEvent.*;
 import static net.kyori.adventure.text.event.HoverEvent.showText;
@@ -216,24 +216,23 @@ public class ClaimMenuBook implements BookAdapter {
                 .sorted(Flag.COMPARATOR)
                 .flatMap(flag -> FlagEntry.expand(flag, 0))
                 .collect(groupingEvery(entriesPerPage)).stream()
-                .map(page -> concat(
-                                of(header),
-                                page.stream()
-                                        .map(entry -> {
-                                            var pageNo = flagPageOffset + pageOffsetCounter.getAndIncrement();
-                                            return text("%03d ".formatted(pageNo) + IntStream.range(1, entry.level + 2)
-                                                    .mapToObj($ -> "- ")
-                                                    .collect(Collectors.joining()))
-                                                    .append(text(entry.flag.getBestName())
-                                                            .decorate(UNDERLINED)
-                                                            .clickEvent(changePage(pageNo))
-                                                            .font(Key.key("minecraft", "uniform"))
-                                                            .hoverEvent(showText(text("Jump to Page " + pageNo))))
-                                                    .append(text("\n"));
-                                        })
+                .map(page -> concat(of(header),
+                        page.stream().map(entry -> {
+                            var pageNo = flagPageOffset + pageOffsetCounter.getAndIncrement();
+                            return text("%03d ".formatted(pageNo) + IntStream.range(1, entry.level + 2)
+                                    .mapToObj($ -> "- ")
+                                    .collect(Collectors.joining()))
+                                    .append(text(entry.flag.getBestName())
+                                            .decorate(UNDERLINED)
+                                            .clickEvent(changePage(pageNo))
+                                            .font(key("minecraft", "uniform"))
+                                            .hoverEvent(showText(text("Jump to Page " + pageNo))))
+                                    .append(text("\n"));
+                        })
                         ).toArray(Component[]::new)
                 );
     }
+
 
     private Stream<Component[]> flags$pages() {
         return Flag.VALUES.values().stream()

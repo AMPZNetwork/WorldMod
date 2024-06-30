@@ -72,8 +72,8 @@ public class WorldModCommands {
     }
 
     @Command
-    @Alias("claim")
-    public static class region {
+    @Alias("region")
+    public static class claim {
         @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
         public static String $(WorldMod worldMod, UUID playerId, @Nullable @Command.Arg String name) {
             if (!selections.containsKey(playerId))

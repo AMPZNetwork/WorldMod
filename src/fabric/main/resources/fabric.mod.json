@@ -11,7 +11,7 @@
 		"homepage": "https://github.com/AMPZNetwork/WorldMod",
 		"sources": "https://github.com/AMPZNetwork/WorldMod"
 	},
-	"license": "CC0-1.0",
+	"license": "GPL-3.0",
 	"icon": "assets/worldmod/icon.png",
 	"environment": "*",
 	"entrypoints": {

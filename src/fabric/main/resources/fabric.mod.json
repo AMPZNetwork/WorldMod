@@ -3,7 +3,7 @@
 	"id": "worldmod",
 	"version": "${version}",
 	"name": "WorldMod",
-	"description": "World Protection Mod, because EngineHub people are assholes",
+	"description": "World Protection Mod",
 	"authors": [
 		"Kaleidox"
 	],

@@ -3,7 +3,7 @@ import net.fabricmc.loom.task.RemapJarTask
 plugins {
 	id 'com.github.johnrengelman.shadow' version '8.1.1'
 	id "de.undercouch.download" version "5.5.0"
-	id 'fabric-loom' version '1.5-SNAPSHOT'
+	id 'fabric-loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
 }
 
@@ -80,7 +80,7 @@ dependencies {
 	// modImplementation "net.fabricmc.fabric-api:fabric-api-deprecated:${project.fabric_version}"
 
 	// worldmod api
-	implementation project(':core') // todo: include as shadowjar
+	implementation project("$prefix:core") // todo: include as shadowjar
 	implementation 'net.kyori:adventure-platform-fabric:5.9.0'
 
 	// owo lib
@@ -143,7 +143,7 @@ publishing {
 }
 
 shadowJar {
-	dependsOn project(':api').simplifyArtifact
+	dependsOn project("$prefix:api").simplifyArtifact
 }
 
 task simplifyArtifact(type: Copy) {

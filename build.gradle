@@ -14,6 +14,10 @@ def getCommitTimestampSeconds() {
 
 allprojects {
     apply plugin: 'idea'
+
+    ext {
+        prefix = rootProject.name.equals('LibMod') ? '' : ':LibMod'
+    }
 }
 
 subprojects {
@@ -37,11 +41,11 @@ subprojects {
 
     dependencies {
         if (!project.name.endsWith('api'))
-            api project(':api')
+            api project("$prefix:api")
 
         if (project.name != 'japi')
-            if (findProject(':japi') != null)
-                api project(':japi')
+            if (findProject("$prefix:japi") != null)
+                api project("$prefix:japi")
             else api 'org.comroid:japi:+'
 
         // utility

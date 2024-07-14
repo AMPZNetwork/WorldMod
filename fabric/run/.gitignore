@@ -3,4 +3,4 @@
 !.gitignore
 !eula.txt
 #!server.properties
-!plugins/WorldMod/config.yml
+!config/worldMod-config.json5

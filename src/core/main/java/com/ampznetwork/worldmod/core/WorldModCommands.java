@@ -177,7 +177,7 @@ public class WorldModCommands {
                 (switch (type) {
                     case MEMBER -> region.getMemberIDs();
                     case ADMIN -> region.getOwnerIDs();
-                    default -> throw new Command.ArgumentError("type", "cannot add member of this type");
+                    default -> throw new Command.Error("cannot add member of this type");
                 }).add(targetId);
                 return "%s was added to the list of %ss".formatted(player, type.name().toLowerCase());
             }

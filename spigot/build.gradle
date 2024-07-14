@@ -7,10 +7,10 @@ plugins {
 group = 'com.ampznetwork.worldmod'
 
 sourceSets {
-    main.java.srcDirs       = files(parent.projectDir.toString() + "/src/spigot/main/java")
-    main.resources.srcDirs  = files(parent.projectDir.toString() + "/src/spigot/main/resources")
-    test.java.srcDirs       = files(parent.projectDir.toString() + "/src/spigot/test/java")
-    test.resources.srcDirs  = files(parent.projectDir.toString() + "/src/spigot/test/java")
+    main.java.srcDirs = files("${parent.projectDir}/src/$project.name/main/java")
+    main.resources.srcDirs = files("${parent.projectDir}/src/$project.name/main/resources")
+    test.java.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
+    test.resources.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
 }
 
 tasks.register('dlSpigotServerJar', Download).configure {
@@ -30,6 +30,14 @@ tasks.register('dlArclightServerJar', Download).configure {
 
 shadowJar {
     dependsOn project("$prefix:api").simplifyArtifact
+
+    configurations = [project.configurations.runtimeClasspath]
+
+    dependencies {
+        include(dependency(':japi'))
+        include(dependency("$prefix:api"))
+        include(dependency("$prefix:core"))
+    }
 }
 
 tasks.register('testPlugin', Copy) {

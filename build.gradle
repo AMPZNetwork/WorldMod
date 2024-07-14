@@ -16,7 +16,7 @@ allprojects {
     apply plugin: 'idea'
 
     ext {
-        prefix = rootProject.name.equals('LibMod') ? '' : ':LibMod'
+        prefix = rootProject.name.equals('WorldMod') ? '' : ':WorldMod'
     }
 }
 

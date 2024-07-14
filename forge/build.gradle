@@ -114,10 +114,10 @@ minecraft {
 
 
 sourceSets {
-    main.java.srcDirs       = files(parent.projectDir.toString() + "/src/forge/main/java")
-    main.resources.srcDirs  = files(parent.projectDir.toString() + "/src/forge/main/resources", "/src/generated/resources")
-    test.java.srcDirs       = files(parent.projectDir.toString() + "/src/forge/test/java")
-    test.resources.srcDirs  = files(parent.projectDir.toString() + "/src/forge/test/java")
+    main.java.srcDirs = files("${parent.projectDir}/src/$project.name/main/java")
+    main.resources.srcDirs = files("${parent.projectDir}/src/$project.name/main/resources")
+    test.java.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
+    test.resources.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
 }
 
 repositories {

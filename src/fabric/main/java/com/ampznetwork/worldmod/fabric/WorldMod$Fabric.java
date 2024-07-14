@@ -19,7 +19,6 @@ import org.comroid.api.java.StackTraceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -37,7 +36,7 @@ public class WorldMod$Fabric implements ModInitializer, WorldMod {
     private final Config config = Config.createAndLoad();
     private MinecraftServer server;
     private Command.Manager cmdr;
-    private Command.Manager.Adapter$Fabric adapter;
+    //private Command.Manager.Adapter$Fabric adapter;
     private EntityService entityService;
 
     @Override
@@ -45,24 +44,6 @@ public class WorldMod$Fabric implements ModInitializer, WorldMod {
         ServerLifecycleEvents.SERVER_STARTING.register(server -> this.server = server);
 
         this.cmdr = new Command.Manager();
-        this.adapter = cmdr.new Adapter$Fabric() {
-            @Override
-            public String handleThrowable(Throwable throwable) {
-                return throwable instanceof InvocationTargetException ITEx
-                        ? handleThrowable(ITEx.getCause())
-                        : super.handleThrowable(new Command.Error(throwable));
-            }
-
-//            @Override
-//            protected Stream<Object> collectExtraArgs(@NotNull CommandSender sender) {
-//                if (!(sender instanceof Player player))
-//                    throw new Command.Error("Cannot be used from console");
-//                var pos = playerAdapter.getPosition(player.getUniqueId());
-//                return super.collectExtraArgs(sender)
-//                        .collect(append(WorldMod$Spigot.this, entityService.findRegion(pos,
-//                                playerAdapter.getWorldName(player.getUniqueId())).orElse(null)));
-//            }
-        };
         cmdr.register(WorldModCommands.class);
         cmdr.register(this);
         cmdr.initialize();

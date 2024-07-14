@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.java.StackTraceUtils;
@@ -24,11 +23,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.bukkit.Bukkit.getPluginManager;
 import static org.comroid.api.func.util.Debug.isDebug;
-import static org.comroid.api.func.util.Streams.append;
 
 @Getter
 public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
@@ -60,6 +57,7 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
                         : super.handleThrowable(new Command.Error(throwable));
             }
 
+            /*
             @Override
             protected Stream<Object> collectExtraArgs(@NotNull CommandSender sender) {
                 if (!(sender instanceof Player player))
@@ -69,6 +67,7 @@ public class WorldMod$Spigot extends JavaPlugin implements WorldMod {
                         .collect(append(WorldMod$Spigot.this, entityService.findRegion(pos,
                                 playerAdapter.getWorldName(player.getUniqueId())).orElse(null)));
             }
+             */
         };
         cmdr.register(WorldModCommands.class);
         cmdr.register(this);

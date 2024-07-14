@@ -14,10 +14,10 @@ base {
 }
 
 sourceSets {
-	main.java.srcDirs       = files(parent.projectDir.toString() + "/src/fabric/main/java")
-	main.resources.srcDirs  = files(parent.projectDir.toString() + "/src/fabric/main/resources")
-	test.java.srcDirs       = files(parent.projectDir.toString() + "/src/fabric/test/java")
-	test.resources.srcDirs  = files(parent.projectDir.toString() + "/src/fabric/test/java")
+	main.java.srcDirs = files("${parent.projectDir}/src/$project.name/main/java")
+	main.resources.srcDirs = files("${parent.projectDir}/src/$project.name/main/resources")
+	test.java.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
+	test.resources.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
 }
 
 tasks.register('dlServerJar', Download).configure {

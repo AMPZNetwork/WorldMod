@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.experimental.NonFinal;
-import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.Level;
+import lombok.extern.slf4j.Slf4j;
 import org.comroid.api.attr.Named;
 import org.comroid.api.attr.UUIDContainer;
 import org.comroid.api.func.util.Cache;
@@ -17,7 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import static org.comroid.api.net.REST.Method.GET;
 
 @Value
-@Log4j2
+@Slf4j
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class Player implements UUIDContainer, Named {
@@ -30,7 +29,7 @@ public class Player implements UUIDContainer, Named {
                 .thenApply(REST.Response::validate2xxOK)
                 .thenApply(rsp -> rsp.getBody().get("name").asString())
                 .exceptionally(t -> {
-                    log.log(Level.WARN, "Could not retrieve Minecraft Username for user " + id, t);
+                    log.warn("Could not retrieve Minecraft Username for user " + id, t);
                     return "<failed to obtain username>";
                 }));
         future.thenAccept(str->name=str);

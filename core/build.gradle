@@ -14,10 +14,10 @@ sourceCompatibility = '17'
 targetCompatibility = '17'
 
 sourceSets {
-    main.java.srcDirs = files(parent.projectDir.toString() + "/src/core/main/java")
-    main.resources.srcDirs = files(parent.projectDir.toString() + "/src/core/main/resources")
-    test.java.srcDirs = files(parent.projectDir.toString() + "/src/core/test/java")
-    test.resources.srcDirs = files(parent.projectDir.toString() + "/src/core/test/java")
+    main.java.srcDirs = files("${parent.projectDir}/src/$project.name/main/java")
+    main.resources.srcDirs = files("${parent.projectDir}/src/$project.name/main/resources")
+    test.java.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
+    test.resources.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
 }
 
 apply from: "$parent.projectDir/gradle/publishing.gradle"
@@ -30,7 +30,6 @@ repositories {
 }
 
 dependencies {
-    // worldmod api
     api project("$prefix:api")
 
     // database

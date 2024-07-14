@@ -20,7 +20,7 @@ sourceSets {
     test.resources.srcDirs  = files(parent.projectDir.toString() + "/src/api/test/java")
 }
 
-apply from: "$rootDir/gradle/publishing.gradle"
+apply from: "$parent.projectDir/gradle/publishing.gradle"
 
 repositories {
     maven { url 'https://maven.comroid.org' }

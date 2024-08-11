@@ -1,5 +1,6 @@
 package com.ampznetwork.worldmod.api.model.region;
 
+import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.mini.PropagationController;
@@ -9,7 +10,11 @@ import lombok.Singular;
 import lombok.Value;
 import org.comroid.api.attr.Named;
 
-import javax.persistence.*;
+import javax.persistence.Convert;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -17,7 +22,7 @@ import java.util.stream.Stream;
 @Value
 @Entity
 @Builder(toBuilder = true)
-public class Group implements PropagationController, Prioritized, Named {
+public class Group extends DbObject implements PropagationController, Prioritized, Named {
     @Id String name;
     @Default long priority = 0;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("owner") Set<UUID> ownerIDs;

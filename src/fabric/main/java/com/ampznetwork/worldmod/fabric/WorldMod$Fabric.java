@@ -1,7 +1,6 @@
 package com.ampznetwork.worldmod.fabric;
 
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.api.database.EntityService;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.core.WorldModCommands;
@@ -37,7 +36,6 @@ public class WorldMod$Fabric implements ModInitializer, WorldMod {
     private MinecraftServer server;
     private Command.Manager cmdr;
     //private Command.Manager.Adapter$Fabric adapter;
-    private EntityService entityService;
 
     @Override
     public void onInitialize() {

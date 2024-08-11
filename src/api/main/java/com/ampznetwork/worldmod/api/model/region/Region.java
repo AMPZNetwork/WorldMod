@@ -1,21 +1,42 @@
 package com.ampznetwork.worldmod.api.model.region;
 
+import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
-import com.ampznetwork.worldmod.api.model.mini.*;
+import com.ampznetwork.worldmod.api.model.mini.PointCollider;
+import com.ampznetwork.worldmod.api.model.mini.Prioritized;
+import com.ampznetwork.worldmod.api.model.mini.PropagationController;
+import com.ampznetwork.worldmod.api.model.mini.RegionCompositeKey;
+import com.ampznetwork.worldmod.api.model.mini.ShapeCollider;
 import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.ampznetwork.worldmod.api.model.sel.Chunk;
 import com.ampznetwork.worldmod.api.util.NameGenerator;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Builder.Default;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.Singular;
+import lombok.Value;
 import lombok.experimental.NonFinal;
 import org.comroid.api.attr.Named;
 import org.comroid.api.data.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.persistence.*;
-import java.util.*;
+import javax.persistence.Convert;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.OneToOne;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,7 +52,7 @@ import static java.util.stream.Stream.concat;
 @Builder(toBuilder = true)
 @NoArgsConstructor(force = true)
 @IdClass(RegionCompositeKey.class)
-public class Region implements PropagationController, ShapeCollider, Prioritized, Named, PointCollider {
+public class Region extends DbObject implements PropagationController, ShapeCollider, Prioritized, Named, PointCollider {
     private static final Map<String, Region> GlobalRegions = new ConcurrentHashMap<>();
     public static String GlobalRegionName = "#global";
     @Id

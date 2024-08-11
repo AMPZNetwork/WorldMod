@@ -1,16 +1,21 @@
 package com.ampznetwork.worldmod.api;
 
-import com.ampznetwork.worldmod.api.database.EntityService;
+import com.ampznetwork.libmod.api.adapter.SubMod;
+import com.ampznetwork.libmod.core.database.hibernate.PersistenceUnitBase;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import org.comroid.api.func.util.Command;
+import org.comroid.api.info.Log;
 import org.jetbrains.annotations.Contract;
 
+import javax.persistence.spi.PersistenceUnitInfo;
+import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.logging.Level;
 
-public interface WorldMod {
+public interface WorldMod extends SubMod {
     String AddonId = "worldmod";
     String AddonName = "WorldMod";
 
@@ -35,12 +40,21 @@ public interface WorldMod {
         return Collections.emptyList();
     }
 
-    EntityService getEntityService();
     PlayerAdapter getPlayerAdapter();
 
     default boolean addRegion(Region region) {
-        //getRegions().add(region);
-        return getEntityService().save(region);
+        try {
+            getEntityService().save(region);
+            return true;
+        } catch (Throwable t) {
+            Log.at(Level.WARNING, "Could not save region " + region, t);
+            return false;
+        }
+    }
+
+    @Override
+    default PersistenceUnitInfo createPersistenceUnit(DataSource dataSource) {
+        return new PersistenceUnitBase("WorldMod", WorldMod.class, dataSource, getEntityTypes().toArray(new Class[0]));
     }
 
     interface Permission {

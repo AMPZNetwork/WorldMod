@@ -1,6 +1,6 @@
 package com.ampznetwork.worldmod.api;
 
-import com.ampznetwork.libmod.api.adapter.SubMod;
+import com.ampznetwork.libmod.api.SubMod;
 import com.ampznetwork.libmod.core.database.hibernate.PersistenceUnitBase;
 import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.region.Group;

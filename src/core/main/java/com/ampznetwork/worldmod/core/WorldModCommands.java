@@ -1,12 +1,12 @@
 package com.ampznetwork.worldmod.core;
 
+import com.ampznetwork.libmod.api.util.NameGenerator;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.PlayerRelation;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.api.model.sel.Area;
-import com.ampznetwork.worldmod.api.util.NameGenerator;
 import com.ampznetwork.worldmod.core.ui.ClaimMenuBook;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.util.TriState;
@@ -26,7 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.ampznetwork.worldmod.api.WorldMod.isClaimed;
 import static com.ampznetwork.worldmod.api.WorldMod.notPermitted;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Stream.*;
+import static java.util.stream.Stream.concat;
+import static java.util.stream.Stream.empty;
+import static java.util.stream.Stream.of;
 
 @UtilityClass
 public class WorldModCommands {
@@ -120,7 +122,7 @@ public class WorldModCommands {
                 notPermitted();
             if (arg == null)
                 arg = NameGenerator.INSTANCE.get();
-            region.setName(arg);
+            region.setId(arg);
             worldMod.getEntityService().save(region);
             return "Name was changed to " + arg;
         }

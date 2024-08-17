@@ -55,7 +55,7 @@ public class EventDispatchBase {
             for (var flag : Arrays.stream(flagChain)
                     .map(flag -> region.getEffectiveFlagValueForPlayer(flag, playerId))
                     .toList()) {
-                var isGlobal = Region.GlobalRegionName.equals(region.getName());
+                var isGlobal = Region.GlobalRegionName.equals(region.getId());
                 if (isGlobal && flag.getFlag().equals(Build) && flag.getState() != TriState.FALSE)
                     continue; // exception for build flag on global region
                 var state = flag.getState();

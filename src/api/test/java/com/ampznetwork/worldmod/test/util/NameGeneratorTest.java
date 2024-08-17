@@ -1,6 +1,6 @@
 package com.ampznetwork.worldmod.test.util;
 
-import com.ampznetwork.worldmod.api.util.NameGenerator;
+import com.ampznetwork.libmod.api.util.NameGenerator;
 import org.junit.jupiter.api.RepeatedTest;
 
 public class NameGeneratorTest {

@@ -53,6 +53,11 @@ public interface WorldMod extends SubMod {
     }
 
     @Override
+    default Class<?> getModuleType() {
+        return WorldMod.class;
+    }
+
+    @Override
     default PersistenceUnitInfo createPersistenceUnit(DataSource dataSource) {
         return new PersistenceUnitBase("WorldMod", WorldMod.class, dataSource, getEntityTypes().toArray(new Class[0]));
     }

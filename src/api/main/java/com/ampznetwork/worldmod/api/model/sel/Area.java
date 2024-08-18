@@ -3,7 +3,11 @@ package com.ampznetwork.worldmod.api.model.sel;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.ShapeCollider;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.Value;
 import org.comroid.api.data.Vector;
 
 import javax.persistence.AttributeConverter;
@@ -38,9 +42,9 @@ public final class Area implements ShapeCollider {
     @NoArgsConstructor
     @AllArgsConstructor
     public static final class Builder implements org.comroid.api.func.ext.Builder<Area> {
-        private Shape shape = Shape.Cuboid;
+        private Shape           shape          = Shape.Cuboid;
         private List<Vector.N4> spatialAnchors = new ArrayList<>() {{
-            for(int i=0;i<8;i++)add(null);
+            for (int i = 0; i < 8; i++) add(null);
         }};
 
         @Override

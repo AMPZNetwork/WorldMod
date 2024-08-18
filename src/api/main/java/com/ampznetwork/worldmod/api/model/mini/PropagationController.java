@@ -30,8 +30,8 @@ public interface PropagationController extends OwnedByParty, FlagContainer, Name
         if (values.isEmpty())
             return builder.build();
         var me = getOwnerIDs().contains(playerId) ? ADMIN
-                : getMemberIDs().contains(playerId) ? MEMBER
-                : GUEST;
+                                                  : getMemberIDs().contains(playerId) ? MEMBER
+                                                                                      : GUEST;
         var explicit = new Flag.Usage[4]; // indices: see PlayerRelation#ordinal()
         var mask = 0;
 
@@ -59,10 +59,10 @@ public interface PropagationController extends OwnedByParty, FlagContainer, Name
         // if there is no result yet and guest is set to false; everyone above should get true
         var guest = explicit[GUEST.ordinal()];
         if (choice == null
-                && guest != null
-                && (choice = guest.getState()) != null
-                && choice == FALSE // choice used as a buffer
-                && me.ordinal() > GUEST.ordinal())
+            && guest != null
+            && (choice = guest.getState()) != null
+            && choice == FALSE // choice used as a buffer
+            && me.ordinal() > GUEST.ordinal())
             choice = TRUE;
             // otherwise or if entity is set; return global decision
         else choice = Region.GlobalRegionName.equals(getName()) ? NOT_SET : FALSE;

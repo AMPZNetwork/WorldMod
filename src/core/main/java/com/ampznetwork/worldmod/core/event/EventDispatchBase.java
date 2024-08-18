@@ -17,8 +17,7 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static com.ampznetwork.worldmod.api.game.Flag.Build;
-import static com.ampznetwork.worldmod.api.game.Flag.Passthrough;
+import static com.ampznetwork.worldmod.api.game.Flag.*;
 
 @Log
 @Value
@@ -41,13 +40,15 @@ public class EventDispatchBase {
         return dependsOnFlag(cancellable, playerId, location, worldName, Streams.OP.LogicalOr, Streams.OP.LogicalOr, flagChain);
     }
 
-    public EventState dependsOnFlag(IPropagationAdapter adp,
-                                    UUID playerId,
-                                    Vector.N3 location,
-                                    String worldName,
-                                    Streams.OP chainOp_cancel,
-                                    Streams.OP chainOp_force,
-                                    Flag... flagChain) {
+    public EventState dependsOnFlag(
+            IPropagationAdapter adp,
+            UUID playerId,
+            Vector.N3 location,
+            String worldName,
+            Streams.OP chainOp_cancel,
+            Streams.OP chainOp_force,
+            Flag... flagChain
+    ) {
         var iter = findRegions(location, worldName).iterator();
         boolean cancel = false, force = false;
         while (iter.hasNext()) {

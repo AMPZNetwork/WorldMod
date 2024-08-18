@@ -23,26 +23,13 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.ampznetwork.worldmod.api.WorldMod.isClaimed;
-import static com.ampznetwork.worldmod.api.WorldMod.notPermitted;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Stream.concat;
-import static java.util.stream.Stream.empty;
-import static java.util.stream.Stream.of;
+import static com.ampznetwork.worldmod.api.WorldMod.*;
+import static java.util.stream.Collectors.*;
+import static java.util.stream.Stream.*;
 
 @UtilityClass
 public class WorldModCommands {
     private final Map<UUID, Area.Builder> selections = new ConcurrentHashMap<>();
-
-    private Area.Builder sel(UUID playerId) {
-        return selections.computeIfAbsent(playerId, $ -> new Area.Builder());
-    }
-
-    private void clearSel(UUID playerId) {
-        sel(playerId).setSpatialAnchors(new ArrayList<>() {{
-            for (int i = 0; i < 8; i++) add(null);
-        }});
-    }
 
     @Alias("sel")
     @Command(permission = WorldMod.Permission.Selection, ephemeral = true)
@@ -56,11 +43,21 @@ public class WorldModCommands {
         return "Now selecting as " + type.name();
     }
 
+    private Area.Builder sel(UUID playerId) {
+        return selections.computeIfAbsent(playerId, $ -> new Area.Builder());
+    }
+
+    private void clearSel(UUID playerId) {
+        sel(playerId).setSpatialAnchors(new ArrayList<>() {{
+            for (int i = 0; i < 8; i++) add(null);
+        }});
+    }
+
     @Alias("pos")
     @Command(permission = WorldMod.Permission.Selection, ephemeral = true)
     public static class position {
         @Command
-        public static String $(WorldMod worldMod, UUID playerId, @Command.Arg(autoFill = {"1", "2"}) int index) {
+        public static String $(WorldMod worldMod, UUID playerId, @Command.Arg(autoFill = { "1", "2" }) int index) {
             var pos = worldMod.getPlayerAdapter().getPosition(playerId);
             sel(playerId).getSpatialAnchors().set(index - 1, pos.to4(0));
             return "Set position " + index;
@@ -101,10 +98,10 @@ public class WorldModCommands {
             var players = worldMod.getPlayerAdapter();
             return Optional.ofNullable(region)
                     .map(rg -> rg.getClaimOwner() != null
-                            ? "Claimed by " + players.getName(rg.getClaimOwner())
-                            : "This area belongs to " + rg.getOwnerIDs().stream()
-                            .map(players::getName)
-                            .collect(joining(", ")))
+                               ? "Claimed by " + players.getName(rg.getClaimOwner())
+                               : "This area belongs to " + rg.getOwnerIDs().stream()
+                                       .map(players::getName)
+                                       .collect(joining(", ")))
                     .orElse("This area is not claimed");
         }
 
@@ -166,11 +163,13 @@ public class WorldModCommands {
             }
 
             @Command
-            public static String add(WorldMod worldMod,
-                                     UUID playerId,
-                                     @Nullable Region region,
-                                     @Command.Arg("0") String player,
-                                     @Command.Arg("1") @Nullable @Default("PlayerRelation.MEMBER") PlayerRelation type) {
+            public static String add(
+                    WorldMod worldMod,
+                    UUID playerId,
+                    @Nullable Region region,
+                    @Command.Arg("0") String player,
+                    @Command.Arg("1") @Nullable @Default("PlayerRelation.MEMBER") PlayerRelation type
+            ) {
                 if (type == null) type = PlayerRelation.MEMBER;
                 isClaimed(region);
                 if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
@@ -185,10 +184,12 @@ public class WorldModCommands {
             }
 
             @Command
-            public static String remove(WorldMod worldMod,
-                                        UUID playerId,
-                                        @Nullable Region region,
-                                        @Command.Arg String player) {
+            public static String remove(
+                    WorldMod worldMod,
+                    UUID playerId,
+                    @Nullable Region region,
+                    @Command.Arg String player
+            ) {
                 isClaimed(region);
                 if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
                     notPermitted();
@@ -208,11 +209,13 @@ public class WorldModCommands {
         @Command
         public static class flag {
             @Command
-            public static String set(WorldMod worldMod,
-                                     UUID playerId,
-                                     @Nullable Region region,
-                                     @Command.Arg String name,
-                                     @Command.Arg String value) {
+            public static String set(
+                    WorldMod worldMod,
+                    UUID playerId,
+                    @Nullable Region region,
+                    @Command.Arg String name,
+                    @Command.Arg String value
+            ) {
                 throw new Command.Error("Not implemented");
             }
         }

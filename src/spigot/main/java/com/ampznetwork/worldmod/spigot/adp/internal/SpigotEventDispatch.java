@@ -9,9 +9,89 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
-import org.bukkit.event.entity.*;
-import org.bukkit.event.player.*;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockCookEvent;
+import org.bukkit.event.block.BlockDispenseArmorEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockFadeEvent;
+import org.bukkit.event.block.BlockFertilizeEvent;
+import org.bukkit.event.block.BlockFormEvent;
+import org.bukkit.event.block.BlockGrowEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockShearEntityEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.entity.AreaEffectCloudApplyEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreeperPowerEvent;
+import org.bukkit.event.entity.EntityBreakDoorEvent;
+import org.bukkit.event.entity.EntityBreedEvent;
+import org.bukkit.event.entity.EntityCombustByBlockEvent;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
+import org.bukkit.event.entity.EntityCombustEvent;
+import org.bukkit.event.entity.EntityDamageByBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDropItemEvent;
+import org.bukkit.event.entity.EntityEnterBlockEvent;
+import org.bukkit.event.entity.EntityEnterLoveModeEvent;
+import org.bukkit.event.entity.EntityExhaustionEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityInteractEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntityPortalEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityResurrectEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.EntitySpellCastEvent;
+import org.bukkit.event.entity.EntityTameEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
+import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.EntityToggleGlideEvent;
+import org.bukkit.event.entity.EntityToggleSwimEvent;
+import org.bukkit.event.entity.EntityTransformEvent;
+import org.bukkit.event.entity.ExplosionPrimeEvent;
+import org.bukkit.event.entity.HorseJumpEvent;
+import org.bukkit.event.entity.ItemDespawnEvent;
+import org.bukkit.event.entity.ItemSpawnEvent;
+import org.bukkit.event.entity.LingeringPotionSplashEvent;
+import org.bukkit.event.entity.PigZapEvent;
+import org.bukkit.event.entity.PigZombieAngerEvent;
+import org.bukkit.event.entity.PiglinBarterEvent;
+import org.bukkit.event.entity.PlayerLeashEntityEvent;
+import org.bukkit.event.entity.PotionSplashEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.event.entity.SheepDyeWoolEvent;
+import org.bukkit.event.entity.SheepRegrowWoolEvent;
+import org.bukkit.event.entity.SlimeSplitEvent;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.bukkit.event.entity.StriderTemperatureChangeEvent;
+import org.bukkit.event.entity.VillagerAcquireTradeEvent;
+import org.bukkit.event.entity.VillagerCareerChangeEvent;
+import org.bukkit.event.entity.VillagerReplenishTradeEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerHarvestBlockEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerPickupArrowEvent;
+import org.bukkit.event.player.PlayerPortalEvent;
+import org.bukkit.event.player.PlayerShearEntityEvent;
+import org.bukkit.event.player.PlayerTakeLecternBookEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.comroid.api.data.Vector;
 
 import java.util.UUID;
@@ -25,10 +105,6 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public SpigotEventDispatch(WorldMod$Spigot worldMod) {
         super(worldMod);
         this.worldMod = worldMod;
-    }
-
-    private static Vector.N3 vec(Location location) {
-        return new Vector.N3(location.getX(), location.getY(), location.getZ());
     }
 
     //region Block Events
@@ -124,7 +200,6 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getBlock().getLocation());
         dispatchEvent(event, null, location, event.getBlock().getWorld().getName(), Spread);
     }
-    //endregion
 
     //region Player Events
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -132,6 +207,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getPlayer().getLocation());
         dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Chat_Send);
     }
+    //endregion
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void dispatch(PlayerArmorStandManipulateEvent event) {
@@ -238,7 +314,6 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getPlayer().getLocation());
         dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Interact_Leash);
     }
-    //endregion
 
     //region Entity Events
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -246,6 +321,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Lingering_Apply);
     }
+    //endregion
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void dispatch(CreatureSpawnEvent event) {
@@ -258,6 +334,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Charge_Creeper);
     }
+
     //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityAirChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Chat_Send);}
     @EventHandler(priority = EventPriority.HIGHEST)
     public void dispatch(EntityBreakDoorEvent event) {
@@ -270,6 +347,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Breeding);
     }
+
     //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityChangeBlockEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Chat_Send);}
     @EventHandler(priority = EventPriority.HIGHEST)
     public void dispatch(EntityCombustEvent event) {
@@ -372,6 +450,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Combat_Ranged);
     }
+
     //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntitySpawnEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Spawn);}
     @EventHandler(priority = EventPriority.HIGHEST)
     public void dispatch(EntitySpellCastEvent event) {
@@ -420,6 +499,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Transform);
     }
+
     //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(EntityUnleashEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Chat_Send);}
     //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(ExpBottleEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Chat_Send);}
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -427,6 +507,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Explode);
     }
+
     //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(FoodLevelChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, );}
     @EventHandler(priority = EventPriority.HIGHEST)
     public void dispatch(HorseJumpEvent event) {
@@ -469,6 +550,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Anger);
     }
+
     //@EventHandler(priority = EventPriority.HIGHEST) public void dispatch(PlayerDeathEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Chat_Send);}
     @EventHandler(priority = EventPriority.HIGHEST)
     public void dispatch(PlayerLeashEntityEvent event) {
@@ -541,9 +623,13 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Villager_Replenish);
     }
-    //endregion
 
     private void dispatchEvent(Cancellable cancellable, UUID playerId, Vector.N3 location, String worldName, Flag... flagChain) {
         dispatchEvent(new SpigotPropagationAdapter(cancellable), playerId, location, worldName, flagChain);
+    }
+    //endregion
+
+    private static Vector.N3 vec(Location location) {
+        return new Vector.N3(location.getX(), location.getY(), location.getZ());
     }
 }

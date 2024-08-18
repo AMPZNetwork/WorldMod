@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
 
-import static net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer.get;
+import static net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer.*;
 
 @Value
 public class SpigotPlayerAdapter implements PlayerAdapter {

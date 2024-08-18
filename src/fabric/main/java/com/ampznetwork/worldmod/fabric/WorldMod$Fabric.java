@@ -24,6 +24,7 @@ import java.util.HashSet;
 @Getter
 public class WorldMod$Fabric implements ModInitializer, WorldMod {
     public static final Logger LOGGER = LoggerFactory.getLogger(WorldMod.AddonName);
+
     static {
         StackTraceUtils.EXTRA_FILTER_NAMES.add("com.ampznetwork");
     }
@@ -31,10 +32,10 @@ public class WorldMod$Fabric implements ModInitializer, WorldMod {
     private final FabricPlayerAdapter playerAdapter = new FabricPlayerAdapter(this);
     private final FabricEventDispatch eventDispatch = new FabricEventDispatch(this);
     private final Collection<Region> regions = new HashSet<>();
-    private final Collection<Group> groups = new HashSet<>();
-    private final Config config = Config.createAndLoad();
-    private MinecraftServer server;
-    private Command.Manager cmdr;
+    private final Collection<Group>  groups  = new HashSet<>();
+    private final Config             config  = Config.createAndLoad();
+    private       MinecraftServer    server;
+    private       Command.Manager    cmdr;
     //private Command.Manager.Adapter$Fabric adapter;
 
     @Override

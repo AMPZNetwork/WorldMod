@@ -30,19 +30,19 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class Group extends DbObject.ByName implements PropagationController, Prioritized, Named {
-    public static final                                                                                            EntityType<String, Group, Group.Builder> TYPE
-                                                                                                                                                                          = new EntityType<>(
+    public static final EntityType<String, Group, Group.Builder> TYPE
+                                                                          = new EntityType<>(
             Group::builder,
             null,
             Group.class,
             Group.Builder.class);
-    @Default                                                                                                       long                                     priority      = 0;
+    @Default            long                                     priority = 0;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("owner")
-                                                                                                                   Set<UUID>                                ownerIDs      = new HashSet<>();
+    Set<UUID>       ownerIDs      = new HashSet<>();
     @ElementCollection(fetch = FetchType.EAGER) @Singular("member")
-                                                                                                                   Set<UUID>                                memberIDs     = new HashSet<>();
+    Set<UUID>       memberIDs     = new HashSet<>();
     @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class)
-                                                                                                                   Set<Flag.Usage>                          declaredFlags = new HashSet<>();
+    Set<Flag.Usage> declaredFlags = new HashSet<>();
 
     @Override
     public Stream<Flag.Usage> streamDeclaredFlags() {

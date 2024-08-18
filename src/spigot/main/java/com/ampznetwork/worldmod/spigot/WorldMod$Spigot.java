@@ -21,20 +21,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.bukkit.Bukkit.getPluginManager;
-import static org.comroid.api.func.util.Debug.isDebug;
+import static org.bukkit.Bukkit.*;
+import static org.comroid.api.func.util.Debug.*;
 
 @Getter
 public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
-    private final SpigotPlayerAdapter playerAdapter = new SpigotPlayerAdapter(this);
-    private final SpigotEventDispatch eventDispatch = new SpigotEventDispatch(this);
-    private final Collection<Region> regions = new HashSet<>();
-    private final Collection<Group> groups = new HashSet<>();
-    private FileConfiguration config;
-
     static {
         StackTraceUtils.EXTRA_FILTER_NAMES.add("com.ampznetwork");
     }
+
+    private final SpigotPlayerAdapter playerAdapter = new SpigotPlayerAdapter(this);
+    private final SpigotEventDispatch eventDispatch = new SpigotEventDispatch(this);
+    private final Collection<Region> regions = new HashSet<>();
+    private final Collection<Group>  groups  = new HashSet<>();
+    private       FileConfiguration  config;
 
     public WorldMod$Spigot() {
         super(Set.of(Capability.Database), Set.of(Region.class, Group.class));
@@ -66,18 +66,22 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
 
     @Nullable
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender,
-                                      @NotNull org.bukkit.command.Command command,
-                                      @NotNull String alias,
-                                      @NotNull String[] args) {
+    public List<String> onTabComplete(
+            @NotNull CommandSender sender,
+            @NotNull org.bukkit.command.Command command,
+            @NotNull String alias,
+            @NotNull String[] args
+    ) {
         return adapter.onTabComplete(sender, command, alias, args);
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender,
-                             @NotNull org.bukkit.command.Command command,
-                             @NotNull String label,
-                             @NotNull String[] args) {
+    public boolean onCommand(
+            @NotNull CommandSender sender,
+            @NotNull org.bukkit.command.Command command,
+            @NotNull String label,
+            @NotNull String[] args
+    ) {
         return adapter.onCommand(sender, command, label, args);
     }
 

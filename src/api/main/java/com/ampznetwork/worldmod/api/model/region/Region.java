@@ -39,9 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.lang.Long.MAX_VALUE;
-import static java.lang.Long.MIN_VALUE;
-import static java.util.stream.Stream.concat;
+import static java.lang.Long.*;
+import static java.util.stream.Stream.*;
 
 @Value
 @Entity

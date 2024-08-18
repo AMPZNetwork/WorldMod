@@ -19,8 +19,8 @@ import org.comroid.api.net.REST;
 import java.util.Collection;
 import java.util.UUID;
 
-import static net.kyori.adventure.text.Component.text;
-import static net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson;
+import static net.kyori.adventure.text.Component.*;
+import static net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.*;
 
 @Value
 public class FabricPlayerAdapter implements PlayerAdapter {
@@ -40,7 +40,7 @@ public class FabricPlayerAdapter implements PlayerAdapter {
     @Override
     public boolean isOnline(UUID playerId) {
         return worldMod.getServer().getPlayerManager()
-                .getPlayer(playerId) != null;
+                       .getPlayer(playerId) != null;
     }
 
     @Override

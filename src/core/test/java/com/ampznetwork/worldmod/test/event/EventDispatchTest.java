@@ -25,12 +25,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static com.ampznetwork.worldmod.api.game.Flag.Build;
+import static com.ampznetwork.worldmod.api.game.Flag.*;
 
 public class EventDispatchTest {
-    final UUID PlayerOwner = UUID.randomUUID();
-    final UUID PlayerMember = UUID.randomUUID();
-    final UUID PlayerGuest = UUID.randomUUID();
+    final UUID   PlayerOwner  = UUID.randomUUID();
+    final UUID   PlayerMember = UUID.randomUUID();
+    final UUID   PlayerGuest  = UUID.randomUUID();
     final Vector.N3 LocationInside;
     final Vector.N3 LocationOutside;
     final Region Region;
@@ -40,7 +40,7 @@ public class EventDispatchTest {
     public EventDispatchTest() {
         LocationInside = new Vector.N3(8, 0, 8);
         LocationOutside = new Vector.N3(-1, 0, -1);
-        Region = com.ampznetwork.worldmod.api.model.region.Region.builder()
+        Region         = com.ampznetwork.worldmod.api.model.region.Region.builder()
                 .name("testregion")
                 .area(new Area(Shape.Cuboid, List.of(
                         new Vector.N4(0, 0, 0, 0),

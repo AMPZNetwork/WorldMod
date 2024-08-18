@@ -42,6 +42,11 @@ public interface WorldMod extends SubMod {
 
     PlayerAdapter getPlayerAdapter();
 
+    @Override
+    default Class<?> getModuleType() {
+        return WorldMod.class;
+    }
+
     default boolean addRegion(Region region) {
         try {
             getEntityService().save(region);
@@ -50,11 +55,6 @@ public interface WorldMod extends SubMod {
             Log.at(Level.WARNING, "Could not save region " + region, t);
             return false;
         }
-    }
-
-    @Override
-    default Class<?> getModuleType() {
-        return WorldMod.class;
     }
 
     @Override

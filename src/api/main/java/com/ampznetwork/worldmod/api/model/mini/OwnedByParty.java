@@ -5,5 +5,6 @@ import java.util.UUID;
 
 public interface OwnedByParty {
     Set<UUID> getOwnerIDs();
+
     Set<UUID> getMemberIDs();
 }

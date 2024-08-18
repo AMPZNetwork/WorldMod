@@ -10,8 +10,8 @@ ext {
 }
 
 group = 'com.ampznetwork.worldmod'
-sourceCompatibility = '17'
-targetCompatibility = '17'
+sourceCompatibility = 21
+targetCompatibility = 21
 
 sourceSets {
     main.java.srcDirs = files("${parent.projectDir}/src/$project.name/main/java")

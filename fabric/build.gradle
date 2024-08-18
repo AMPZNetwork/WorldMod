@@ -50,7 +50,7 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
-	maven { url 'https://maven.wispforest.io/releases' }
+	mavenCentral()
 }
 
 loom {
@@ -82,11 +82,6 @@ dependencies {
 	// worldmod api
 	implementation project("$prefix:core") // todo: include as shadowjar
 	implementation 'net.kyori:adventure-platform-fabric:5.9.0'
-
-	// owo lib
-	modImplementation "io.wispforest:owo-lib:${project.owo_version}"
-	include "io.wispforest:owo-sentinel:${project.owo_version}"
-	annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_version}")
 }
 
 processResources {

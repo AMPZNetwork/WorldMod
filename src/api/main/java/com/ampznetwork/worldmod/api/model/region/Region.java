@@ -1,6 +1,7 @@
 package com.ampznetwork.worldmod.api.model.region;
 
 import com.ampznetwork.libmod.api.entity.DbObject;
+import com.ampznetwork.libmod.api.model.EntityType;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.PointCollider;
@@ -26,9 +27,9 @@ import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -48,10 +49,15 @@ import static java.util.stream.Stream.*;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@IdClass(RegionCompositeKey.class)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "name", "worldName" }))
 public class Region extends DbObject.ByPoiName implements PropagationController, ShapeCollider, Prioritized, Named, PointCollider {
-    private static final Map<String, Region> GlobalRegions    = new ConcurrentHashMap<>();
-    public static        String              GlobalRegionName = "#global";
+    private static final Map<String, Region>                        GlobalRegions    = new ConcurrentHashMap<>();
+    public static final  EntityType<String, Region, Region.Builder> TYPE
+                                                                                     = new EntityType<>(Region::builder,
+            null,
+            Region.class,
+            Region.Builder.class);
+    public static        String                                     GlobalRegionName = "#global";
 
     public static Region global(String worldName) {
         return GlobalRegions.computeIfAbsent(worldName,
@@ -64,7 +70,8 @@ public class Region extends DbObject.ByPoiName implements PropagationController,
                         .build());
     }
 
-    @Id @Default                                                                                                   String          worldName  = "world";
+    @Default String name      = randomId();
+    @Default String worldName = "world";
     @ElementCollection(fetch = FetchType.EAGER) @Singular @Convert(converter = Area.Converter.class)               Set<Area>       areas;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("owner")                                                 Set<UUID>       ownerIDs;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("member")                                                Set<UUID>       memberIDs;

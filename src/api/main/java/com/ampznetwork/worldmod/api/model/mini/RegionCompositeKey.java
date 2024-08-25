@@ -1,15 +1,17 @@
 package com.ampznetwork.worldmod.api.model.mini;
 
-import lombok.AllArgsConstructor;
+import com.ampznetwork.libmod.api.entity.DbObject;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RegionCompositeKey implements Serializable {
-    private String name;
-    private String worldName;
+@SuppressWarnings("unused")
+public class RegionCompositeKey extends DbObject.CompositeKey<String, String> implements Serializable {
+    public RegionCompositeKey() {
+    }
+
+    public RegionCompositeKey(String name, String worldName) {
+        super(name, worldName);
+    }
 }

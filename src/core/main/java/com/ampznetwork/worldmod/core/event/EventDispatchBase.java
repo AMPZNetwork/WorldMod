@@ -14,6 +14,7 @@ import org.comroid.api.func.util.Streams;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -32,7 +33,8 @@ public class EventDispatchBase {
 
     public Stream<? extends Region> findRegions(@NotNull Vector.N3 location, @NotNull String worldName) {
         return Stream.concat(
-                worldMod.getEntityService().findRegions(location, worldName),
+                worldMod.getEntityService().getAccessor(Region.TYPE)
+                        .querySelect("", Map.of("location", location, "worldname", worldName)),
                 Stream.of(Region.global("world")));
     }
 

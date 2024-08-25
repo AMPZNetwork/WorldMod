@@ -2,12 +2,12 @@ package com.ampznetwork.worldmod.api.model.region;
 
 import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.libmod.api.model.EntityType;
+import com.ampznetwork.libmod.api.util.NameGenerator;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.PointCollider;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.mini.PropagationController;
-import com.ampznetwork.worldmod.api.model.mini.RegionCompositeKey;
 import com.ampznetwork.worldmod.api.model.mini.ShapeCollider;
 import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.ampznetwork.worldmod.api.model.sel.Chunk;
@@ -49,28 +49,28 @@ import static java.util.stream.Stream.*;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "name", "worldName" }))
-public class Region extends DbObject.ByPoiName implements PropagationController, ShapeCollider, Prioritized, Named, PointCollider {
-    private static final Map<String, Region>                        GlobalRegions    = new ConcurrentHashMap<>();
-    public static final  EntityType<String, Region, Region.Builder> TYPE
-                                                                                     = new EntityType<>(Region::builder,
+@Table(name = "regions", uniqueConstraints = @UniqueConstraint(columnNames = { "name", "worldName" }))
+public class Region extends DbObject implements PropagationController, ShapeCollider, Prioritized, Named, PointCollider {
+    private static final Map<String, Region>         GlobalRegions    = new ConcurrentHashMap<>();
+    public static final  EntityType<Region, Builder> TYPE             = new EntityType<>(Region::builder,
             null,
             Region.class,
             Region.Builder.class);
-    public static        String                                     GlobalRegionName = "#global";
+    public static        String                      GlobalRegionName = "#global";
 
     public static Region global(String worldName) {
         return GlobalRegions.computeIfAbsent(worldName,
                 $ -> Region.builder()
-                        .id(GlobalRegionName)
+                        .name(GlobalRegionName)
                         .worldName(worldName)
                         .priority(Long.MIN_VALUE)
                         .area(new Area(Shape.Cuboid,
-                                List.of(new Vector.N4(MIN_VALUE, MIN_VALUE, MIN_VALUE, MIN_VALUE), new Vector.N4(MAX_VALUE, MAX_VALUE, MAX_VALUE, MAX_VALUE))))
+                                List.of(new Vector.N4(MIN_VALUE, MIN_VALUE, MIN_VALUE, MIN_VALUE),
+                                        new Vector.N4(MAX_VALUE, MAX_VALUE, MAX_VALUE, MAX_VALUE))))
                         .build());
     }
 
-    @Default String name      = randomId();
+    @Default String name      = NameGenerator.POI.get();
     @Default String worldName = "world";
     @ElementCollection(fetch = FetchType.EAGER) @Singular @Convert(converter = Area.Converter.class)               Set<Area>       areas;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("owner")                                                 Set<UUID>       ownerIDs;
@@ -101,9 +101,5 @@ public class Region extends DbObject.ByPoiName implements PropagationController,
                 ? declaredFlags.stream()
                 : concat(declaredFlags.stream(), group.streamDeclaredFlags())).sorted(Comparator.<Flag.Usage>comparingLong(value -> -value.getFlag()
                 .getPriority()).thenComparingLong(value -> -value.getPriority()));
-    }
-
-    public RegionCompositeKey key() {
-        return new RegionCompositeKey(id, worldName);
     }
 }

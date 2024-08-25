@@ -29,14 +29,14 @@ import java.util.stream.Stream;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class Group extends DbObject.ByName implements PropagationController, Prioritized, Named {
-    public static final EntityType<String, Group, Group.Builder> TYPE
+public class Group extends DbObject.WithName implements PropagationController, Prioritized, Named {
+    public static final EntityType<Group, Builder> TYPE
                                                                           = new EntityType<>(
             Group::builder,
             null,
             Group.class,
             Group.Builder.class);
-    @Default            long                                     priority = 0;
+    @Default            long                       priority               = 0;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("owner")
     Set<UUID>       ownerIDs      = new HashSet<>();
     @ElementCollection(fetch = FetchType.EAGER) @Singular("member")

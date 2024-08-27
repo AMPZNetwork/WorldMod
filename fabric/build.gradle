@@ -7,6 +7,7 @@ plugins {
 	id 'maven-publish'
 }
 
+version = '0.1'
 group = project.maven_group + '.worldmod'
 
 base {
@@ -31,14 +32,14 @@ tasks.register('dlFabricApi', Download).configure {
 }
 
 tasks.register('serverJar', Copy) {
-	dependsOn dlServerJar, dlFabricApi
+	dependsOn dlFabricApi
 	from dlServerJar.outputs.files.singleFile
 	into "$projectDir/run"
 	rename { n -> "server.jar" }
 }
 
 tasks.register('testMod', Copy) {
-	dependsOn shadowJar, serverJar
+	dependsOn shadowJar
 	from shadowJar.outputs.files.singleFile
 	into "${projectDir}/run/mods"
 	rename { n -> "WorldMod-fabric.jar" }

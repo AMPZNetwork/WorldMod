@@ -58,7 +58,7 @@ public class WorldModCommands {
     public static class position {
         @Command
         public static String $(WorldMod worldMod, UUID playerId, @Command.Arg(autoFill = { "1", "2" }) int index) {
-            var pos = worldMod.getPlayerAdapter().getPosition(playerId);
+            var pos = worldMod.getLib().getPlayerAdapter().getPosition(playerId);
             sel(playerId).getSpatialAnchors().set(index - 1, pos.to4(0));
             return "Set position " + index;
         }
@@ -80,7 +80,7 @@ public class WorldModCommands {
             var sel = sel(playerId).build();
             if (sel.getShape().getAnchorPointCount() != sel.getSpatialAnchors().length)
                 throw new Command.Error("Invalid selection; wrong position count");
-            var world = worldMod.getPlayerAdapter().getWorldName(playerId);
+            var world = worldMod.getLib().getPlayerAdapter().getWorldName(playerId);
             var rg = Region.builder()
                     .area(sel)
                     .worldName(world)
@@ -95,7 +95,7 @@ public class WorldModCommands {
         @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
         public static String info(WorldMod worldMod, @Nullable Region region) {
             isClaimed(region);
-            var players = worldMod.getPlayerAdapter();
+            var players = worldMod.getLib().getPlayerAdapter();
             return Optional.ofNullable(region)
                     .map(rg -> rg.getClaimOwner() != null
                                ? "Claimed by " + players.getName(rg.getClaimOwner())
@@ -108,8 +108,8 @@ public class WorldModCommands {
         @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
         public static void menu(WorldMod worldMod, UUID playerId, @Nullable Region region) {
             isClaimed(region);
-            var menu = new ClaimMenuBook(worldMod, region, playerId);
-            worldMod.getPlayerAdapter().openBook(playerId, menu);
+            var menu = new ClaimMenuBook(worldMod.getLib(), region, playerId);
+            worldMod.getLib().getPlayerAdapter().openBook(playerId, menu);
         }
 
         @Command
@@ -118,8 +118,8 @@ public class WorldModCommands {
             if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
                 notPermitted();
             if (arg == null)
-                arg = NameGenerator.INSTANCE.get();
-            region.setId(arg);
+                arg = NameGenerator.POI.get();
+            region.setName(arg);
             worldMod.getEntityService().save(region);
             return "Name was changed to " + arg;
         }
@@ -138,7 +138,7 @@ public class WorldModCommands {
                 region.setClaimOwner(null);
                 return "Owner removed";
             }
-            var targetId = worldMod.getPlayerAdapter().getId(arg);
+            var targetId = worldMod.getLib().getPlayerAdapter().getId(arg);
             region.setClaimOwner(targetId);
             worldMod.getEntityService().save(region);
             return arg + " is now owner of " + region.getBestName();
@@ -154,10 +154,10 @@ public class WorldModCommands {
                         %sMembers%s: %s
                         """.formatted(
                         McFormatCode.Aqua, McFormatCode.White, region.getOwnerIDs().stream()
-                                .map(worldMod.getPlayerAdapter()::getName)
+                                .map(worldMod.getLib().getPlayerAdapter()::getName)
                                 .collect(joining(", ")),
                         McFormatCode.Green, McFormatCode.White, region.getMemberIDs().stream()
-                                .map(worldMod.getPlayerAdapter()::getName)
+                                .map(worldMod.getLib().getPlayerAdapter()::getName)
                                 .collect(joining(", "))
                 );
             }
@@ -174,7 +174,7 @@ public class WorldModCommands {
                 isClaimed(region);
                 if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
                     notPermitted();
-                var targetId = worldMod.getPlayerAdapter().getId(player);
+                var targetId = worldMod.getLib().getPlayerAdapter().getId(player);
                 (switch (type) {
                     case MEMBER -> region.getMemberIDs();
                     case ADMIN -> region.getOwnerIDs();
@@ -193,7 +193,7 @@ public class WorldModCommands {
                 isClaimed(region);
                 if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
                     notPermitted();
-                var targetId = worldMod.getPlayerAdapter().getId(player);
+                var targetId = worldMod.getLib().getPlayerAdapter().getId(player);
                 var wasOwner = region.getOwnerIDs().remove(targetId);
                 var wasMember = region.getMemberIDs().remove(targetId);
                 return "%s was removed from the list of %s".formatted(player, concat(

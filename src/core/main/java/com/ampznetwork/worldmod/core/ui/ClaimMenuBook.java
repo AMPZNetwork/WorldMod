@@ -1,8 +1,8 @@
 package com.ampznetwork.worldmod.core.ui;
 
-import com.ampznetwork.worldmod.api.WorldMod;
+import com.ampznetwork.libmod.api.LibMod;
+import com.ampznetwork.libmod.api.adapter.BookAdapter;
 import com.ampznetwork.worldmod.api.game.Flag;
-import com.ampznetwork.worldmod.api.model.adp.BookAdapter;
 import com.ampznetwork.worldmod.api.model.mini.PlayerRelation;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Value;
@@ -35,7 +35,7 @@ import static org.comroid.api.text.Capitalization.*;
 
 @Value
 public class ClaimMenuBook implements BookAdapter {
-    WorldMod worldMod;
+    LibMod worldMod;
     Region region;
     UUID   playerId;
 

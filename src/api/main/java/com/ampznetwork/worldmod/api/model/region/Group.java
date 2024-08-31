@@ -8,10 +8,10 @@ import com.ampznetwork.worldmod.api.model.mini.PropagationController;
 import lombok.AllArgsConstructor;
 import lombok.Builder.Default;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Singular;
 import lombok.Value;
 import lombok.experimental.SuperBuilder;
+import org.comroid.api.Polyfill;
 import org.comroid.api.attr.Named;
 
 import javax.persistence.Convert;
@@ -28,15 +28,14 @@ import java.util.stream.Stream;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class Group extends DbObject.WithName implements PropagationController, Prioritized, Named {
-    public static final EntityType<Group, Builder> TYPE
-                                                                          = new EntityType<>(
+    public static final EntityType<Group, Builder<Group, ?>> TYPE     = Polyfill.uncheckedCast(new EntityType<>(
             Group::builder,
             null,
             Group.class,
-            Group.Builder.class);
-    @Default            long                       priority               = 0;
+            Group.Builder.class));
+    @Default            long                                 priority = 0;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("owner")
     Set<UUID>       ownerIDs      = new HashSet<>();
     @ElementCollection(fetch = FetchType.EAGER) @Singular("member")

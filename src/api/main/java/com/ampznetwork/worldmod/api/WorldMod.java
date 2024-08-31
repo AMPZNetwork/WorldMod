@@ -1,16 +1,12 @@
 package com.ampznetwork.worldmod.api;
 
 import com.ampznetwork.libmod.api.SubMod;
-import com.ampznetwork.libmod.core.database.hibernate.PersistenceUnitBase;
-import com.ampznetwork.worldmod.api.model.adp.PlayerAdapter;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.info.Log;
 import org.jetbrains.annotations.Contract;
 
-import javax.persistence.spi.PersistenceUnitInfo;
-import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -40,8 +36,6 @@ public interface WorldMod extends SubMod {
         return Collections.emptyList();
     }
 
-    PlayerAdapter getPlayerAdapter();
-
     @Override
     default Class<?> getModuleType() {
         return WorldMod.class;
@@ -55,11 +49,6 @@ public interface WorldMod extends SubMod {
             Log.at(Level.WARNING, "Could not save region " + region, t);
             return false;
         }
-    }
-
-    @Override
-    default PersistenceUnitInfo createPersistenceUnit(DataSource dataSource) {
-        return new PersistenceUnitBase("WorldMod", WorldMod.class, dataSource, getEntityTypes().toArray(new Class[0]));
     }
 
     interface Permission {

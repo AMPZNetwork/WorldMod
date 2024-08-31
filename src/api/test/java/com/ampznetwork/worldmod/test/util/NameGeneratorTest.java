@@ -6,6 +6,6 @@ import org.junit.jupiter.api.RepeatedTest;
 public class NameGeneratorTest {
     @RepeatedTest(100)
     public void testGenerateName() {
-        System.out.println(NameGenerator.INSTANCE.get());
+        System.out.println(NameGenerator.POI.get());
     }
 }

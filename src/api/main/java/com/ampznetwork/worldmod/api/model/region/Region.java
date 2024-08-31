@@ -19,6 +19,7 @@ import lombok.Singular;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import lombok.experimental.SuperBuilder;
+import org.comroid.api.Polyfill;
 import org.comroid.api.attr.Named;
 import org.comroid.api.data.Vector;
 import org.jetbrains.annotations.Nullable;
@@ -51,12 +52,12 @@ import static java.util.stream.Stream.*;
 @NoArgsConstructor(force = true)
 @Table(name = "regions", uniqueConstraints = @UniqueConstraint(columnNames = { "name", "worldName" }))
 public class Region extends DbObject implements PropagationController, ShapeCollider, Prioritized, Named, PointCollider {
-    private static final Map<String, Region>         GlobalRegions    = new ConcurrentHashMap<>();
-    public static final  EntityType<Region, Builder> TYPE             = new EntityType<>(Region::builder,
+    private static final Map<String, Region>                    GlobalRegions    = new ConcurrentHashMap<>();
+    public static final  EntityType<Region, Builder<Region, ?>> TYPE             = Polyfill.uncheckedCast(new EntityType<>(Region::builder,
             null,
             Region.class,
-            Region.Builder.class);
-    public static        String                      GlobalRegionName = "#global";
+            Region.Builder.class));
+    public static        String                                 GlobalRegionName = "#global";
 
     public static Region global(String worldName) {
         return GlobalRegions.computeIfAbsent(worldName,

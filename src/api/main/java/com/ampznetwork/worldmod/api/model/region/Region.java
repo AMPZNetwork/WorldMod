@@ -24,10 +24,13 @@ import org.comroid.api.attr.Named;
 import org.comroid.api.data.Vector;
 import org.jetbrains.annotations.Nullable;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -71,15 +74,19 @@ public class Region extends DbObject implements PropagationController, ShapeColl
                         .build());
     }
 
-    @Default String name      = NameGenerator.POI.get();
-    @Default String worldName = "world";
-    @ElementCollection(fetch = FetchType.EAGER) @Singular @Convert(converter = Area.Converter.class)               Set<Area>       areas;
-    @ElementCollection(fetch = FetchType.EAGER) @Singular("owner")                                                 Set<UUID>       ownerIDs;
-    @ElementCollection(fetch = FetchType.EAGER) @Singular("member")                                                Set<UUID>       memberIDs;
-    @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class) Set<Flag.Usage> declaredFlags;
-    @OneToOne @Default @Nullable @NonFinal                                                                         Group           group      = null;
-    @Default @NonFinal                                                                                             long            priority   = 0;
-    @Default @Nullable @NonFinal                                                                                   UUID            claimOwner = null;
+    @Default                                                                          String          name       = NameGenerator.POI.get();
+    @Default                                                                          String          worldName  = "world";
+    @ElementCollection(fetch = FetchType.EAGER) @Singular @Convert(converter = Area.Converter.class) @Column(name = "area")
+    @CollectionTable(name = "region_areas", joinColumns = @JoinColumn(name = "id"))   Set<Area>       areas;
+    @ElementCollection(fetch = FetchType.EAGER) @Singular("owner") @Column(name = "owner_id")
+    @CollectionTable(name = "region_owners", joinColumns = @JoinColumn(name = "id"))  Set<UUID>       ownerIDs;
+    @ElementCollection(fetch = FetchType.EAGER) @Singular("member") @Column(name = "member_id")
+    @CollectionTable(name = "region_members", joinColumns = @JoinColumn(name = "id")) Set<UUID>       memberIDs;
+    @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class) @Column(name = "flag")
+    @CollectionTable(name = "region_flags", joinColumns = @JoinColumn(name = "id"))   Set<Flag.Usage> declaredFags;
+    @OneToOne @Default @Nullable @NonFinal                                            Group           group      = null;
+    @Default @NonFinal                                                                long            priority   = 0;
+    @Default @Nullable @NonFinal                                                      UUID            claimOwner = null;
 
     public Set<UUID> getOwnerIDs() {
         return Stream.concat(Stream.of(claimOwner), ownerIDs.stream()).filter(Objects::nonNull).collect(Collectors.toUnmodifiableSet());
@@ -99,8 +106,8 @@ public class Region extends DbObject implements PropagationController, ShapeColl
     public Stream<Flag.Usage> streamDeclaredFlags() {
         var group = getGroup();
         return (group == null
-                ? declaredFlags.stream()
-                : concat(declaredFlags.stream(), group.streamDeclaredFlags())).sorted(Comparator.<Flag.Usage>comparingLong(value -> -value.getFlag()
+                ? declaredFags.stream()
+                : concat(declaredFags.stream(), group.streamDeclaredFlags())).sorted(Comparator.<Flag.Usage>comparingLong(value -> -value.getFlag()
                 .getPriority()).thenComparingLong(value -> -value.getPriority()));
     }
 }

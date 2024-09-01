@@ -46,6 +46,8 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
     @Override
     @SneakyThrows
     public void onEnable() {
+        super.onEnable();
+
         getPluginManager().registerEvents(eventDispatch, this);
     }
 

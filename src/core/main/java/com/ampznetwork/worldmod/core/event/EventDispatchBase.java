@@ -34,7 +34,7 @@ public class EventDispatchBase {
     public Stream<? extends Region> findRegions(@NotNull Vector.N3 location, @NotNull String worldName) {
         return Stream.concat(
                 worldMod.getEntityService().getAccessor(Region.TYPE)
-                        .querySelect("", Map.of("location", location, "worldname", worldName)),
+                        .querySelect("select r.* from REGIONS ", Map.of("location", location, "worldname", worldName)),
                 Stream.of(Region.global("world")));
     }
 

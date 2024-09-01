@@ -34,7 +34,49 @@ public class EventDispatchBase {
     public Stream<? extends Region> findRegions(@NotNull Vector.N3 location, @NotNull String worldName) {
         return Stream.concat(
                 worldMod.getEntityService().getAccessor(Region.TYPE)
-                        .querySelect("select r.* from REGIONS ", Map.of("location", location, "worldname", worldName)),
+                        .querySelect("""
+                                SELECT r.*
+                                FROM regions r
+                                JOIN region_areas ra ON r.id = ra.id
+                                WHERE r.worldName = :worldname
+                                  AND (
+                                    -- For Cuboid shapes
+                                    JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.shape')) = 'Cuboid'
+                                    AND :posX BETWEEN LEAST(
+                                        JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.anchors[0].x')),
+                                        JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.anchors[1].x'))
+                                    ) AND GREATEST(
+                                        JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.anchors[0].x')),
+                                        JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.anchors[1].x'))
+                                    )
+                                    AND :posY BETWEEN LEAST(
+                                        JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.anchors[0].y')),
+                                        JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.anchors[1].y'))
+                                    ) AND GREATEST(
+                                        JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.anchors[0].y')),
+                                        JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.anchors[1].y'))
+                                    )
+                                    AND :posZ BETWEEN LEAST(
+                                        JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.anchors[0].z')),
+                                        JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.anchors[1].z'))
+                                    ) AND GREATEST(
+                                        JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.anchors[0].z')),
+                                        JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.anchors[1].z'))
+                                    )
+                                  )
+                                ##    UNION ALL
+                                ##    -- For Spherical shapes
+                                ##    JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.shape')) = 'Spherical'
+                                ##    AND (
+                                ##        POWER(:posX - JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.center.x')), 2) +
+                                ##        POWER(:posY - JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.center.y')), 2) +
+                                ##        POWER(:posZ - JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.center.z')), 2)
+                                ##    ) <= POWER(JSON_UNQUOTE(JSON_EXTRACT(ra.area, '$.radius')), 2)
+                                ##  );
+                                """, Map.of("posX", location.getX(),
+                                "posY", location.getY(),
+                                "posZ", location.getZ(),
+                                "worldname", worldName)),
                 Stream.of(Region.global("world")));
     }
 

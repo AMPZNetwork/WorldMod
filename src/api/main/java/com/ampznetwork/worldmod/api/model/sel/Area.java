@@ -20,12 +20,12 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public final class Area implements ShapeCollider {
     private final Shape shape;
-    private final List<Vector.N4> spatialAnchors;
+    private final List<Vector.N3> spatialAnchors;
 
-    public Vector.N4[] getSpatialAnchors() {
+    public Vector.N3[] getSpatialAnchors() {
         return spatialAnchors.stream()
                 .filter(Objects::nonNull)
-                .toArray(Vector.N4[]::new);
+                .toArray(Vector.N3[]::new);
     }
 
     @Override
@@ -43,7 +43,7 @@ public final class Area implements ShapeCollider {
     @AllArgsConstructor
     public static final class Builder implements org.comroid.api.func.ext.Builder<Area> {
         private Shape           shape          = Shape.Cuboid;
-        private List<Vector.N4> spatialAnchors = new ArrayList<>() {{
+        private List<Vector.N3> spatialAnchors = new ArrayList<>() {{
             for (int i = 0; i < 8; i++) add(null);
         }};
 

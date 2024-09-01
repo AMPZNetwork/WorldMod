@@ -5,8 +5,8 @@ main: com.ampznetwork.worldmod.spigot.WorldMod$Spigot
 api-version: '1.18'
 load: STARTUP
 website: https://github.com/AMPZNetwork/WorldMod
-  depend:
-    - LibMod
+depend:
+  - LibMod
 commands:
   reload:
     description: Reloads Configuration

@@ -52,7 +52,7 @@ public interface WorldMod extends SubMod {
     }
 
     interface Permission {
-        String Selection = "worldmod.area.selection";
+        String Selection = "worldmod.selection";
         String Claiming = "worldmod.region.claim";
     }
 }

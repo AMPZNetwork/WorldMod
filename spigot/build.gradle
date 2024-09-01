@@ -29,15 +29,12 @@ tasks.register('dlArclightServerJar', Download).configure {
 }
 
 shadowJar {
-    dependsOn project("$prefix:api").simplifyArtifact
+    // Specify which projects' classes to include
+    from(project(":${prefix}:api").sourceSets.main.output)
+    from(project(":${prefix}:core").sourceSets.main.output)
 
-    configurations = [project.configurations.runtimeClasspath]
-
-    dependencies {
-        include(dependency(':japi'))
-        include(dependency("$prefix:api"))
-        include(dependency("$prefix:core"))
-    }
+    // Exclude dependencies by ensuring the JAR contains only the classes
+    configurations = [project.configurations.shadow]
 }
 
 tasks.register('testPlugin', Copy) {

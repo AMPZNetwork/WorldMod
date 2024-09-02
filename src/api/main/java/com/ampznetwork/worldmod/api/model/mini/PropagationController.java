@@ -8,6 +8,7 @@ import net.kyori.adventure.util.TriState;
 import org.comroid.api.attr.Named;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.ampznetwork.worldmod.api.model.mini.PlayerRelation.*;
@@ -19,7 +20,7 @@ public interface PropagationController extends OwnedByParty, FlagContainer, Name
             return Flag.Usage.builder()
                     .flag(flag)
                     .build();
-        if (this instanceof Region rg && playerId.equals(rg.getClaimOwner()))
+        if (this instanceof Region rg && Optional.ofNullable(rg.getClaimOwner()).map(DbObject::getId).filter(playerId::equals).isPresent())
             return Flag.Usage.builder()
                     .flag(flag)
                     .state(TRUE)

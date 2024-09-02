@@ -15,6 +15,7 @@ import org.comroid.annotations.Alias;
 import org.comroid.annotations.Default;
 import org.comroid.api.attr.Named;
 import org.comroid.api.func.util.Command;
+import org.comroid.api.text.StringMode;
 import org.comroid.api.text.minecraft.McFormatCode;
 import org.jetbrains.annotations.Nullable;
 
@@ -115,7 +116,7 @@ public class WorldModCommands {
         }
 
         @Command
-        public static String name(WorldMod worldMod, UUID playerId, @Nullable Region region, @Nullable @Command.Arg String arg) {
+        public static String name(WorldMod worldMod, UUID playerId, @Nullable Region region, @Nullable @Command.Arg(stringMode = StringMode.GREEDY) String arg) {
             isClaimed(region);
             if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
                 notPermitted();

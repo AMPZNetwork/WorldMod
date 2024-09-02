@@ -1,5 +1,6 @@
 package com.ampznetwork.worldmod.api.model.mini;
 
+import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.region.FlagContainer;
 import com.ampznetwork.worldmod.api.model.region.Region;
@@ -29,9 +30,9 @@ public interface PropagationController extends OwnedByParty, FlagContainer, Name
         var builder = Flag.Usage.builder().flag(flag).state(NOT_SET);
         if (values.isEmpty())
             return builder.build();
-        var me = getOwnerIDs().contains(playerId) ? ADMIN
-                                                  : getMemberIDs().contains(playerId) ? MEMBER
-                                                                                      : GUEST;
+        var me = getOwners().stream().map(DbObject::getId).anyMatch(playerId::equals)
+                 ? ADMIN : getMembers().stream().map(DbObject::getId).anyMatch(playerId::equals)
+                           ? MEMBER : GUEST;
         var explicit = new Flag.Usage[4]; // indices: see PlayerRelation#ordinal()
         var mask = 0;
 

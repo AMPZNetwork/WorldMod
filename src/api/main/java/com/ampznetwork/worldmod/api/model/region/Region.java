@@ -1,6 +1,7 @@
 package com.ampznetwork.worldmod.api.model.region;
 
 import com.ampznetwork.libmod.api.entity.DbObject;
+import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.libmod.api.model.EntityType;
 import com.ampznetwork.libmod.api.util.NameGenerator;
 import com.ampznetwork.worldmod.api.game.Flag;
@@ -31,15 +32,16 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -74,22 +76,20 @@ public class Region extends DbObject implements PropagationController, ShapeColl
                         .build());
     }
 
-    @Default                                                                          String          name       = NameGenerator.POI.get();
-    @Default                                                                          String          worldName  = "world";
+    @Default                                                                        String          name       = NameGenerator.POI.get();
+    @Default                                                                        String          worldName  = "world";
+    @Singular("owner") @ManyToMany                                                  Set<Player>     owners     = new HashSet<>();
+    @Singular("member") @ManyToMany                                                 Set<Player>     members    = new HashSet<>();
     @ElementCollection(fetch = FetchType.EAGER) @Singular @Convert(converter = Area.Converter.class) @Column(name = "area")
-    @CollectionTable(name = "region_areas", joinColumns = @JoinColumn(name = "id"))   Set<Area>       areas;
-    @ElementCollection(fetch = FetchType.EAGER) @Singular("owner") @Column(name = "owner_id")
-    @CollectionTable(name = "region_owners", joinColumns = @JoinColumn(name = "id"))  Set<UUID>       ownerIDs;
-    @ElementCollection(fetch = FetchType.EAGER) @Singular("member") @Column(name = "member_id")
-    @CollectionTable(name = "region_members", joinColumns = @JoinColumn(name = "id")) Set<UUID>       memberIDs;
+    @CollectionTable(name = "region_areas", joinColumns = @JoinColumn(name = "id")) Set<Area>       areas;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class) @Column(name = "flag")
-    @CollectionTable(name = "region_flags", joinColumns = @JoinColumn(name = "id"))   Set<Flag.Usage> declaredFags;
-    @OneToOne @Default @Nullable @NonFinal                                            Group           group      = null;
-    @Default @NonFinal                                                                long            priority   = 0;
-    @Default @Nullable @NonFinal                                                      UUID            claimOwner = null;
+    @CollectionTable(name = "region_flags", joinColumns = @JoinColumn(name = "id")) Set<Flag.Usage> declaredFags;
+    @Default @Nullable @NonFinal @ManyToOne                                         Player          claimOwner = null;
+    @Default @Nullable @NonFinal @ManyToOne                                         Group           group      = null;
+    @Default @NonFinal                                                              long            priority   = 0;
 
-    public Set<UUID> getOwnerIDs() {
-        return Stream.concat(Stream.of(claimOwner), ownerIDs.stream()).filter(Objects::nonNull).collect(Collectors.toUnmodifiableSet());
+    public Set<Player> getOwners() {
+        return Stream.concat(Stream.of(claimOwner), owners.stream()).filter(Objects::nonNull).collect(Collectors.toUnmodifiableSet());
     }
 
     @Override

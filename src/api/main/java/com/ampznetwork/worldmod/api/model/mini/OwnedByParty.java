@@ -1,10 +1,11 @@
 package com.ampznetwork.worldmod.api.model.mini;
 
+import com.ampznetwork.libmod.api.entity.Player;
+
 import java.util.Set;
-import java.util.UUID;
 
 public interface OwnedByParty {
-    Set<UUID> getOwnerIDs();
+    Set<Player> getOwners();
 
-    Set<UUID> getMemberIDs();
+    Set<Player> getMembers();
 }

@@ -1,5 +1,6 @@
 package com.ampznetwork.worldmod.core;
 
+import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.libmod.api.util.NameGenerator;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
@@ -75,6 +76,8 @@ public class WorldModCommands {
     public static class claim {
         @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
         public static String $(WorldMod worldMod, UUID playerId, @Nullable @Command.Arg String name) {
+            var player = worldMod.getLib().getPlayerAdapter()
+                    .getPlayer(playerId).orElseThrow();
             if (!selections.containsKey(playerId))
                 throw new Command.Error("No area selected!");
             var sel = sel(playerId).build();
@@ -84,7 +87,7 @@ public class WorldModCommands {
             var rg = Region.builder()
                     .area(sel)
                     .worldName(world)
-                    .claimOwner(playerId);
+                    .claimOwner(player);
             if (name != null)
                 rg.name(name);
             if (!worldMod.addRegion(rg.build()))
@@ -93,14 +96,13 @@ public class WorldModCommands {
         }
 
         @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
-        public static String info(WorldMod worldMod, @Nullable Region region) {
+        public static String info(@Nullable Region region) {
             isClaimed(region);
-            var players = worldMod.getLib().getPlayerAdapter();
             return Optional.ofNullable(region)
                     .map(rg -> rg.getClaimOwner() != null
-                               ? "Claimed by " + players.getName(rg.getClaimOwner())
-                               : "This area belongs to " + rg.getOwnerIDs().stream()
-                                       .map(players::getName)
+                               ? "Claimed by " + rg.getClaimOwner().getName()
+                               : "This area belongs to " + rg.getOwners().stream()
+                                       .map(Player::getName)
                                        .collect(joining(", ")))
                     .orElse("This area is not claimed");
         }
@@ -139,9 +141,11 @@ public class WorldModCommands {
                 return "Owner removed";
             }
             var targetId = worldMod.getLib().getPlayerAdapter().getId(arg);
-            region.setClaimOwner(targetId);
+            var target = worldMod.getLib().getPlayerAdapter()
+                    .getPlayer(targetId).orElseThrow();
+            region.setClaimOwner(target);
             worldMod.getEntityService().save(region);
-            return arg + " is now owner of " + region.getBestName();
+            return target.getName() + " is now owner of " + region.getBestName();
         }
 
         @Command
@@ -153,11 +157,11 @@ public class WorldModCommands {
                         %sOwners%s: %s
                         %sMembers%s: %s
                         """.formatted(
-                        McFormatCode.Aqua, McFormatCode.White, region.getOwnerIDs().stream()
-                                .map(worldMod.getLib().getPlayerAdapter()::getName)
+                        McFormatCode.Aqua, McFormatCode.White, region.getOwners().stream()
+                                .map(Player::getName)
                                 .collect(joining(", ")),
-                        McFormatCode.Green, McFormatCode.White, region.getMemberIDs().stream()
-                                .map(worldMod.getLib().getPlayerAdapter()::getName)
+                        McFormatCode.Green, McFormatCode.White, region.getMembers().stream()
+                                .map(Player::getName)
                                 .collect(joining(", "))
                 );
             }
@@ -175,11 +179,13 @@ public class WorldModCommands {
                 if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
                     notPermitted();
                 var targetId = worldMod.getLib().getPlayerAdapter().getId(player);
+                var target = worldMod.getLib().getPlayerAdapter()
+                        .getPlayer(targetId).orElseThrow();
                 (switch (type) {
-                    case MEMBER -> region.getMemberIDs();
-                    case ADMIN -> region.getOwnerIDs();
+                    case MEMBER -> region.getMembers();
+                    case ADMIN -> region.getOwners();
                     default -> throw new Command.Error("cannot add member of this type");
-                }).add(targetId);
+                }).add(target);
                 return "%s was added to the list of %ss".formatted(player, type.name().toLowerCase());
             }
 
@@ -194,8 +200,8 @@ public class WorldModCommands {
                 if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
                     notPermitted();
                 var targetId = worldMod.getLib().getPlayerAdapter().getId(player);
-                var wasOwner = region.getOwnerIDs().remove(targetId);
-                var wasMember = region.getMemberIDs().remove(targetId);
+                var wasOwner  = region.getOwners().remove(targetId);
+                var wasMember = region.getMembers().remove(targetId);
                 return "%s was removed from the list of %s".formatted(player, concat(
                         wasOwner ? of(PlayerRelation.ADMIN) : empty(),
                         wasMember ? of(PlayerRelation.MEMBER) : empty())

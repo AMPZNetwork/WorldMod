@@ -1,6 +1,7 @@
 package com.ampznetwork.worldmod.api.model.region;
 
 import com.ampznetwork.libmod.api.entity.DbObject;
+import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.libmod.api.model.EntityType;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
@@ -21,10 +22,10 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 @Value
@@ -40,15 +41,9 @@ public class Group extends DbObject.WithName implements PropagationController, P
             null,
             Group.class,
             Group.Builder.class));
-    @Default            long                                 priority = 0;
-    @ElementCollection(fetch = FetchType.EAGER) @Singular("owner")
-    @Column(name = "owner_id")
-    @CollectionTable(name = "region_group_owner_ids", joinColumns = @JoinColumn(name = "id"))
-    Set<UUID>       ownerIDs      = new HashSet<>();
-    @Column(name = "member_id")
-    @CollectionTable(name = "region_group_member_ids", joinColumns = @JoinColumn(name = "id"))
-    @ElementCollection(fetch = FetchType.EAGER) @Singular("member")
-    Set<UUID>       memberIDs     = new HashSet<>();
+    @Default                        long        priority = 0;
+    @Singular("owner") @ManyToMany  Set<Player> owners   = new HashSet<>();
+    @Singular("member") @ManyToMany Set<Player> members  = new HashSet<>();
     @Column(name = "flag")
     @CollectionTable(name = "region_group_flags", joinColumns = @JoinColumn(name = "id"))
     @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class)

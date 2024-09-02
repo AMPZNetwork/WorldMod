@@ -59,7 +59,7 @@ public class ClaimMenuBook implements BookAdapter {
                         .decorate(UNDERLINED),
                 text("%s by %s\n".formatted(bestName.matches(RegExpUtil.UUID4_PATTERN)
                                             ? "Unnamed " + rcTitle
-                                            : bestName, worldMod.getPlayerAdapter().getName(claimOwner))),
+                                            : bestName, worldMod.getPlayerAdapter().getName(claimOwner.getId()))),
                 text("\n"),
                 text("\n"),
                 text("2 - ")
@@ -91,7 +91,7 @@ public class ClaimMenuBook implements BookAdapter {
         var compGroup = text("Group: %s".formatted(group == null
                                                    ? "none" : group.getBestName()));
         var compOwner = text("Owner: %s".formatted(claimOwner == null
-                                                   ? "none" : worldMod.getPlayerAdapter().getName(claimOwner)));
+                                                   ? "none" : claimOwner.getName()));
 
         if (canManage) {
             compName = compName
@@ -150,12 +150,11 @@ public class ClaimMenuBook implements BookAdapter {
             List<@NotNull TextComponent> entries(PlayerRelation type) {
                 var typeNameTitleCase = Title_Case.convert(type.name());
                 return (switch (type) {
-                    case MEMBER -> region.getMemberIDs();
-                    case ADMIN -> region.getOwnerIDs();
+                    case MEMBER -> region.getMembers();
+                    case ADMIN -> region.getOwners();
                     default -> throw new IllegalStateException("Unexpected value: " + type);
-                }).stream()
-                        .map(id -> {
-                            var name = worldMod.getPlayerAdapter().getName(id);
+                }).stream().map(player -> {
+                            var name = player.getName();
                             return text()
                                     .append(text("[-]")
                                             .color(RED)

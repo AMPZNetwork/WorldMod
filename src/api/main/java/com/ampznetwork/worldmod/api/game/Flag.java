@@ -1,5 +1,6 @@
 package com.ampznetwork.worldmod.api.game;
 
+import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.worldmod.api.model.mini.OwnedByParty;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -263,8 +264,8 @@ public class Flag implements Named, Described, Prioritized {
 
         @Deprecated
         public boolean appliesToUser(OwnedByParty target, UUID playerId) {
-            var owner = target.getOwnerIDs().contains(playerId);
-            var member = target.getMemberIDs().contains(playerId);
+            var owner  = target.getOwners().stream().map(DbObject::getId).anyMatch(playerId::equals);
+            var member = target.getMembers().stream().map(DbObject::getId).anyMatch(playerId::equals);
             var mask  = this.target;
             return owner ? Usage.Target.Owners.isFlagSet(mask)
                          : member ? Usage.Target.Members.isFlagSet(mask)

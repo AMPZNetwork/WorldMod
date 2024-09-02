@@ -62,6 +62,7 @@ public class Region extends DbObject implements PropagationController, ShapeColl
             null,
             Region.class,
             Region.Builder.class));
+    public static final Comparator<Region> BY_PRIORITY = Comparator.comparingLong(Region::getPriority).reversed();
     public static        String                                 GlobalRegionName = "#global";
 
     public static Region global(String worldName) {

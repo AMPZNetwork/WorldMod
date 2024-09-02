@@ -1,5 +1,6 @@
 package com.ampznetwork.worldmod.core.event;
 
+import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
@@ -10,10 +11,13 @@ import lombok.extern.java.Log;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.attr.Named;
 import org.comroid.api.data.Vector;
+import org.comroid.api.func.util.Optionals;
 import org.comroid.api.func.util.Streams;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import static com.ampznetwork.worldmod.api.game.Flag.*;
 
@@ -47,8 +51,14 @@ public class EventDispatchBase {
                 if (isGlobal && flag.getFlag().equals(Build) && flag.getState() != TriState.FALSE)
                     continue; // exception for build flag on global region
                 var state = flag.getState();
-                if (state == TriState.NOT_SET)
-                    continue;
+                if (state == TriState.NOT_SET) {
+                    if (playerId != null && Optional.ofNullable(region.getClaimOwner())
+                            .map(DbObject::getId)
+                            .filter(Predicate.not(playerId::equals))
+                            .isPresent())
+                        cancel = chainOp_cancel.test(cancel, !(boolean)flag.getFlag().getDefaultValue());
+                    else continue;
+                }
                 if (state == TriState.FALSE)
                     cancel = chainOp_cancel.test(cancel, true);
                 else if (state == TriState.TRUE && flag.isForce())

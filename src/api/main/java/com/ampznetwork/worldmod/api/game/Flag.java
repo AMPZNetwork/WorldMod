@@ -58,8 +58,8 @@ public class Flag implements Named, Described, Prioritized {
             "Building",
             "Enable to force WorldMod to not handle any events",
             false);
-    public static final  Flag                     Spawn               = new Flag("spawn", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Spawn_Mobs          = new Flag(Spawn, "mobs", 20, BOOLEAN, "", "", false);
+    public static final  Flag                     Spawn               = new Flag("spawn", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Spawn_Mobs          = new Flag(Spawn, "mobs", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Interact            = new Flag("interact",
             30,
             BOOLEAN,
@@ -72,12 +72,12 @@ public class Flag implements Named, Described, Prioritized {
     public static final  Flag                     Interact_Shear      = new Flag(Interact, "shear", 30, BOOLEAN, "", "", false);
     public static final  Flag                     Interact_Lectern    = new Flag(Interact, "lectern", 30, BOOLEAN, "", "", false);
     public static final  Flag                     Interact_Leash      = new Flag(Interact, "leash", 30, BOOLEAN, "", "", false);
-    public static final  Flag                     Damage              = new Flag("damage", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Damage_ByBlock      = new Flag(Damage, "byBlock", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Damage_ByEntity     = new Flag(Damage, "byEntity", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Lingering           = new Flag("lingering", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Lingering_Splash    = new Flag(Lingering, "splash", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Lingering_Apply     = new Flag(Lingering, "apply", 20, BOOLEAN, "", "", false);
+    public static final  Flag                     Damage              = new Flag("damage", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Damage_ByBlock      = new Flag(Damage, "byBlock", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Damage_ByEntity     = new Flag(Damage, "byEntity", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Lingering           = new Flag("lingering", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Lingering_Splash    = new Flag(Lingering, "splash", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Lingering_Apply     = new Flag(Lingering, "apply", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Use                 = new Flag("use",
             40,
             BOOLEAN,
@@ -85,27 +85,27 @@ public class Flag implements Named, Described, Prioritized {
             "Enable to allow users to use items in your claim",
             false);
     public static final  Flag                     Use_Egg             = new Flag(Use, "egg", 40, BOOLEAN, "", "", false);
-    public static final  Flag                     Chat                = new Flag("chat", 40, BOOLEAN, "", "", false);
-    public static final  Flag                     Chat_Send           = new Flag(Chat, "send", 40, BOOLEAN, "", "", false);
-    public static final  Flag                     Chat_Command        = new Flag(Chat, "command", 40, BOOLEAN, "", "", false);
-    public static final  Flag                     Move                = new Flag("move", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Teleport            = new Flag("teleport", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Join                = new Flag("join", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Respawn             = new Flag("respawn", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Sleep               = new Flag("sleep", 20, BOOLEAN, "", "", false);
+    public static final  Flag                     Chat                = new Flag("chat", 40, BOOLEAN, "", "", true);
+    public static final  Flag                     Chat_Send           = new Flag(Chat, "send", 40, BOOLEAN, "", "", true);
+    public static final  Flag                     Chat_Command        = new Flag(Chat, "command", 40, BOOLEAN, "", "", true);
+    public static final  Flag                     Move                = new Flag("move", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Teleport            = new Flag("teleport", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Join                = new Flag("join", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Respawn             = new Flag("respawn", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Sleep               = new Flag("sleep", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Craft               = new Flag("craft",
             20,
             BOOLEAN,
             "Craft Item",
             "Enable to allow users to craft specific items in your claim",
-            false);
-    public static final  Flag                     Portal              = new Flag("portal", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Pickup              = new Flag("pickup", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Pickup_Arrow        = new Flag(Pickup, "arrow", 20, BOOLEAN, "", "", false);
+            true);
+    public static final  Flag                     Portal              = new Flag("portal", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Pickup              = new Flag("pickup", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Pickup_Arrow        = new Flag(Pickup, "arrow", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Fire                = new Flag("fire", 20, BOOLEAN, "", "", false);
     public static final  Flag                     Fire_Spread         = new Flag(Fire, "spread", 20, BOOLEAN, "", "", false);
     public static final  Flag                     Fire_Damage         = new Flag(Fire, "damage", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Drop                = new Flag("drop", 20, BOOLEAN, "", "", false);
+    public static final  Flag                     Drop                = new Flag("drop", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Fade                = new Flag("fade", 20, BOOLEAN, "", "", false);
     public static final  Flag                     Form                = new Flag("form", 20, BOOLEAN, "", "", false);
     public static final  Flag                     Grow                = new Flag("grow", 20, BOOLEAN, "", "", false);
@@ -115,41 +115,41 @@ public class Flag implements Named, Described, Prioritized {
     public static final  Flag                     Charge              = new Flag("charge", 20, BOOLEAN, "", "", false);
     public static final  Flag                     Charge_Creeper      = new Flag(Charge, "creeper", 20, BOOLEAN, "", "", false);
     public static final  Flag                     Leash               = new Flag("leash", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Combat              = new Flag("combat", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Combat_Melee        = new Flag(Combat, "melee", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Combat_Ranged       = new Flag(Combat, "ranged", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Regrow              = new Flag("regrow", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     SpellCast           = new Flag("spellCast", 20, BOOLEAN, "", "", false);
+    public static final  Flag                     Combat              = new Flag("combat", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Combat_Melee        = new Flag(Combat, "melee", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Combat_Ranged       = new Flag(Combat, "ranged", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Regrow              = new Flag("regrow", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     SpellCast           = new Flag("spellCast", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Tame                = new Flag("tame", 20, BOOLEAN, "", "", false);
     public static final  Flag                     Target              = new Flag("target", 20, BOOLEAN, "", "", false);
     public static final  Flag                     Target_Living       = new Flag(Target, "living", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Glide               = new Flag("glide", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Swim                = new Flag("swim", 20, BOOLEAN, "", "", false);
+    public static final  Flag                     Glide               = new Flag("glide", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Swim                = new Flag("swim", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Transform           = new Flag("transform", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     HorseJump           = new Flag("horseJump", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Despawn             = new Flag("despawn", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Splash              = new Flag("splash", 20, BOOLEAN, "", "", false);
+    public static final  Flag                     HorseJump           = new Flag("horseJump", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Despawn             = new Flag("despawn", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Splash              = new Flag("splash", 20, BOOLEAN, "", "", true);
     public static final  Flag                     MobGriefing         = new Flag("mobGriefing", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Breeding            = new Flag("breeding", 20, BOOLEAN, "", "", false);
+    public static final  Flag                     Breeding            = new Flag("breeding", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Combust             = new Flag("combust", 20, BOOLEAN, "", "", false);
     public static final  Flag                     Combust_ByBlock     = new Flag(Combust, "byBlock", 20, BOOLEAN, "", "", false);
     public static final  Flag                     Combust_ByEntity    = new Flag(Combust, "byEntity", 20, BOOLEAN, "", "", false);
     public static final  Flag                     Hide                = new Flag("hide", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Romance             = new Flag("romance", 20, BOOLEAN, "", "", false);
+    public static final  Flag                     Romance             = new Flag("romance", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Exhaust             = new Flag("exhaust", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Regenerate          = new Flag("regenerate", 20, BOOLEAN, "", "", false);
+    public static final  Flag                     Regenerate          = new Flag("regenerate", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Resurrect           = new Flag("resurrect", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Fertilize           = new Flag("fertilize", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Dispense            = new Flag("dispense", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Spread              = new Flag("spread", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Barter              = new Flag("barter", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     SlimeSplit          = new Flag("slimeSplit", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Villager            = new Flag("villager", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Villager_Acquire    = new Flag(Villager, "acquire", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Villager_Career     = new Flag(Villager, "career", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Villager_Replenish  = new Flag(Villager, "replenish", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     TemperatureChange   = new Flag("temperatureChange", 20, BOOLEAN, "", "", false);
-    public static final  Flag                     Anger               = new Flag("anger", 20, BOOLEAN, "", "", false);
+    public static final  Flag                     Fertilize           = new Flag("fertilize", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Dispense            = new Flag("dispense", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Spread              = new Flag("spread", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Barter              = new Flag("barter", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     SlimeSplit          = new Flag("slimeSplit", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Villager            = new Flag("villager", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Villager_Acquire    = new Flag(Villager, "acquire", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Villager_Career     = new Flag(Villager, "career", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Villager_Replenish  = new Flag(Villager, "replenish", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     TemperatureChange   = new Flag("temperatureChange", 20, BOOLEAN, "", "", true);
+    public static final  Flag                     Anger               = new Flag("anger", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Explode             = new Flag("explode",
             20,
             BOOLEAN,
@@ -168,13 +168,13 @@ public class Flag implements Named, Described, Prioritized {
             BOOLEAN,
             "Enter Area",
             "Disable to disallow users from entering the area",
-            false);
+            true);
     public static final  Flag                     Leave               = new Flag("leave",
             70,
             BOOLEAN,
             "Leave Area",
             "Disable to disallow users from leaving the area",
-            false);
+            true);
 
     @Nullable Flag   parent;
     @NotNull  String name;

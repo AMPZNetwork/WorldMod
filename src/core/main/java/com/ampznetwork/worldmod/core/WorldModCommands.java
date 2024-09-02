@@ -116,7 +116,8 @@ public class WorldModCommands {
         }
 
         @Command
-        public static String name(WorldMod worldMod, UUID playerId, @Nullable Region region, @Nullable @Command.Arg(stringMode = StringMode.GREEDY) String arg) {
+        public static String name(WorldMod worldMod, UUID playerId, @Nullable Region region,
+                                  @Nullable @Command.Arg(stringMode = StringMode.GREEDY, required = false) String arg) {
             isClaimed(region);
             if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
                 notPermitted();

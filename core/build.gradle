@@ -15,10 +15,47 @@ targetCompatibility = 21
 
 sourceSets {
     main.java.srcDirs = files("${parent.projectDir}/src/$project.name/main/java")
-    main.resources.srcDirs = files("${parent.projectDir}/src/$project.name/main/resources")
+    main.resources.srcDirs = files(
+            parent.projectDir.toString() + "/src/core/main/resources",
+            parent.projectDir.toString() + "/src/core/main/antlr"
+    )
     test.java.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
     test.resources.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
 }
+
+// Task to generate lexer and parser using ANTLR
+task generateGrammarSource(type: JavaExec) {
+    description = 'Generates ANTLR lexer and parser from grammar files'
+    inputs.file(file("$parent.projectDir/src/core/main/antlr/WorldQuery.g"))
+    outputs.dir(file("$parent.projectDir/src/core/main/java/com/ampznetwork/worldmod/core/antlr"))
+
+    doFirst {
+        mkdir "$parent.projectDir/src/core/main/java/com/ampznetwork/worldmod/core/antlr"
+    }
+
+    classpath = configurations.compileClasspath
+    main = 'antlr.Tool'
+    args = [
+            '-o', "$parent.projectDir/src/core/main/java/com/ampznetwork/worldmod/core/antlr/",
+            "$parent.projectDir/src/core/main/antlr/WorldQuery.g"
+    ]
+
+    doLast {
+        // Iterate through all generated Java files
+        fileTree(dir: outputs.files.singleFile, include: '**/*.java').forEach { File file ->
+            def lines = file.readLines()
+
+            // If there's no package declaration, add it
+            if (!lines[0].startsWith('package ')) {
+                lines = ["package com.ampznetwork.worldmod.core.antlr;", ''] + lines
+                file.text = lines.join('\n')
+            }
+        }
+    }
+}
+
+// Ensure that the ANTLR files are generated before compilation
+compileJava.dependsOn(generateGrammarSource)
 
 apply from: "$parent.projectDir/gradle/publishing.gradle"
 
@@ -32,12 +69,8 @@ repositories {
 dependencies {
     api project("$prefix:api")
 
-    // database
-    implementation 'org.hibernate:hibernate-core:5.6.0.Final'
-    implementation 'org.jboss:jandex:2.4.5.Final'
-    implementation 'com.zaxxer:HikariCP:4.0.3'
-    runtimeOnly 'com.mysql:mysql-connector-j:8.4.0'
-    runtimeOnly 'com.h2database:h2:2.2.224'
+    // antlr
+    implementation 'antlr:antlr:2.7.7'
 
     // logger
     compileOnly 'org.apache.logging.log4j:log4j-core:2.+'

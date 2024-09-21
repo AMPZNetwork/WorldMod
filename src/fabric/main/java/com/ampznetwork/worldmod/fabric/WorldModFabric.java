@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Getter
-public class WorldMod$Fabric extends SubMod$Fabric implements ModInitializer, WorldMod {
+public class WorldModFabric extends SubMod$Fabric implements ModInitializer, WorldMod {
     public static final Logger LOGGER = LoggerFactory.getLogger(WorldMod.AddonName);
 
     static {
@@ -33,7 +33,7 @@ public class WorldMod$Fabric extends SubMod$Fabric implements ModInitializer, Wo
     private final WorldModConfig     config  = Config.createAndLoad(WorldModConfig.class);
     private       MinecraftServer    server;
 
-    public WorldMod$Fabric() {
+    public WorldModFabric() {
         super(Set.of(Capability.Database), Set.of(Region.class, Group.class));
     }
 

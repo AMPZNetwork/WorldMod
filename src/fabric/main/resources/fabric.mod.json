@@ -16,7 +16,7 @@
 	"environment": "server",
 	"entrypoints": {
 		"main": [
-			"com.ampznetwork.worldmod.fabric.WorldMod$Fabric"
+			"com.ampznetwork.worldmod.fabric.WorldModFabric"
 		]
 	},
 	"depends": {

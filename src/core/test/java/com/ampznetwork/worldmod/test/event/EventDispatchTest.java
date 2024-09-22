@@ -1,5 +1,6 @@
 package com.ampznetwork.worldmod.test.event;
 
+import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
@@ -39,10 +40,9 @@ public class EventDispatchTest {
                         new Vector.N4(0, 0, 0, 0),
                         new Vector.N4(16, 0, 16, 0)
                 )))
-                .owner(PlayerOwner)
-                .member(PlayerMember)
-                .declaredFlags(List.of(
-                        Flag.Usage.builder()
+                .owner(Player.builder().id(PlayerOwner).name("Steve").build())
+                .member(Player.builder().id(PlayerMember).name("Dinnerbone").build())
+                .flag(Flag.Usage.builder()
                                 .flag(Build)
                                 .state(TriState.TRUE)
                                 .force(true)
@@ -50,16 +50,15 @@ public class EventDispatchTest {
                                         .base(Tellraw.Selector.Base.NEAREST_PLAYER)
                                         .type("owner")
                                         .build()))
-                                .build(),
-                        Flag.Usage.builder()
+                                .build())
+                .flag(Flag.Usage.builder()
                                 .flag(Build)
                                 .state(TriState.TRUE)
                                 .selectors(Set.of(Tellraw.Selector.builder()
                                         .base(Tellraw.Selector.Base.NEAREST_PLAYER)
                                         .type("member")
                                         .build()))
-                                .build()
-                ))
+                                .build())
                 .build();
     }
 

@@ -79,8 +79,8 @@ public class Region extends DbObject implements PropagationController, ShapeColl
 
     @Default                                                                        String          name       = NameGenerator.POI.get();
     @Default                                                                        String          worldName  = "world";
-    @Singular("owner") @ManyToMany                                                  Set<Player>     owners     = new HashSet<>();
-    @Singular("member") @ManyToMany                                                 Set<Player>     members    = new HashSet<>();
+    @Singular("owner") @ManyToMany                                                  Set<Player>     owners;
+    @Singular("member") @ManyToMany                                                 Set<Player>     members;
     @ElementCollection(fetch = FetchType.EAGER) @Singular @Convert(converter = Area.Converter.class) @Column(name = "area")
     @CollectionTable(name = "region_areas", joinColumns = @JoinColumn(name = "id")) Set<Area>       areas;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class) @Column(name = "flag")

@@ -78,7 +78,7 @@ public class QueryTest {
 
     @Test
     void test7() {
-        var query = WorldQuery.parse("deny action=craft type=diamond_hoe group~staff");
+        var query = WorldQuery.parse("deny flag=craft type=diamond_hoe group~staff");
         assertEquals(WorldQuery.Verb.DENY, query.getVerb());
         assertEquals(3, query.getConditions().size());
         assertCondition(query, RegionNameCondition.class, RegionNameCondition::name, "staff", WorldQuery.Comparator.SIMILAR);

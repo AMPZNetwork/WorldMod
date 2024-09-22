@@ -16,10 +16,12 @@ import lombok.Singular;
 import lombok.SneakyThrows;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.comroid.api.Polyfill;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.exc.ThrowingSupplier;
 import org.comroid.api.func.util.Command;
+import org.comroid.api.func.util.Debug;
 import org.comroid.api.func.util.Streams;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,6 +33,7 @@ import java.util.Optional;
 import java.util.function.BiPredicate;
 
 @Value
+@Slf4j
 @Builder
 public class WorldQuery {
     @SneakyThrows // todo: handle
@@ -161,6 +164,7 @@ public class WorldQuery {
     }
 
     private static Command.Error wrapExc(String detail, Throwable t) {
+        Debug.log(log, detail, t);
         return new Command.Error(detail + "; " + t.toString());
     }
 }

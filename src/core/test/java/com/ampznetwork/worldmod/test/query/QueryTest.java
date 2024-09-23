@@ -1,7 +1,7 @@
 package com.ampznetwork.worldmod.test.query;
 
 import com.ampznetwork.worldmod.api.game.Flag;
-import com.ampznetwork.worldmod.core.query.FlagCondition;
+import com.ampznetwork.worldmod.core.query.condition.FlagCondition;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.core.query.condition.BlockTypeCondition;
 import com.ampznetwork.worldmod.core.query.condition.PositionCondition;

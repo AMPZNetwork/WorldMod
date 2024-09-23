@@ -1,9 +1,9 @@
-package com.ampznetwork.worldmod.core.query;
+package com.ampznetwork.worldmod.core.query.condition;
 
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
-import com.ampznetwork.worldmod.core.query.condition.QueryCondition;
-import lombok.Value;
+import com.ampznetwork.worldmod.core.query.InputData;
+import com.ampznetwork.worldmod.core.query.WorldQuery;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;

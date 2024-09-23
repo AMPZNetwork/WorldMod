@@ -6,17 +6,12 @@ import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ValueNode;
-import lombok.Value;
 import org.comroid.api.func.util.Streams;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-@Value
-public class TagCondition implements QueryCondition {
-    String                data;
-    WorldQuery.Comparator comparator;
-
+public record TagCondition(String data, WorldQuery.Comparator comparator) implements QueryCondition {
     @Override
     public boolean test(WorldMod mod, WorldQuery query, InputData data, @Nullable UUID executor) {
         return checkContainsKeyOrValueRecursive(data.getNbt());

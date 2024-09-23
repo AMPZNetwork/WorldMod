@@ -7,6 +7,7 @@ import com.ampznetwork.worldmod.core.query.condition.QueryCondition;
 import com.ampznetwork.worldmod.core.query.condition.RadiusCondition;
 import com.ampznetwork.worldmod.core.query.condition.RegionNameCondition;
 import com.ampznetwork.worldmod.core.query.condition.SourceCondition;
+import com.ampznetwork.worldmod.core.query.condition.TagCondition;
 import com.ampznetwork.worldmod.core.query.condition.TimeCondition;
 import com.ampznetwork.worldmod.core.query.condition.WorldCondition;
 import lombok.AccessLevel;
@@ -57,6 +58,7 @@ public class WorldQuery {
                     case "since" -> new TimeCondition(wrapParseArg("duration", () -> Instant.now().minus(Polyfill.parseDuration(value))));
                     case "type" -> new BlockTypeCondition(value, comparator(str, key, value));
                     case "flag" -> new FlagCondition(wrapParseArg("flag", () -> Flag.VALUES.get(value)));
+                    case "tag" -> new TagCondition(value, comparator(str,key,value));
                     case "x", "y", "z" -> wrapParseArg("coordinate", () -> {
                         // find bounds from available condition
                         Vector.N3 a, b = null;

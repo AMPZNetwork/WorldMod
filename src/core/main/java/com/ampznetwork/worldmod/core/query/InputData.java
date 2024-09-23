@@ -3,6 +3,7 @@ package com.ampznetwork.worldmod.core.query;
 import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.region.Region;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Singular;
@@ -27,4 +28,5 @@ public class InputData {
     @Nullable @Default  Vector.N3    position          = null;
     @Nullable @Default  Integer      radius            = null;
     @Nullable @Default  Flag         action            = null;
+    @Nullable @Default  ObjectNode   nbt               = null;
 }

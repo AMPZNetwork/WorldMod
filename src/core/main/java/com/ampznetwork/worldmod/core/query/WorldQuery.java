@@ -85,7 +85,7 @@ public class WorldQuery {
                     });
                     default -> throw new IllegalStateException("Unexpected value: " + key);
                 };
-                if (add != null) builder.condition(add);
+                if (add != null && (builder.conditions == null || !builder.conditions.contains(add))) builder.condition(add);
             }
 
             return builder.build();

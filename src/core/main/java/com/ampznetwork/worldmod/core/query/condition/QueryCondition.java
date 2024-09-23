@@ -1,7 +1,7 @@
 package com.ampznetwork.worldmod.core.query.condition;
 
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.core.query.InputData;
+import com.ampznetwork.worldmod.api.model.mini.QueryInputData;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,5 +23,5 @@ public interface QueryCondition {
      *
      * @return whether the data passes the condition
      */
-    boolean test(WorldMod mod, WorldQuery query, InputData data, @Nullable UUID executor);
+    boolean test(WorldMod mod, WorldQuery query, QueryInputData data, @Nullable UUID executor);
 }

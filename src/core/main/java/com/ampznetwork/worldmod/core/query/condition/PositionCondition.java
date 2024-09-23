@@ -1,7 +1,7 @@
 package com.ampznetwork.worldmod.core.query.condition;
 
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.core.query.InputData;
+import com.ampznetwork.worldmod.api.model.mini.QueryInputData;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import lombok.Value;
 import org.comroid.api.data.Vector;
@@ -17,7 +17,7 @@ public class PositionCondition implements QueryCondition {
     Vector.@Nullable N3     b;
 
     @Override
-    public boolean test(WorldMod mod, WorldQuery query, InputData data, @Nullable UUID executor) {
+    public boolean test(WorldMod mod, WorldQuery query, QueryInputData data, @Nullable UUID executor) {
         var position = data.getPosition();
         if (position == null)
             return true;

@@ -1,4 +1,4 @@
-package com.ampznetwork.worldmod.core.query;
+package com.ampznetwork.worldmod.api.model.mini;
 
 import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.worldmod.api.game.Flag;
@@ -18,7 +18,7 @@ import java.util.List;
 
 @Value
 @Builder
-public class InputData {
+public class QueryInputData {
     @NotNull            String       worldName;
     @NotNull            Instant      timestamp;
     @Nullable @Singular List<Region> regions;

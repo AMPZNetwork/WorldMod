@@ -23,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -231,6 +232,21 @@ public class Flag implements Named, Described, Prioritized {
 
     public String getCanonicalName() {
         return parent == null ? name : parent.getCanonicalName() + '.' + name;
+    }
+
+    @javax.persistence.Converter(autoApply = true)
+    public class Converter implements AttributeConverter<Flag, String> {
+        @Override
+        @SneakyThrows
+        public String convertToDatabaseColumn(Flag attribute) {
+            return attribute.getName();
+        }
+
+        @Override
+        @SneakyThrows
+        public Flag convertToEntityAttribute(String dbData) {
+            return VALUES.get(dbData);
+        }
     }
 
     @Data

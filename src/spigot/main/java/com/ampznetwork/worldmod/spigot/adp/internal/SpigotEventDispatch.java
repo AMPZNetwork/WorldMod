@@ -624,7 +624,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Villager_Replenish);
     }
 
-    private void dispatchEvent(Cancellable cancellable, UUID playerId, Vector.N3 location, String worldName, Flag... flagChain) {
+    private void dispatchEvent(Cancellable cancellable, UUID playerId, Vector.N3 location, String worldName, Flag flagChain) {
         dispatchEvent(new SpigotPropagationAdapter(cancellable), playerId, location, worldName, flagChain);
     }
     //endregion

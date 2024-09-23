@@ -59,8 +59,10 @@ public class WorldQuery {
                     case "flag" -> new FlagCondition(wrapParseArg("flag", () -> Flag.VALUES.get(value)));
                     case "x", "y", "z" -> wrapParseArg("coordinate", () -> {
                         // find bounds from available condition
-                        Vector.N3 a, b      = null;
-                        var       condition = builder.conditions.stream().flatMap(Streams.cast(PositionCondition.class)).findAny().orElse(null);
+                        Vector.N3 a, b = null;
+                        var condition = builder.conditions == null
+                                        ? null
+                                        : builder.conditions.stream().flatMap(Streams.cast(PositionCondition.class)).findAny().orElse(null);
                         if (value.contains("..")) b = Optional.ofNullable(condition).map(PositionCondition::getB).orElseGet(Vector.N3::new);
                         if (condition == null) {
                             a         = new Vector.N3();
@@ -152,14 +154,14 @@ public class WorldQuery {
     }
 
     private static Comparator comparator(String str, String key, String value) {
-        return wrapParseArg("comparator", () -> Comparator.find(str.substring(key.length(), str.indexOf(value))));
+        return wrapParseArg("comparator", () -> Comparator.find(str.substring(key.length(), str.indexOf(value, key.length()))));
     }
 
     private static <T> T wrapParseArg(String nameof, ThrowingSupplier<T, Throwable> parse) {
         try {
             return parse.get();
         } catch (Throwable t) {
-            throw wrapExc("Unable to parse argument " + nameof, t);
+            throw wrapExc("Cannot parse argument " + nameof, t);
         }
     }
 

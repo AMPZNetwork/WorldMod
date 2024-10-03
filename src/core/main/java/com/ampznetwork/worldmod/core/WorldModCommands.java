@@ -5,11 +5,15 @@ import com.ampznetwork.libmod.api.util.NameGenerator;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
+import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.mini.PlayerRelation;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.api.model.sel.Area;
+import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.core.ui.ClaimMenuBook;
 import lombok.experimental.UtilityClass;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.util.TriState;
 import org.comroid.annotations.Alias;
 import org.comroid.annotations.Default;
@@ -24,10 +28,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
 
 import static com.ampznetwork.worldmod.api.WorldMod.*;
 import static java.util.stream.Collectors.*;
 import static java.util.stream.Stream.*;
+import static net.kyori.adventure.text.Component.*;
 
 @UtilityClass
 public class WorldModCommands {
@@ -43,6 +50,15 @@ public class WorldModCommands {
         sel(playerId).setShape(type);
         clearSel(playerId);
         return "Now selecting as " + type.name();
+    }
+
+    @Command
+    public Component lookup(WorldMod mod, Player player, @Command.Arg(stringMode = StringMode.GREEDY)String query) {
+        var parse = WorldQuery.parse(query);
+        return mod.getEntityService().getAccessor(LogEntry.TYPE)
+                .querySelect(parse.toLookupQuery(mod))
+                .collect(Collector.of(Component::text, (txt, log)->txt.append(text("\n")
+                        .append(text(log.getAction()))), ComponentBuilder::append, ComponentBuilder::build));
     }
 
     private Area.Builder sel(UUID playerId) {
@@ -109,17 +125,17 @@ public class WorldModCommands {
         }
 
         @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
-        public static void menu(WorldMod worldMod, UUID playerId, @Nullable Region region) {
+        public static void menu(WorldMod worldMod, Player player, @Nullable Region region) {
             isClaimed(region);
-            var menu = new ClaimMenuBook(worldMod.getLib(), region, playerId);
-            worldMod.getLib().getPlayerAdapter().openBook(playerId, menu);
+            var menu = new ClaimMenuBook(worldMod.getLib(), region, player);
+            worldMod.getLib().getPlayerAdapter().openBook(player, menu);
         }
 
         @Command
-        public static String name(WorldMod worldMod, UUID playerId, @Nullable Region region,
+        public static String name(WorldMod worldMod, Player player, @Nullable Region region,
                                   @Nullable @Command.Arg(stringMode = StringMode.GREEDY, required = false) String arg) {
             isClaimed(region);
-            if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
+            if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player).getState() != TriState.TRUE)
                 notPermitted();
             if (arg == null)
                 arg = NameGenerator.POI.get();
@@ -134,9 +150,9 @@ public class WorldModCommands {
         }
 
         @Command
-        public static String owner(WorldMod worldMod, UUID playerId, @Nullable Region region, @Nullable @Command.Arg String arg) {
+        public static String owner(WorldMod worldMod, Player player, @Nullable Region region, @Nullable @Command.Arg String arg) {
             isClaimed(region);
-            if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
+            if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player).getState() != TriState.TRUE)
                 notPermitted();
             if (arg == null) {
                 region.setClaimOwner(null);
@@ -171,16 +187,16 @@ public class WorldModCommands {
             @Command
             public static String add(
                     WorldMod worldMod,
-                    UUID playerId,
+                    Player player,
                     @Nullable Region region,
-                    @Command.Arg("0") String player,
+                    @Command.Arg("0") String targetName,
                     @Command.Arg("1") @Nullable @Default("PlayerRelation.MEMBER") PlayerRelation type
             ) {
                 if (type == null) type = PlayerRelation.MEMBER;
                 isClaimed(region);
-                if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
+                if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player).getState() != TriState.TRUE)
                     notPermitted();
-                var targetId = worldMod.getLib().getPlayerAdapter().getId(player);
+                var targetId = worldMod.getLib().getPlayerAdapter().getId(targetName);
                 var target = worldMod.getLib().getPlayerAdapter()
                         .getPlayer(targetId).orElseThrow();
                 (switch (type) {
@@ -194,19 +210,19 @@ public class WorldModCommands {
             @Command
             public static String remove(
                     WorldMod worldMod,
-                    UUID playerId,
+                    Player player,
                     @Nullable Region region,
-                    @Command.Arg String player
+                    @Command.Arg String targetName
             ) {
                 isClaimed(region);
-                if (region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() != TriState.TRUE)
+                if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player).getState() != TriState.TRUE)
                     notPermitted();
-                var targetId = worldMod.getLib().getPlayerAdapter().getId(player);
+                var targetId = worldMod.getLib().getPlayerAdapter().getId(targetName);
                 var wasOwner  = region.getOwners().remove(targetId);
                 var wasMember = region.getMembers().remove(targetId);
-                return "%s was removed from the list of %s".formatted(player, concat(
-                        wasOwner ? of(PlayerRelation.ADMIN) : empty(),
-                        wasMember ? of(PlayerRelation.MEMBER) : empty())
+                return "%s was removed from the list of %s".formatted(targetName, concat(
+                        wasOwner ? of(PlayerRelation.ADMIN) : Stream.empty(),
+                        wasMember ? of(PlayerRelation.MEMBER) : Stream.empty())
                         .map(Named::getName)
                         .map(String::toLowerCase)
                         .map(str -> str + 's')

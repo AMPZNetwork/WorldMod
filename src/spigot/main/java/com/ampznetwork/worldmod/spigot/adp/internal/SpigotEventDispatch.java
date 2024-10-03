@@ -94,8 +94,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
 import org.comroid.api.data.Vector;
 
-import java.util.UUID;
-
 import static com.ampznetwork.worldmod.api.game.Flag.*;
 
 @Value
@@ -111,73 +109,73 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockBreakEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getBlock().getWorld().getName(), Build);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getBlock().getWorld().getName(), Build);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockPlaceEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getBlock().getWorld().getName(), Build);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getBlock().getWorld().getName(), Build);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockBurnEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, null, location, event.getBlock().getWorld().getName(), Fire_Damage);
+        dispatchEvent(event, null, null, location, event.getBlock().getWorld().getName(), Fire_Damage);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockCookEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, null, location, event.getBlock().getWorld().getName(), Cook);
+        dispatchEvent(event, null, null, location, event.getBlock().getWorld().getName(), Cook);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockDispenseEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, null, location, event.getBlock().getWorld().getName(), Dispense);
+        dispatchEvent(event, null, null, location, event.getBlock().getWorld().getName(), Dispense);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockDispenseArmorEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, null, location, event.getBlock().getWorld().getName(), Dispense);
+        dispatchEvent(event, null, null, location, event.getBlock().getWorld().getName(), Dispense);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockDropItemEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getBlock().getWorld().getName(), Drop);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getBlock().getWorld().getName(), Drop);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockExplodeEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, null, location, event.getBlock().getWorld().getName(), Explode);
+        dispatchEvent(event, null, null, location, event.getBlock().getWorld().getName(), Explode);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockFadeEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, null, location, event.getBlock().getWorld().getName(), Fade);
+        dispatchEvent(event, null, null, location, event.getBlock().getWorld().getName(), Fade);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockFertilizeEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getBlock().getWorld().getName(), Fertilize);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getBlock().getWorld().getName(), Fertilize);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockFormEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, null, location, event.getBlock().getWorld().getName(), Form);
+        dispatchEvent(event, null, null, location, event.getBlock().getWorld().getName(), Form);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockGrowEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, null, location, event.getBlock().getWorld().getName(), Grow);
+        dispatchEvent(event, null, null, location, event.getBlock().getWorld().getName(), Grow);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -186,446 +184,446 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var player = event.getPlayer();
         if (player == null)
             return;
-        dispatchEvent(event, player.getUniqueId(), location, event.getBlock().getWorld().getName(), Fire);
+        dispatchEvent(event, player.getUniqueId(), null, location, event.getBlock().getWorld().getName(), Fire);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockShearEntityEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, null, location, event.getBlock().getWorld().getName(), Shear);
+        dispatchEvent(event, null, null, location, event.getBlock().getWorld().getName(), Shear);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockSpreadEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event, null, location, event.getBlock().getWorld().getName(), Spread);
+        dispatchEvent(event, null, null, location, event.getBlock().getWorld().getName(), Spread);
     }
 
     //region Player Events
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(AsyncPlayerChatEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Chat_Send);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Chat_Send);
     }
     //endregion
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerArmorStandManipulateEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Interact_ArmorStand);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Interact_ArmorStand);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerBedEnterEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Sleep);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Sleep);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerBucketEmptyEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Build, Interact);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Build);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerBucketFillEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Build, Interact);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Build);
     }
 
     //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerCommandSendEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Chat_Command);}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerDropItemEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Drop);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Drop);
     }
 
     //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerEggThrowEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Use_Egg);}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerFishEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Interact_Fishing);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Interact_Fishing);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerHarvestBlockEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Build, Interact_Harvest);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Interact_Harvest);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerInteractEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Interact);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Interact);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerInteractEntityEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Interact);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Interact);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerInteractAtEntityEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Interact);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Interact);
     }
 
     //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerJoinEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Join);}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerMoveEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Move);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Move);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerPickupArrowEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Pickup_Arrow);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Pickup_Arrow);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerPortalEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Portal);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Portal);
     }
 
     //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerRespawnEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Respawn);}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerShearEntityEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Interact_Shear);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Interact_Shear);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerTakeLecternBookEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Interact_Lectern);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Interact_Lectern);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerTeleportEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Move, Teleport);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Teleport);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerUnleashEntityEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getPlayer().getWorld().getName(), Interact_Leash);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getPlayer().getWorld().getName(), Interact_Leash);
     }
 
     //region Entity Events
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(AreaEffectCloudApplyEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Lingering_Apply);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Lingering_Apply);
     }
     //endregion
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(CreatureSpawnEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Spawn_Mobs);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Spawn_Mobs);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(CreeperPowerEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Charge_Creeper);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Charge_Creeper);
     }
 
-    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(EntityAirChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Chat_Send);}
+    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(EntityAirChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getName(), location, Chat_Send);}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityBreakDoorEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), MobGriefing);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), MobGriefing);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityBreedEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Breeding);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Breeding);
     }
 
     //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(EntityChangeBlockEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Chat_Send);}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityCombustEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Combust);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Combust);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityCombustByBlockEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Combust_ByBlock);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Combust_ByBlock);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityCombustByEntityEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Combust_ByEntity);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Combust_ByEntity);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityDamageEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Damage);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Damage);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityDamageByBlockEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Damage_ByBlock);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Damage_ByBlock);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityDamageByEntityEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Damage_ByEntity);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Damage_ByEntity);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityDropItemEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Drop);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Drop);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityEnterBlockEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Hide);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Hide);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityEnterLoveModeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Romance);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Romance);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityExhaustionEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Exhaust);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Exhaust);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityExplodeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Explode);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Explode);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityInteractEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Interact);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Interact);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityPickupItemEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Pickup);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Pickup);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityPortalEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Portal);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Portal);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityRegainHealthEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Regenerate);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Regenerate);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityResurrectEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Resurrect);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Resurrect);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityShootBowEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Combat_Ranged);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Combat_Ranged);
     }
 
-    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(EntitySpawnEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Spawn);}
+    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(EntitySpawnEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getName(), location, Spawn);}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntitySpellCastEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), SpellCast);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), SpellCast);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityTameEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Tame);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Tame);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityTargetEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Target);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Target);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityTargetLivingEntityEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Target_Living);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Target_Living);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityTeleportEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Teleport);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Teleport);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityToggleGlideEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Glide);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Glide);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityToggleSwimEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Swim);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Swim);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityTransformEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Transform);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Transform);
     }
 
-    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(EntityUnleashEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Chat_Send);}
-    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(ExpBottleEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Chat_Send);}
+    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(EntityUnleashEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getName(), location, Chat_Send);}
+    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(ExpBottleEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getName(), location, Chat_Send);}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(ExplosionPrimeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Explode);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Explode);
     }
 
-    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(FoodLevelChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, );}
+    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(FoodLevelChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getName(), location, );}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(HorseJumpEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), HorseJump);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), HorseJump);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(ItemDespawnEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Despawn);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Despawn);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(ItemSpawnEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Spawn);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Spawn);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(LingeringPotionSplashEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Lingering);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Lingering);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PiglinBarterEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Barter);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Barter);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PigZapEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Charge);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Charge);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PigZombieAngerEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Anger);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Anger);
     }
 
-    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerDeathEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getUniqueId(), location, Chat_Send);}
+    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerDeathEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getName(), location, Chat_Send);}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerLeashEntityEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getEntity().getWorld().getName(), Leash);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getEntity().getWorld().getName(), Leash);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PotionSplashEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Splash);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Splash);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(ProjectileLaunchEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Combat_Ranged);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Combat_Ranged);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(ProjectileHitEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Combat_Ranged);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Combat_Ranged);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(SheepDyeWoolEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer().getUniqueId(), location, event.getEntity().getWorld().getName(), Dye);
+        dispatchEvent(event, event.getPlayer().getUniqueId(), null, location, event.getEntity().getWorld().getName(), Dye);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(SheepRegrowWoolEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Regrow);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Regrow);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(SlimeSplitEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), SlimeSplit);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), SlimeSplit);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(SpawnerSpawnEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Spawn);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Spawn);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(StriderTemperatureChangeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), TemperatureChange);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), TemperatureChange);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(VillagerAcquireTradeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Villager_Acquire);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Villager_Acquire);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(VillagerCareerChangeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Villager_Career);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Villager_Career);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(VillagerReplenishTradeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getUniqueId(), location, event.getEntity().getWorld().getName(), Villager_Replenish);
+        dispatchEvent(event, event.getEntity().getName(), null, location, event.getEntity().getWorld().getName(), Villager_Replenish);
     }
 
-    private void dispatchEvent(Cancellable cancellable, UUID playerId, Vector.N3 location, String worldName, Flag flagChain) {
-        dispatchEvent(new SpigotPropagationAdapter(cancellable), playerId, location, worldName, flagChain);
+    private void dispatchEvent(Cancellable cancellable, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {
+        dispatchEvent(new SpigotPropagationAdapter(cancellable), source, target, location, worldName, flag);
     }
     //endregion
 

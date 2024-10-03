@@ -14,6 +14,7 @@ import lombok.Value;
 import lombok.experimental.SuperBuilder;
 import org.comroid.api.Polyfill;
 import org.comroid.api.attr.Named;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -34,20 +35,25 @@ import java.util.stream.Stream;
 @NoArgsConstructor
 @AllArgsConstructor
 //@RequiredArgsConstructor
-@Table(name = "region_groups")
+@Table(name = "worldmod_region_groups")
 public class Group extends DbObject.WithName implements PropagationController, Prioritized, Named {
-    public static final EntityType<Group, Builder<Group, ?>> TYPE     = Polyfill.uncheckedCast(new EntityType<>(
-            Group::builder,
-            null,
-            Group.class,
-            Group.Builder.class));
-    @Default                        long        priority = 0;
-    @Singular("owner") @ManyToMany  Set<Player> owners   = new HashSet<>();
-    @Singular("member") @ManyToMany Set<Player> members  = new HashSet<>();
-    @Column(name = "flag")
-    @CollectionTable(name = "region_group_flags", joinColumns = @JoinColumn(name = "id"))
+    public static final                                                                     EntityType<Group, Builder<Group, ?>> TYPE     = Polyfill.uncheckedCast(
+            new EntityType<>(
+                    Group::builder,
+                    null,
+                    Group.class,
+                    Group.Builder.class));
+    @Default                                                                                long                                 priority = 0;
+    @Singular("owner") @ManyToMany @CollectionTable(name = "worldmod_region_group_owners")  Set<Player>                          owners   = new HashSet<>();
+    @Singular("member") @ManyToMany @CollectionTable(name = "worldmod_region_group_members") Set<Player>                          members  = new HashSet<>();
+    @Column(name = "flag") @CollectionTable(name = "worldmod_region_group_flags", joinColumns = @JoinColumn(name = "id"))
     @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class)
     Set<Flag.Usage> declaredFlags = new HashSet<>();
+
+    @Override
+    public @Nullable Player getClaimOwner() {
+        return null;
+    }
 
     @Override
     public Stream<Flag.Usage> streamDeclaredFlags() {

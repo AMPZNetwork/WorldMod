@@ -2,6 +2,7 @@ package com.ampznetwork.worldmod.core.ui;
 
 import com.ampznetwork.libmod.api.LibMod;
 import com.ampznetwork.libmod.api.adapter.BookAdapter;
+import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.mini.PlayerRelation;
 import com.ampznetwork.worldmod.api.model.region.Region;
@@ -37,7 +38,7 @@ import static org.comroid.api.text.Capitalization.*;
 public class ClaimMenuBook implements BookAdapter {
     LibMod worldMod;
     Region region;
-    UUID   playerId;
+    Player playerId;
 
     @Override
     public List<Component[]> getPages() {

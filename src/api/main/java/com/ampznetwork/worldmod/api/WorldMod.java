@@ -78,7 +78,7 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
                                             CONVERT(JSON_EXTRACT(ra.area, '$.anchors[1].x'), double) as x2,
                                             CONVERT(JSON_EXTRACT(ra.area, '$.anchors[1].y'), double) as y2,
                                             CONVERT(JSON_EXTRACT(ra.area, '$.anchors[1].z'), double) as z2,
-                                            ra.id as id from region_areas ra
+                                            ra.id as id from worldmod_region_areas ra
                                         ), isMatch as (select id as matchId, false
                                         ## Cuboid Matching part
                                             or (shape = 'Cuboid'
@@ -88,7 +88,7 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
                                             ))))
                                         ## todo add more matching methods
                                         as bool from parse
-                                        ) select r.* from regions r, isMatch where bool and matchId = r.id and r.worldName = :worldName
+                                        ) select r.* from worldmod_regions r, isMatch where bool and matchId = r.id and r.worldName = :worldName
                                         """, Map.of("posX", location.getX(), "posY", location.getY(), "posZ", location.getZ(), "worldName", worldName)),
                         Stream.of(Region.global("world")))
                 .sorted(Region.BY_PRIORITY);

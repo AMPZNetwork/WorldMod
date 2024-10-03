@@ -3,17 +3,13 @@ package com.ampznetwork.worldmod.core.query.condition;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.model.mini.QueryInputData;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
 public interface QueryCondition {
     boolean SKIP = true;
-
-    @Nullable
-    default WorldQuery.Comparator comparator() {
-        return null;
-    }
 
     /**
      * @param mod      WorldMod instance
@@ -24,4 +20,9 @@ public interface QueryCondition {
      * @return whether the data passes the condition
      */
     boolean test(WorldMod mod, WorldQuery query, QueryInputData data, @Nullable UUID executor);
+
+    @Nullable
+    default WorldQuery.Comparator comparator() {
+        return null;
+    }
 }

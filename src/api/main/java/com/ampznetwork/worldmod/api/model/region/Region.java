@@ -37,7 +37,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,14 +54,14 @@ import static java.util.stream.Stream.*;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@Table(name = "regions", uniqueConstraints = @UniqueConstraint(columnNames = { "name", "worldName" }))
+@Table(name = "worldmod_regions", uniqueConstraints = @UniqueConstraint(columnNames = { "name", "worldName" }))
 public class Region extends DbObject implements PropagationController, ShapeCollider, Prioritized, Named, PointCollider {
     private static final Map<String, Region>                    GlobalRegions    = new ConcurrentHashMap<>();
     public static final  EntityType<Region, Builder<Region, ?>> TYPE             = Polyfill.uncheckedCast(new EntityType<>(Region::builder,
             null,
             Region.class,
             Region.Builder.class));
-    public static final Comparator<Region> BY_PRIORITY = Comparator.comparingLong(Region::getPriority).reversed();
+    public static final  Comparator<Region>                     BY_PRIORITY      = Comparator.comparingLong(Region::getPriority).reversed();
     public static        String                                 GlobalRegionName = "#global";
 
     public static Region global(String worldName) {
@@ -77,17 +76,17 @@ public class Region extends DbObject implements PropagationController, ShapeColl
                         .build());
     }
 
-    @Default                                                                        String          name       = NameGenerator.POI.get();
-    @Default                                                                        String          worldName  = "world";
-    @Singular("owner") @ManyToMany                                                  Set<Player>     owners;
-    @Singular("member") @ManyToMany                                                 Set<Player>     members;
+    @Default                                                                                 String          name       = NameGenerator.POI.get();
+    @Default                                                                                 String          worldName  = "world";
+    @Singular("owner") @ManyToMany @CollectionTable(name = "worldmod_region_owners")         Set<Player>     owners;
+    @Singular("member") @ManyToMany @CollectionTable(name = "worldmod_region_members")       Set<Player>     members;
     @ElementCollection(fetch = FetchType.EAGER) @Singular @Convert(converter = Area.Converter.class) @Column(name = "area")
-    @CollectionTable(name = "region_areas", joinColumns = @JoinColumn(name = "id")) Set<Area>       areas;
+    @CollectionTable(name = "worldmod_region_areas", joinColumns = @JoinColumn(name = "id")) Set<Area>       areas;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class) @Column(name = "flag")
-    @CollectionTable(name = "region_flags", joinColumns = @JoinColumn(name = "id")) Set<Flag.Usage> declaredFags;
-    @Default @Nullable @NonFinal @ManyToOne                                         Player          claimOwner = null;
-    @Default @Nullable @NonFinal @ManyToOne                                         Group           group      = null;
-    @Default @NonFinal                                                              long            priority   = 0;
+    @CollectionTable(name = "worldmod_region_flags", joinColumns = @JoinColumn(name = "id")) Set<Flag.Usage> declaredFags;
+    @Default @Nullable @NonFinal @ManyToOne                                                  Player          claimOwner = null;
+    @Default @Nullable @NonFinal @ManyToOne                                                  Group           group      = null;
+    @Default @NonFinal                                                                       long            priority   = 0;
 
     public Set<Player> getOwners() {
         return Stream.concat(Stream.of(claimOwner), owners.stream()).filter(Objects::nonNull).collect(Collectors.toUnmodifiableSet());

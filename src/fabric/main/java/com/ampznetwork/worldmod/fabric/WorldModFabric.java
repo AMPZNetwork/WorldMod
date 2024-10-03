@@ -3,6 +3,7 @@ package com.ampznetwork.worldmod.fabric;
 import com.ampznetwork.libmod.fabric.SubMod$Fabric;
 import com.ampznetwork.libmod.fabric.config.Config;
 import com.ampznetwork.worldmod.api.WorldMod;
+import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.core.WorldModCommands;
@@ -34,7 +35,7 @@ public class WorldModFabric extends SubMod$Fabric implements ModInitializer, Wor
     private       MinecraftServer    server;
 
     public WorldModFabric() {
-        super(Set.of(Capability.Database), Set.of(Region.class, Group.class));
+        super(Set.of(Capability.Database), Set.of(Region.class, Group.class, LogEntry.class));
     }
 
     @Override

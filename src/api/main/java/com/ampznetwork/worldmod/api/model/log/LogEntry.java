@@ -4,7 +4,6 @@ import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.libmod.api.model.EntityType;
 import com.ampznetwork.libmod.api.model.convert.VectorConverter;
-import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.mini.EventState;
 import lombok.AllArgsConstructor;
 import lombok.Builder.Default;
@@ -20,6 +19,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import java.time.Instant;
 
 @Data
@@ -27,12 +27,13 @@ import java.time.Instant;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "worldmod_world_log")
 public class LogEntry extends DbObject {
     public static final EntityType<LogEntry, LogEntry.Builder<LogEntry, ?>> TYPE
             = Polyfill.uncheckedCast(new EntityType<>(LogEntry::builder, null, LogEntry.class, LogEntry.Builder.class));
     String worldName;
+    String action;
     @Convert(converter = VectorConverter.class) Vector.N3  position;
-    @Convert(converter = Flag.Converter.class)  Flag       action;
     @Default                                    Instant    timestamp       = Instant.now();
     @Nullable @Default @ManyToOne               Player     player          = null;
     @Nullable @Default                          String     nonPlayerSource = null;

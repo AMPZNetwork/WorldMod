@@ -2,6 +2,7 @@ package com.ampznetwork.worldmod.spigot;
 
 import com.ampznetwork.libmod.spigot.SubMod$Spigot;
 import com.ampznetwork.worldmod.api.WorldMod;
+import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.core.WorldModCommands;
@@ -30,7 +31,7 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
     private       FileConfiguration  config;
 
     public WorldMod$Spigot() {
-        super(Set.of(Capability.Database), Set.of(Region.class, Group.class));
+        super(Set.of(Capability.Database), Set.of(Region.class, Group.class, LogEntry.class));
     }
 
     @Override

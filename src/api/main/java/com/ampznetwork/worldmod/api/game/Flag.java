@@ -17,6 +17,7 @@ import org.comroid.api.attr.Described;
 import org.comroid.api.attr.Named;
 import org.comroid.api.data.seri.type.ValueType;
 import org.comroid.api.func.util.Bitmask;
+import org.comroid.api.func.util.Command;
 import org.comroid.api.info.Constraint;
 import org.comroid.api.text.minecraft.Tellraw;
 import org.jetbrains.annotations.NotNull;
@@ -239,13 +240,24 @@ public class Flag implements Named, Described, Prioritized {
         @Override
         @SneakyThrows
         public String convertToDatabaseColumn(Flag attribute) {
-            return attribute.getName();
+            return attribute.getCanonicalName();
         }
 
         @Override
         @SneakyThrows
         public Flag convertToEntityAttribute(String dbData) {
-            return VALUES.get(dbData);
+            var i = 0;
+            var keys = dbData.split("\\.");
+            var current = VALUES.getOrDefault(keys[i], null);
+            while (current != null && ++i < keys.length) {
+                var name = keys[i];
+                current = current.getChildren().stream()
+                        .filter(it-> name.equals(it.getName()))
+                        .findAny().orElse(null);
+            }
+            if (current == null)
+                throw new RuntimeException("Unable to parse flag name: " + dbData);
+            return current;
         }
     }
 

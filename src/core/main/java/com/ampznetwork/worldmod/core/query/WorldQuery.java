@@ -1,6 +1,8 @@
 package com.ampznetwork.worldmod.core.query;
 
+import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import com.ampznetwork.worldmod.core.query.condition.BlockTypeCondition;
 import com.ampznetwork.worldmod.core.query.condition.FlagCondition;
 import com.ampznetwork.worldmod.core.query.condition.PositionCondition;
@@ -15,7 +17,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Singular;
-import lombok.SneakyThrows;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +26,14 @@ import org.comroid.api.func.exc.ThrowingSupplier;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Debug;
 import org.comroid.api.func.util.Streams;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Query;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,7 +43,10 @@ import java.util.function.BiPredicate;
 @Slf4j
 @Builder
 public class WorldQuery {
-    @SneakyThrows // todo: handle
+    public static WorldQuery parseLookup(String query) {
+        return parse(query.startsWith("lookup ") ? query : "lookup " + query);
+    }
+
     public static WorldQuery parse(String query) {
         try {
             var builder = builder();
@@ -59,7 +67,7 @@ public class WorldQuery {
                     case "since" -> new TimeCondition(wrapParseArg("duration", () -> Instant.now().minus(Polyfill.parseDuration(value))));
                     case "type" -> new BlockTypeCondition(value, comparator(str, key, value));
                     case "flag" -> new FlagCondition(wrapParseArg("flag", () -> Flag.VALUES.get(value)));
-                    case "tag" -> new TagCondition(value, comparator(str,key,value));
+                    case "tag" -> new TagCondition(value, comparator(str, key, value));
                     case "x", "y", "z" -> wrapParseArg("coordinate", () -> {
                         // find bounds from available condition
                         Vector.N3 a, b = null;
@@ -97,6 +105,62 @@ public class WorldQuery {
 
     @NotNull  Verb                 verb;
     @Singular List<QueryCondition> conditions;
+
+    public Query toLookupQuery(WorldMod mod) {
+        @Language("SQL") String query = """
+with p as (select
+    CONVERT(JSON_EXTRACT(e.position, '$.x'), double) as x,
+    CONVERT(JSON_EXTRACT(e.position, '$.y'), double) as y,
+    CONVERT(JSON_EXTRACT(e.position, '$.z'), double) as z,
+    e.id as id, from world_log e
+) select e.* from world_log e where e.id = p.id
+""";
+        var append = new ArrayList<String>();
+        var params = new HashMap<String, Object>();
+        conditions.stream()
+                .flatMap(Streams.cast(PositionCondition.class))
+                .findAny()
+                .ifPresent(pos -> {/*todo*/});
+        conditions.stream()
+                .flatMap(Streams.cast(FlagCondition.class))
+                .findAny()
+                .ifPresent(flag -> {
+                    append.add("and e.action = :flag");
+                    params.put("flag", flag.flag().getName());
+                });
+        conditions.stream()
+                .flatMap(Streams.cast(TimeCondition.class))
+                .findAny()
+                .ifPresent(time -> {
+                    append.add("and e.timestamp > :since");
+                    params.put("since", time.since());
+                });
+        conditions.stream()
+                .flatMap(Streams.cast(SourceCondition.class))
+                .findAny()
+                .ifPresent(source -> {
+                    append.add("and (e.player.id = :playerId or e.nonPlayerSource = :source)");
+                    params.put("playerId", EventDispatchBase.tryGetAsPlayer(mod, source.source()));
+                    params.put("source", source.source());
+                });
+        /* todo: target condition
+        conditions.stream()
+                .flatMap(Streams.cast(SourceCondition.class))
+                .findAny()
+                .ifPresent(source -> {
+                    append.add("and (e.player.id = :playerId or e.nonPlayerSource = :source)");
+                    params.put("playerId", EventDispatchBase.tryGetAsPlayer(mod, source.source()));
+                    params.put("source", source.source());
+                });
+         */
+
+        return mod.getEntityService().createQuery(mgr -> {
+            //noinspection SqlSourceToSinkFlow
+            var q = mgr.createQuery(query + String.join("\n", append) + ';');
+            params.forEach(q::setParameter);
+            return q;
+        });
+    }
 
     public enum Verb {LOOKUP, DENY, ALLOW, FORCE, PASSTHROUGH}
 

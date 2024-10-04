@@ -12,7 +12,7 @@ sourceSets {
     test.java.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
     test.resources.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
 }
-
+/*
 tasks.register('dlSpigotServerJar', Download).configure {
     src 'https://download.getbukkit.org/spigot/spigot-1.20.1.jar'
     dest "$projectDir/run/spigot.jar"
@@ -27,21 +27,18 @@ tasks.register('dlArclightServerJar', Download).configure {
     src 'https://github.com/IzzelAliz/Arclight/releases/download/Trials%2F1.0.5/arclight-forge-1.20.1-1.0.5.jar'
     dest "$projectDir/run/arclight.jar"
 }
-
+*/
 shadowJar {
-    dependsOn project("$prefix:api").simplifyArtifact
+    // Specify which projects' classes to include
+    from(project(":${prefix}:api").sourceSets.main.output)
+    from(project(":${prefix}:core").sourceSets.main.output)
 
-    configurations = [project.configurations.runtimeClasspath]
-
-    dependencies {
-        include(dependency(':japi'))
-        include(dependency("$prefix:api"))
-        include(dependency("$prefix:core"))
-    }
+    // Exclude dependencies by ensuring the JAR contains only the classes
+    configurations = [project.configurations.shadow]
 }
 
 tasks.register('testPlugin', Copy) {
-    dependsOn shadowJar, dlArclightServerJar, dlPaperServerJar, dlSpigotServerJar
+    dependsOn shadowJar//, dlArclightServerJar, dlPaperServerJar, dlSpigotServerJar
     from shadowJar.outputs.files.singleFile
     into "${projectDir}/run/plugins"
     rename { n -> "WorldMod-spigot.jar" }
@@ -90,10 +87,10 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
 
     // placeholderapi
-    compileOnly 'me.clip:placeholderapi:2.9.+'
+    compileOnly 'me.clip:placeholderapi:2.+'
 }
 
-def targetJavaVersion = 17
+def targetJavaVersion = 21
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     sourceCompatibility = javaVersion

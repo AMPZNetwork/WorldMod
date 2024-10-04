@@ -10,12 +10,15 @@ ext {
 }
 
 group = 'com.ampznetwork.worldmod'
-sourceCompatibility = '17'
-targetCompatibility = '17'
+sourceCompatibility = 21
+targetCompatibility = 21
 
 sourceSets {
     main.java.srcDirs = files("${parent.projectDir}/src/$project.name/main/java")
-    main.resources.srcDirs = files("${parent.projectDir}/src/$project.name/main/resources")
+    main.resources.srcDirs = files(
+            parent.projectDir.toString() + "/src/core/main/resources",
+            parent.projectDir.toString() + "/src/core/main/antlr"
+    )
     test.java.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
     test.resources.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
 }
@@ -32,12 +35,8 @@ repositories {
 dependencies {
     api project("$prefix:api")
 
-    // database
-    implementation 'org.hibernate:hibernate-core:5.6.0.Final'
-    implementation 'org.jboss:jandex:2.4.5.Final'
-    implementation 'com.zaxxer:HikariCP:4.0.3'
-    runtimeOnly 'com.mysql:mysql-connector-j:8.4.0'
-    runtimeOnly 'com.h2database:h2:2.2.224'
+    // antlr
+    implementation 'antlr:antlr:2.7.7'
 
     // logger
     compileOnly 'org.apache.logging.log4j:log4j-core:2.+'

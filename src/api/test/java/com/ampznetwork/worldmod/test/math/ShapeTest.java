@@ -18,13 +18,13 @@ public class ShapeTest {
 
         final var control = IntStream.range(-7, -3).boxed()
                 .flatMap(x -> Stream.of(
-                        new Chunk(new Vector.N2(x,2)),
-                        new Chunk(new Vector.N2(x,3)),
-                        new Chunk(new Vector.N2(x,4))))
+                        new Chunk(new Vector.N2(x, 2)),
+                        new Chunk(new Vector.N2(x, 3)),
+                        new Chunk(new Vector.N2(x, 4))))
                 .collect(Collectors.toList());
         final var anchors = new Vector.N3[]{
                 new Vector.N3(-117, 146, 78),
-                new Vector.N3( -71, 118, 42)
+                new Vector.N3(-71, 118, 42)
         };
         final var result = Shape.Cuboid.streamChunks(anchors).toList();
 

@@ -6,19 +6,16 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.comroid.api.data.Vector;
-import org.comroid.api.func.util.Streams;
 import org.comroid.api.info.Constraint;
 
-import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import static java.lang.Math.*;
 
 @Getter
 @RequiredArgsConstructor
-@FieldDefaults(makeFinal = true,level = AccessLevel.PRIVATE)
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum Shape {
     Cuboid(2) {
         //region anchor indices
@@ -63,7 +60,6 @@ public enum Shape {
                             .mapToObj(z -> new Chunk(new Vector.N2(x, z))))
                     .distinct();
         }
-
     }/*,
     Spherical(2) {
         @Override

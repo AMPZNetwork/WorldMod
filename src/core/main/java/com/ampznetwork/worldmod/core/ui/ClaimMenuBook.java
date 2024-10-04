@@ -1,8 +1,9 @@
 package com.ampznetwork.worldmod.core.ui;
 
-import com.ampznetwork.worldmod.api.WorldMod;
+import com.ampznetwork.libmod.api.LibMod;
+import com.ampznetwork.libmod.api.adapter.BookAdapter;
+import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.worldmod.api.game.Flag;
-import com.ampznetwork.worldmod.api.model.adp.BookAdapter;
 import com.ampznetwork.worldmod.api.model.mini.PlayerRelation;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Value;
@@ -12,31 +13,32 @@ import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.RegExpUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.util.stream.Stream.concat;
 import static java.util.stream.Stream.of;
-import static net.kyori.adventure.key.Key.key;
-import static net.kyori.adventure.text.Component.text;
+import static java.util.stream.Stream.*;
+import static net.kyori.adventure.key.Key.*;
+import static net.kyori.adventure.text.Component.*;
 import static net.kyori.adventure.text.event.ClickEvent.*;
-import static net.kyori.adventure.text.event.HoverEvent.showText;
+import static net.kyori.adventure.text.event.HoverEvent.*;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
-import static net.kyori.adventure.text.format.TextDecoration.ITALIC;
-import static net.kyori.adventure.text.format.TextDecoration.UNDERLINED;
-import static org.comroid.api.func.util.Streams.atLeastOneOrElseGet;
-import static org.comroid.api.func.util.Streams.groupingEvery;
-import static org.comroid.api.text.Capitalization.Title_Case;
-import static org.comroid.api.text.Capitalization.lower_case;
+import static net.kyori.adventure.text.format.TextDecoration.*;
+import static org.comroid.api.func.util.Streams.*;
+import static org.comroid.api.text.Capitalization.*;
 
 @Value
 public class ClaimMenuBook implements BookAdapter {
-    WorldMod worldMod;
+    LibMod worldMod;
     Region region;
-    UUID playerId;
+    Player playerId;
 
     @Override
     public List<Component[]> getPages() {
@@ -48,17 +50,17 @@ public class ClaimMenuBook implements BookAdapter {
     }
 
     private Component[] toc() {
-        var pgFlags = 3 + (int) members().count();
+        var pgFlags  = 3 + (int) members().count();
         var claimOwner = region.getClaimOwner();
         var bestName = region.getBestName();
-        var rcTitle = region.getClaimOwner() == null ? "Region" : "Claim";
+        var rcTitle  = region.getClaimOwner() == null ? "Region" : "Claim";
 
         return new Component[]{
                 text("%s Menu\n".formatted(rcTitle))
                         .decorate(UNDERLINED),
                 text("%s by %s\n".formatted(bestName.matches(RegExpUtil.UUID4_PATTERN)
-                        ? "Unnamed " + rcTitle
-                        : bestName, worldMod.getPlayerAdapter().getName(claimOwner))),
+                                            ? "Unnamed " + rcTitle
+                                            : bestName, worldMod.getPlayerAdapter().getName(claimOwner.getId()))),
                 text("\n"),
                 text("\n"),
                 text("2 - ")
@@ -81,16 +83,16 @@ public class ClaimMenuBook implements BookAdapter {
 
     private Component[] details() {
         var claimOwner = region.getClaimOwner();
-        var bestName = region.getBestName();
-        var group = region.getGroup();
+        var bestName  = region.getBestName();
+        var group     = region.getGroup();
         var canManage = region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() == TriState.TRUE;
 
         var compName = text("Name: %s".formatted(bestName.matches(RegExpUtil.UUID4_PATTERN)
-                ? "<not set>" : bestName));
+                                                 ? "<not set>" : bestName));
         var compGroup = text("Group: %s".formatted(group == null
-                ? "none" : group.getBestName()));
+                                                   ? "none" : group.getBestName()));
         var compOwner = text("Owner: %s".formatted(claimOwner == null
-                ? "none" : worldMod.getPlayerAdapter().getName(claimOwner)));
+                                                   ? "none" : claimOwner.getName()));
 
         if (canManage) {
             compName = compName
@@ -149,12 +151,11 @@ public class ClaimMenuBook implements BookAdapter {
             List<@NotNull TextComponent> entries(PlayerRelation type) {
                 var typeNameTitleCase = Title_Case.convert(type.name());
                 return (switch (type) {
-                    case MEMBER -> region.getMemberIDs();
-                    case ADMIN -> region.getOwnerIDs();
+                    case MEMBER -> region.getMembers();
+                    case ADMIN -> region.getOwners();
                     default -> throw new IllegalStateException("Unexpected value: " + type);
-                }).stream()
-                        .map(id -> {
-                            var name = worldMod.getPlayerAdapter().getName(id);
+                }).stream().map(player -> {
+                            var name = player.getName();
                             return text()
                                     .append(text("[-]")
                                             .color(RED)
@@ -170,9 +171,9 @@ public class ClaimMenuBook implements BookAdapter {
             }
         };
 
-        var pages = new ArrayList<TextComponent>();
-        TextComponent page = null;
-        int pageSize = 0;
+        var           pages    = new ArrayList<TextComponent>();
+        TextComponent page     = null;
+        int           pageSize = 0;
         var categories = of(PlayerRelation.ADMIN, PlayerRelation.MEMBER)
                 .map(type -> new AbstractMap.SimpleImmutableEntry<>(type, helper.entries(type).iterator()))
                 .iterator();
@@ -200,15 +201,15 @@ public class ClaimMenuBook implements BookAdapter {
         if (page != null)
             pages.add(page);
 
-        return pages.stream().map(comp -> new Component[]{comp});
+        return pages.stream().map(comp -> new Component[]{ comp });
     }
 
     private Stream<Component[]> flags$toc() {
         final var header = text("Flag List\n\n")
                 .decorate(UNDERLINED);
         final var entriesPerPage = 10;
-        final var pgFlags = (int) members().count();
-        final var lenFlagToc = Flag.VALUES.size() / entriesPerPage;
+        final var pgFlags        = (int) members().count();
+        final var lenFlagToc     = Flag.VALUES.size() / entriesPerPage;
         final var flagPageOffset = pgFlags + lenFlagToc;
         final var pageOffsetCounter = new AtomicInteger(0);
         return Flag.VALUES.values().stream()
@@ -231,7 +232,6 @@ public class ClaimMenuBook implements BookAdapter {
                         })).toArray(Component[]::new)
                 );
     }
-
 
     private Stream<Component[]> flags$pages() {
         return Flag.VALUES.values().stream()

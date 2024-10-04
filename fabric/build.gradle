@@ -7,7 +7,8 @@ plugins {
 	id 'maven-publish'
 }
 
-group = project.maven_group
+version = '0.1'
+group = project.maven_group + '.worldmod'
 
 base {
 	archivesName = project.archives_base_name
@@ -31,14 +32,14 @@ tasks.register('dlFabricApi', Download).configure {
 }
 
 tasks.register('serverJar', Copy) {
-	dependsOn dlServerJar, dlFabricApi
+	dependsOn dlFabricApi
 	from dlServerJar.outputs.files.singleFile
 	into "$projectDir/run"
 	rename { n -> "server.jar" }
 }
 
 tasks.register('testMod', Copy) {
-	dependsOn shadowJar, serverJar
+	dependsOn shadowJar
 	from shadowJar.outputs.files.singleFile
 	into "${projectDir}/run/mods"
 	rename { n -> "WorldMod-fabric.jar" }
@@ -50,7 +51,7 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
-	maven { url 'https://maven.wispforest.io/releases' }
+	mavenCentral()
 }
 
 loom {
@@ -82,11 +83,6 @@ dependencies {
 	// worldmod api
 	implementation project("$prefix:core") // todo: include as shadowjar
 	implementation 'net.kyori:adventure-platform-fabric:5.9.0'
-
-	// owo lib
-	modImplementation "io.wispforest:owo-lib:${project.owo_version}"
-	include "io.wispforest:owo-sentinel:${project.owo_version}"
-	annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_version}")
 }
 
 processResources {
@@ -107,8 +103,8 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {

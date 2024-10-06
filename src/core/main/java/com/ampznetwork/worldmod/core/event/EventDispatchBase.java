@@ -89,6 +89,10 @@ public class EventDispatchBase {
     private @Nullable Player tryGetAsPlayer(Object it) {
         return tryGetAsPlayer(worldMod,it);
     }
+    public static @Nullable Object tryGetAsPlayer(WorldMod mod, Object it, Object or) {
+        var r = tryGetAsPlayer(mod, it);
+        return r != null ? r : or;
+    }
     public static @Nullable Player tryGetAsPlayer(WorldMod mod, Object it) {
         return it == null ? null : switch (it) {
             case Player plr -> plr;
@@ -112,7 +116,7 @@ public class EventDispatchBase {
     private void triggerLog(Object source, Object target, Vector.N3 location, String worldName, Flag flag, EventState result) {
         var builder = LogEntry.builder()
                 .worldName(worldName)
-                .action(flag.getName())
+                .action(flag.getCanonicalName())
                 .position(location)
                 .result(result);
         Player playerSource = tryGetAsPlayer(source);

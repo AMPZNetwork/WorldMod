@@ -33,7 +33,7 @@ public class LogEntry extends DbObject {
             = Polyfill.uncheckedCast(new EntityType<>(LogEntry::builder, null, LogEntry.class, LogEntry.Builder.class));
     String worldName;
     String action;
-    @Convert(converter = VectorConverter.class) Vector.N3  position;
+    int x,y,z;
     @Default                                    Instant    timestamp       = Instant.now();
     @Nullable @Default @ManyToOne               Player     player          = null;
     @Nullable @Default                          String     nonPlayerSource = null;

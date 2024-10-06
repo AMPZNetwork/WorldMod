@@ -16,6 +16,7 @@ import org.comroid.api.java.StackTraceUtils;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.bukkit.Bukkit.*;
 
@@ -55,5 +56,15 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
         onDisable();
         onEnable();
         return "Reload complete!";
+    }
+
+    @Override
+    public boolean loggingSkipsNonPlayer() {
+        return config.getBoolean("logging.skip-non-player", true);
+    }
+
+    @Override
+    public Stream<String> loggingSkipFlagNames() {
+        return config.getStringList("logging.skip").stream();
     }
 }

@@ -1,0 +1,9 @@
+# configures world logging behaviour
+logging:
+  # set to 'true' to skip all logging entries that have no player involved
+  skip-non-player: true
+  # list of flags to skip on logging; wildcards supported
+  skip:
+    - move
+    - grow
+    - spawn.mobs

@@ -22,6 +22,9 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
     String AddonId = "worldmod";
     String AddonName = "WorldMod";
 
+    boolean loggingSkipsNonPlayer();
+    Stream<String> loggingSkipFlagNames();
+
     @Contract("->fail")
     static void notPermitted() {
         throw new Command.Error("You are not permitted to perform this action");

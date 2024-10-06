@@ -108,12 +108,7 @@ public class WorldQuery {
 
     public Query toLookupQuery(WorldMod mod) {
         @Language("SQL") String query = """
-with p as (select
-    CONVERT(JSON_EXTRACT(e.position, '$.x'), double) as x,
-    CONVERT(JSON_EXTRACT(e.position, '$.y'), double) as y,
-    CONVERT(JSON_EXTRACT(e.position, '$.z'), double) as z,
-    e.id as id, from world_log e
-) select e.* from world_log e where e.id = p.id
+select e.* from world_log e where e.id = p.id
 """;
         var append = new ArrayList<String>();
         var params = new HashMap<String, Object>();

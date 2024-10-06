@@ -18,7 +18,6 @@ import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Streams;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -29,6 +28,18 @@ import static com.ampznetwork.worldmod.api.game.Flag.*;
 @Value
 @NonFinal
 public class EventDispatchBase {
+    public static @Nullable Object tryGetAsPlayer(WorldMod mod, Object it, Object or) {
+        var r = tryGetAsPlayer(mod, it);
+        return r != null ? r : or;
+    }
+
+    public static @Nullable Player tryGetAsPlayer(WorldMod mod, Object it) {
+        return it == null ? null : switch (it) {
+            case Player plr -> plr;
+            case UUID playerId -> mod.getEntityService().getAccessor(Player.TYPE).getOrCreate(playerId).orElseThrow();
+            default -> null;
+        };
+    }
     WorldMod worldMod;
 
     public EventState dependsOnFlag(IPropagationAdapter cancellable, Player player, Vector.N3 location, String worldName, Flag flagChain) {
@@ -87,18 +98,7 @@ public class EventDispatchBase {
     }
 
     private @Nullable Player tryGetAsPlayer(Object it) {
-        return tryGetAsPlayer(worldMod,it);
-    }
-    public static @Nullable Object tryGetAsPlayer(WorldMod mod, Object it, Object or) {
-        var r = tryGetAsPlayer(mod, it);
-        return r != null ? r : or;
-    }
-    public static @Nullable Player tryGetAsPlayer(WorldMod mod, Object it) {
-        return it == null ? null : switch (it) {
-            case Player plr -> plr;
-            case UUID playerId -> mod.getEntityService().getAccessor(Player.TYPE).getOrCreate(playerId).orElseThrow();
-            default -> null;
-        };
+        return tryGetAsPlayer(worldMod, it);
     }
 
     public void dispatchEvent(IPropagationAdapter cancellable, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {
@@ -114,10 +114,25 @@ public class EventDispatchBase {
     }
 
     private void triggerLog(Object source, Object target, Vector.N3 location, String worldName, Flag flag, EventState result) {
+        final var fNames = flag.getCanonicalName().split("\\.");
+        if (worldMod.loggingSkipFlagNames()
+                .map(name -> name.split("\\."))
+                .anyMatch(names -> {
+                    for (var i = 0; i < fNames.length && i < names.length; i++) {
+                        if (!fNames[i].equals(names[i]))
+                            return false; // doesnt match any more
+                        if ("*".equals(names[i]))
+                            break; // wildcard
+                    }
+                    return true; // all parts matched up to this point
+                }))
+            return;
         var builder = LogEntry.builder()
                 .worldName(worldName)
                 .action(flag.getCanonicalName())
-                .position(location)
+                .x((int) location.getX())
+                .y((int) location.getY())
+                .z((int) location.getZ())
                 .result(result);
         Player playerSource = tryGetAsPlayer(source);
         if (playerSource != null)
@@ -127,6 +142,8 @@ public class EventDispatchBase {
         if (playerTarget != null)
             builder.target(playerTarget);
         else builder.nonPlayerTarget(String.valueOf(target));
+        if (worldMod.loggingSkipsNonPlayer() && playerSource == null && playerTarget == null)
+            return;
         worldMod.getEntityService().save(builder.build());
     }
 }

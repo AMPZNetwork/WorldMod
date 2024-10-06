@@ -33,16 +33,6 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
             throw new Command.Error("This area is not claimed");
     }
 
-    @Deprecated(forRemoval = true)
-    default Collection<Region> getRegions() {
-        return Collections.emptyList();
-    }
-
-    @Deprecated(forRemoval = true)
-    default Collection<? extends Group> getGroups() {
-        return Collections.emptyList();
-    }
-
     @Override
     default Class<?> getModuleType() {
         return WorldMod.class;

@@ -26,8 +26,6 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
     }
 
     private final SpigotEventDispatch eventDispatch = new SpigotEventDispatch(this);
-    private final Collection<Region> regions = new HashSet<>();
-    private final Collection<Group>  groups  = new HashSet<>();
     private       FileConfiguration  config;
 
     public WorldMod$Spigot() {

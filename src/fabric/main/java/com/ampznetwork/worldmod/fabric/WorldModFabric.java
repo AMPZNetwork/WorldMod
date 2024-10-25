@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 @Getter
 public class WorldModFabric extends SubMod$Fabric implements ModInitializer, WorldMod {
@@ -45,5 +46,15 @@ public class WorldModFabric extends SubMod$Fabric implements ModInitializer, Wor
         cmdr.register(WorldModCommands.class);
 
         super.onInitialize();
+    }
+
+    @Override
+    public boolean loggingSkipsNonPlayer() {
+        return config.isLoggingSkipsNonPlayer();
+    }
+
+    @Override
+    public Stream<String> loggingSkipFlagNames() {
+        return config.getLoggingSkipFlags().stream();
     }
 }

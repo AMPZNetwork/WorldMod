@@ -5,6 +5,7 @@ import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
+import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.ampznetwork.worldmod.core.WorldModCommands;
 import com.ampznetwork.worldmod.spigot.adp.internal.SpigotEventDispatch;
 import lombok.Getter;
@@ -13,8 +14,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.java.StackTraceUtils;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -30,7 +29,7 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
     private       FileConfiguration  config;
 
     public WorldMod$Spigot() {
-        super(Set.of(Capability.Database), Set.of(Region.class, Group.class, LogEntry.class));
+        super(Set.of(Capability.Database), Set.of(Region.class, Group.class, LogEntry.class, Area.class));
     }
 
     @Override

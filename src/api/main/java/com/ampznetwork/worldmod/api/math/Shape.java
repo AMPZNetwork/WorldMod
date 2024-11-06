@@ -17,7 +17,7 @@ import static java.lang.Math.*;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public enum Shape {
-    Cuboid(2) {
+    Cuboid(0x3f) {
         //region anchor indices
         public static final int A = 0;
         public static final int B = 1;
@@ -109,7 +109,8 @@ public enum Shape {
         //endregion
     }*/;
 
-    int anchorPointCount;
+    /** declares what coordinates (x1,y1,z1,x2,...) should be at least available for shape math to work properly */
+    int anchorPointMask;
 
     public abstract boolean isPointInside(Vector[] spatialAnchors, Vector.N3 point);
 

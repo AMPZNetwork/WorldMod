@@ -5,7 +5,6 @@ import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.libmod.api.model.EntityType;
 import com.ampznetwork.libmod.api.util.NameGenerator;
 import com.ampznetwork.worldmod.api.game.Flag;
-import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.PointCollider;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.mini.PropagationController;
@@ -37,7 +36,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -45,7 +43,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.lang.Long.*;
+import static java.lang.Integer.*;
 import static java.util.stream.Stream.*;
 
 @Value
@@ -70,9 +68,14 @@ public class Region extends DbObject implements PropagationController, ShapeColl
                         .name(GlobalRegionName)
                         .worldName(worldName)
                         .priority(Long.MIN_VALUE)
-                        .area(new Area(Shape.Cuboid,
-                                List.of(new Vector.N4(MIN_VALUE, MIN_VALUE, MIN_VALUE, MIN_VALUE),
-                                        new Vector.N4(MAX_VALUE, MAX_VALUE, MAX_VALUE, MAX_VALUE))))
+                        .area(Area.builder()
+                                .x1(MIN_VALUE)
+                                .y1(MIN_VALUE)
+                                .z1(MIN_VALUE)
+                                .x2(MAX_VALUE)
+                                .y2(MAX_VALUE)
+                                .z2(MAX_VALUE)
+                                .build())
                         .build());
     }
 
@@ -80,8 +83,7 @@ public class Region extends DbObject implements PropagationController, ShapeColl
     @Default                                                                                 String          worldName  = "world";
     @Singular("owner") @ManyToMany @CollectionTable(name = "worldmod_region_owners")         Set<Player>     owners;
     @Singular("member") @ManyToMany @CollectionTable(name = "worldmod_region_members")       Set<Player>     members;
-    @ElementCollection(fetch = FetchType.EAGER) @Singular @Convert(converter = Area.Converter.class) @Column(name = "area")
-    @CollectionTable(name = "worldmod_region_areas", joinColumns = @JoinColumn(name = "id")) Set<Area>       areas;
+    @Singular("area") @ManyToMany @CollectionTable(name = "worldmod_region_areas") Set<Area> areas;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class) @Column(name = "flag")
     @CollectionTable(name = "worldmod_region_flags", joinColumns = @JoinColumn(name = "id")) Set<Flag.Usage> declaredFags;
     @Default @Nullable @NonFinal @ManyToOne                                                  Player          claimOwner = null;

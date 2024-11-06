@@ -23,7 +23,6 @@ import org.comroid.api.text.StringMode;
 import org.comroid.api.text.minecraft.McFormatCode;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,28 +46,34 @@ public class WorldModCommands {
             selections.remove(playerId);
             return "Selection cleared";
         }
-        sel(playerId).setShape(type);
+        sel(playerId).shape(type);
         clearSel(playerId);
         return "Now selecting as " + type.name();
     }
 
     @Command
-    public Component lookup(WorldMod mod, Player player, @Command.Arg(stringMode = StringMode.GREEDY)String query) {
+    public Component lookup(WorldMod mod, Player player, @Command.Arg(stringMode = StringMode.GREEDY) String query) {
         var parse = WorldQuery.parse(query);
         return mod.getEntityService().getAccessor(LogEntry.TYPE)
                 .querySelect(parse.toLookupQuery(mod))
-                .collect(Collector.of(Component::text, (txt, log)->txt.append(text("\n")
+                .collect(Collector.of(Component::text, (txt, log) -> txt.append(text("\n")
                         .append(text(log.getAction()))), ComponentBuilder::append, ComponentBuilder::build));
     }
 
     private Area.Builder sel(UUID playerId) {
-        return selections.computeIfAbsent(playerId, $ -> new Area.Builder());
+        return selections.computeIfAbsent(playerId, $ -> Area.builder());
     }
 
     private void clearSel(UUID playerId) {
-        sel(playerId).setSpatialAnchors(new ArrayList<>() {{
-            for (int i = 0; i < 8; i++) add(null);
-        }});
+        sel(playerId)
+                .x1(null).y1(null).z1(null)
+                .x2(null).y2(null).z2(null)
+                .x3(null).y3(null).z3(null)
+                .x4(null).y4(null).z4(null)
+                .x5(null).y5(null).z5(null)
+                .x6(null).y6(null).z6(null)
+                .x7(null).y7(null).z7(null)
+                .x8(null).y8(null).z8(null);
     }
 
     @Alias("pos")
@@ -77,7 +82,9 @@ public class WorldModCommands {
         @Command
         public static String $(WorldMod worldMod, UUID playerId, @Command.Arg(autoFill = { "1", "2" }) int index) {
             var pos = worldMod.getLib().getPlayerAdapter().getPosition(playerId);
-            sel(playerId).getSpatialAnchors().set(index - 1, pos.to4(0));
+            if (index == 1)
+                sel(playerId).x1((int) pos.getX()).y1((int) pos.getY()).z1((int) pos.getZ());
+            else if (index == 2) sel(playerId).x2((int) pos.getX()).y2((int) pos.getY()).z2((int) pos.getZ());
             return "Set position " + index;
         }
 
@@ -98,8 +105,7 @@ public class WorldModCommands {
             if (!selections.containsKey(playerId))
                 throw new Command.Error("No area selected!");
             var sel = sel(playerId).build();
-            if (sel.getShape().getAnchorPointCount() != sel.getSpatialAnchors().length)
-                throw new Command.Error("Invalid selection; wrong position count");
+            sel.validateShapeMask();
             var world = worldMod.getLib().getPlayerAdapter().getWorldName(playerId);
             var rg = Region.builder()
                     .area(sel)
@@ -132,8 +138,10 @@ public class WorldModCommands {
         }
 
         @Command
-        public static String name(WorldMod worldMod, Player player, @Nullable Region region,
-                                  @Nullable @Command.Arg(stringMode = StringMode.GREEDY, required = false) String arg) {
+        public static String name(
+                WorldMod worldMod, Player player, @Nullable Region region,
+                @Nullable @Command.Arg(stringMode = StringMode.GREEDY, required = false) String arg
+        ) {
             isClaimed(region);
             if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player).getState() != TriState.TRUE)
                 notPermitted();

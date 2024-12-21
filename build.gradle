@@ -44,9 +44,7 @@ subprojects {
             api project("$prefix:api")
 
         if (project.name != 'japi')
-            if (findProject("$prefix:japi") != null)
-                api project("$prefix:japi")
-            else api 'org.comroid:japi:+'
+            api project(":japi")
 
         // utility
         compileOnly 'org.projectlombok:lombok:+'

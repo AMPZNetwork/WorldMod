@@ -1,4 +1,9 @@
-# configures world logging behaviour
+# configure wand items
+wand:
+  selection: minecraft:stick
+  lookup: minecraft:blaze_rod
+
+# configure world logging behaviour
 logging:
   # set to 'true' to skip all logging entries that have no player involved
   skip-non-player: true

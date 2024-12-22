@@ -2,8 +2,10 @@ package com.ampznetwork.worldmod.core.event;
 
 import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.libmod.api.entity.Player;
+import com.ampznetwork.libmod.api.util.chat.BroadcastWrapper;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.model.WandType;
 import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.mini.EventState;
@@ -15,6 +17,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
+import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +43,7 @@ public class EventDispatchBase {
             default -> null;
         };
     }
-    WorldMod worldMod;
+    WorldMod mod;
 
     public EventState dependsOnFlag(IPropagationAdapter cancellable, Player player, Vector.N3 location, String worldName, Flag flagChain) {
         return dependsOnFlag(cancellable, player, location, worldName, Streams.OP.LogicalOr, Streams.OP.LogicalOr, flagChain);
@@ -57,7 +60,7 @@ public class EventDispatchBase {
     ) {
         var     player   = tryGetAsPlayer(source);
         var     playerId = player == null ? null : player.getId();
-        var     iter     = worldMod.findRegions(location, worldName).iterator();
+        var     iter     = mod.findRegions(location, worldName).iterator();
         boolean cancel   = false, force = false;
         while (iter.hasNext()) {
             var region   = iter.next();
@@ -90,7 +93,7 @@ public class EventDispatchBase {
     }
 
     public boolean passthrough(Vector.N3 location, String worldName) {
-        return worldMod.findRegions(location, worldName)
+        return mod.findRegions(location, worldName)
                 .map(region -> region.getFlagState(Passthrough))
                 .findFirst()
                 .filter(state -> state == TriState.TRUE)
@@ -98,7 +101,18 @@ public class EventDispatchBase {
     }
 
     private @Nullable Player tryGetAsPlayer(Object it) {
-        return tryGetAsPlayer(worldMod, it);
+        return tryGetAsPlayer(mod, it);
+    }
+
+    public boolean tryDispatchWandEvent(IPropagationAdapter cancellable, String worldName, Player player, Vector.N3 location, WandType type) {
+        if (mod.getLib().getPlayerAdapter().checkPermission(player.getId(), type.usePermission) != TriState.TRUE) {
+            // not permitted
+            // todo: send 'not permitted' message?
+            return false;
+        }
+        // todo
+        cancellable.cancel();
+        return true;
     }
 
     public void dispatchEvent(IPropagationAdapter cancellable, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {
@@ -107,15 +121,15 @@ public class EventDispatchBase {
         Player playerSource = tryGetAsPlayer(source);
         var    result       = dependsOnFlag(cancellable, playerSource, location, worldName, flag);
         if (result == EventState.Cancelled && playerSource != null)
-            worldMod.getLib().getPlayerAdapter().send(playerSource.getId(),
+            mod.getLib().getPlayerAdapter().send(playerSource.getId(),
                     Component.text("You don't have permission to do that here").color(NamedTextColor.RED));
-        worldMod.getLib().getScheduler().execute(() -> triggerLog(source, target, location, worldName, flag, result));
+        mod.getLib().getScheduler().execute(() -> triggerLog(source, target, location, worldName, flag, result));
         log.finer(() -> "%s by %s at %s towards %s resulted in %s".formatted(cancellable, source, location, target, result));
     }
 
     private void triggerLog(Object source, Object target, Vector.N3 location, String worldName, Flag flag, EventState result) {
         final var fNames = flag.getCanonicalName().split("\\.");
-        if (worldMod.loggingSkipFlagNames()
+        if (mod.loggingSkipFlagNames()
                 .map(name -> name.split("\\."))
                 .anyMatch(names -> {
                     for (var i = 0; i < fNames.length && i < names.length; i++) {
@@ -142,8 +156,8 @@ public class EventDispatchBase {
         if (playerTarget != null)
             builder.target(playerTarget);
         else builder.nonPlayerTarget(String.valueOf(target));
-        if (worldMod.loggingSkipsNonPlayer() && playerSource == null && playerTarget == null)
+        if (mod.loggingSkipsNonPlayer() && playerSource == null && playerTarget == null)
             return;
-        worldMod.getEntityService().save(builder.build());
+        mod.getEntityService().save(builder.build());
     }
 }

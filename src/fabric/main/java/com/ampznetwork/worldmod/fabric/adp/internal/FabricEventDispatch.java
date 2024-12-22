@@ -10,8 +10,6 @@ import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.PlayerManager;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.comroid.api.data.Vector;
@@ -50,7 +48,7 @@ public class FabricEventDispatch extends EventDispatchBase implements PlayerBloc
     }
 
     private @Nullable PlayerEntity tryGetAsPlayer(@Nullable Object source) {
-        var playerManager = ((WorldModFabric) getWorldMod()).getServer().getPlayerManager();
+        var playerManager = ((WorldModFabric) getMod()).getServer().getPlayerManager();
         if (source instanceof PlayerEntity entity) return entity;
         else if (source instanceof UUID id) return playerManager.getPlayer(id);
         else if (source instanceof String name) return playerManager.getPlayer(name);

@@ -18,10 +18,56 @@ commands:
   position:
     aliases: pos
     description: Modify selected Area
-    permission: worldmod.selection
+    permission: worldmod.selection.pos
   claim:
     description: Interact with your Claim
     permission: worldmod.claim
   region:
     description: Interact with Regions
     permission: worldmod.region
+  lookup:
+    description: Lookup logged world events
+    permission: worldmod.lookup
+  wand:
+    description: Toggle wand item
+    permission: worldmod.wand
+permissions:
+  worldmod:
+    description: WorldMod root permission node
+    default: false
+    children:
+      worldmod.reload:
+        description: Permission for the /worldmod:reload command
+        default: false
+      worldmod.selection:
+        description: Permission for making and interacting with selections
+        default: true #
+        children:
+          worldmod.selection.pos:
+            description: Permission to use the /pos commands to make a selection
+          worldmod.selection.wand:
+            description: Permission to use the selection wand item
+            default: true
+      worldmod.claim:
+        description: Permission for making and interacting with claims
+        default: true
+      worldmod.region:
+        description: Permission for administrating regions and creating common claims
+        default: false
+      worldmod.lookup:
+        description: Permission for looking up logged world events
+        default: false
+        children:
+          worldmod.lookup.wand:
+            description: Permission to use the lookup wand item
+            default: false
+      worldmod.wand:
+        description: Permission for toggling the wand item
+        default: true
+        children:
+          worldmod.wand.selection:
+            description: Permission for toggling the selection wand item
+            default: true
+          worldmod.wand.lookup:
+            description: Permission for toggling the lookup wand item
+            default: false

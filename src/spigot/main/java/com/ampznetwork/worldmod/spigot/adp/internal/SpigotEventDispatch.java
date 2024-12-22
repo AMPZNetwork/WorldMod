@@ -5,9 +5,11 @@ import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import com.ampznetwork.worldmod.spigot.WorldMod$Spigot;
 import lombok.Value;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Translatable;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -112,16 +114,23 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockPlaceEvent event) {
-        var block    = event.getBlock();
-        var location = vec(block.getLocation());
-        dispatchEvent(event, event.getPlayer(), block.getTranslationKey(), location, block.getWorld().getName(), Build);
+        var block     = event.getBlock();
+        var player    = event.getPlayer();
+        var location  = vec(block.getLocation());
+        var worldName = block.getWorld().getName();
+        if (!tryDispatchWandEvent(event, worldName, player, location, block.getType()))
+            dispatchEvent(event, player, block.getTranslationKey(), location, worldName, Build);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockBreakEvent event) {
-        var block    = event.getBlock();
-        var location = vec(block.getLocation());
-        dispatchEvent(event, event.getPlayer(), block.getTranslationKey(), location, block.getWorld().getName(), Build);
+        var block     = event.getBlock();
+        var player    = event.getPlayer();
+        var location  = vec(block.getLocation());
+        var worldName = block.getWorld().getName();
+        var itemInUse = player.getItemInUse();
+        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, location, itemInUse.getType()))
+            dispatchEvent(event, player, block.getTranslationKey(), location, worldName, Build);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -302,39 +311,39 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerInteractEvent event) {
+        var player    = event.getPlayer();
+        var worldName = player.getWorld().getName();
         var location = vec(Optional.ofNullable(event.getClickedBlock())
                 .map(Block::getLocation)
-                .orElseGet(() -> event.getPlayer().getEyeLocation()));
-        dispatchEvent(event,
-                event.getPlayer(),
-                Optional.ofNullable(event.getClickedBlock())
-                        .map(Translatable::getTranslationKey)
-                        .orElse(event.getAction().name()),
-                location,
-                event.getPlayer().getWorld().getName(),
-                Interact);
+                .orElseGet(player::getEyeLocation));
+        var itemInUse = event.getItem();
+        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, location, itemInUse.getType()))
+            dispatchEvent(event,
+                    player,
+                    Optional.ofNullable(event.getClickedBlock()).map(Translatable::getTranslationKey).orElse(event.getAction().name()),
+                    location,
+                    worldName,
+                    Interact);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerInteractEntityEvent event) {
-        var location = vec(event.getRightClicked().getLocation());
-        dispatchEvent(event,
-                event.getPlayer(),
-                event.getRightClicked().getType().getTranslationKey(),
-                location,
-                event.getPlayer().getWorld().getName(),
-                Interact);
+        var player    = event.getPlayer();
+        var worldName = player.getWorld().getName();
+        var location  = vec(event.getRightClicked().getLocation());
+        var itemInUse = player.getItemInUse();
+        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, location, itemInUse.getType()))
+            dispatchEvent(event, player, event.getRightClicked().getType().getTranslationKey(), location, worldName, Interact);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerInteractAtEntityEvent event) {
-        var location = vec(event.getRightClicked().getLocation());
-        dispatchEvent(event,
-                event.getPlayer(),
-                event.getRightClicked().getType().getTranslationKey(),
-                location,
-                event.getPlayer().getWorld().getName(),
-                Interact);
+        var player    = event.getPlayer();
+        var worldName = player.getWorld().getName();
+        var location  = vec(event.getRightClicked().getLocation());
+        var itemInUse = player.getItemInUse();
+        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, location, itemInUse.getType()))
+            dispatchEvent(event, player, event.getRightClicked().getType().getTranslationKey(), location, worldName, Interact);
     }
 
     //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerJoinEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Join);}
@@ -776,13 +785,20 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Villager_Replenish);
     }
 
-    private void dispatchEvent(Cancellable cancellable, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {
-        dispatchEvent(new SpigotPropagationAdapter(cancellable), convertPlayer(source), convertPlayer(target), location, worldName, flag);
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    private boolean tryDispatchWandEvent(Cancellable event, String worldName, Player player, Vector.N3 location, Material wandMaterial) {
+        return mod.findWandType(wandMaterial.getKey().toString())
+                .filter(type -> tryDispatchWandEvent(new SpigotPropagationAdapter(event), worldName, tryGetAsPlayer(mod, player), location, type))
+                .isPresent();
     }
 
-    private Object convertPlayer(Object object) {
+    private void dispatchEvent(Cancellable cancellable, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {
+        dispatchEvent(new SpigotPropagationAdapter(cancellable), tryConvertPlayer(source), tryConvertPlayer(target), location, worldName, flag);
+    }
+
+    private Object tryConvertPlayer(Object object) {
         return object == null ? null : switch (object) {
-            case org.bukkit.entity.Player player -> convertPlayer(player.getUniqueId());
+            case org.bukkit.entity.Player player -> tryConvertPlayer(player.getUniqueId());
             case UUID id -> mod.getLib().getPlayerAdapter().getPlayer(id).orElseThrow();
             default -> object;
         };

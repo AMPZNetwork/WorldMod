@@ -1,6 +1,8 @@
 package com.ampznetwork.worldmod.api;
 
+import com.ampznetwork.libmod.api.LibMod;
 import com.ampznetwork.libmod.api.SubMod;
+import com.ampznetwork.worldmod.api.model.WandType;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Command;
@@ -11,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Stream;
@@ -47,6 +50,15 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
     boolean loggingSkipsNonPlayer();
 
     Stream<String> loggingSkipFlagNames();
+
+    Map<WandType, String> wandItems();
+
+    default Optional<WandType> findWandType(String itemResourceKey) {
+        return wandItems().entrySet().stream()
+                .filter(e -> LibMod.equalResourceKey(itemResourceKey, e.getValue()))
+                .findAny()
+                .map(Map.Entry::getKey);
+    }
 
     default boolean addRegion(Region region) {
         try {

@@ -131,7 +131,7 @@ publishing {
 	}
 }
 
-shadowJar {
+shadowJar { setProperty("zip64",true)
 	dependsOn project("$prefix:api").simplifyArtifact
 }
 

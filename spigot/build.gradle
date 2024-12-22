@@ -22,7 +22,7 @@ tasks.register('dlArclightServerJar', Download).configure {
     dest "$projectDir/run/arclight.jar"
 }
 */
-shadowJar {
+shadowJar { setProperty("zip64",true)
     // Specify which projects' classes to include
     from(project(":${prefix}:api").sourceSets.main.output)
     from(project(":${prefix}:core").sourceSets.main.output)

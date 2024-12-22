@@ -4,6 +4,8 @@ import com.ampznetwork.libmod.api.LibMod;
 import com.ampznetwork.libmod.api.SubMod;
 import com.ampznetwork.worldmod.api.model.WandType;
 import com.ampznetwork.worldmod.api.model.region.Region;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
@@ -36,6 +38,11 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
     @Override
     default Class<?> getModuleType() {
         return WorldMod.class;
+    }
+
+    @Override
+    default TextColor getThemeColor() {
+        return NamedTextColor.LIGHT_PURPLE;
     }
 
     @Override

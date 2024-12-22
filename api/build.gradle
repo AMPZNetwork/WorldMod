@@ -1,6 +1,5 @@
 plugins {
     id 'java-library'
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 ext {
@@ -14,8 +13,6 @@ sourceCompatibility = 21
 targetCompatibility = 21
 
 apply from: "$parent.projectDir/gradle/publishing.gradle"
-
-shadowJar { setProperty("zip64",true) }
 
 repositories {
     maven { url 'https://maven.comroid.org' }

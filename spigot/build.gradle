@@ -1,33 +1,16 @@
 plugins {
     id 'java'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
-    id "de.undercouch.download" version "5.5.0"
 }
 
 group = 'com.ampznetwork.worldmod'
 
-/*
-tasks.register('dlSpigotServerJar', Download).configure {
-    src 'https://download.getbukkit.org/spigot/spigot-1.20.1.jar'
-    dest "$projectDir/run/spigot.jar"
-}
+shadowJar {
+    setProperty("zip64", true)
 
-tasks.register('dlPaperServerJar', Download).configure {
-    src 'https://api.papermc.io/v2/projects/paper/versions/1.20.1/builds/196/downloads/paper-1.20.1-196.jar'
-    dest "$projectDir/run/paper.jar"
-}
-
-tasks.register('dlArclightServerJar', Download).configure {
-    src 'https://github.com/IzzelAliz/Arclight/releases/download/Trials%2F1.0.5/arclight-forge-1.20.1-1.0.5.jar'
-    dest "$projectDir/run/arclight.jar"
-}
-*/
-shadowJar { setProperty("zip64",true)
-    // Specify which projects' classes to include
     from(project(":${prefix}:api").sourceSets.main.output)
     from(project(":${prefix}:core").sourceSets.main.output)
 
-    // Exclude dependencies by ensuring the JAR contains only the classes
     configurations = [project.configurations.shadow]
 }
 

@@ -37,7 +37,7 @@ import static net.kyori.adventure.text.Component.*;
 
 @UtilityClass
 public class WorldModCommands {
-    private final Map<UUID, Area.Builder> selections = new ConcurrentHashMap<>();
+    private static final Map<UUID, Area.Builder> selections = new ConcurrentHashMap<>();
 
     @Alias("sel")
     @Command(permission = WorldMod.Permission.Selection, ephemeral = true)
@@ -60,11 +60,11 @@ public class WorldModCommands {
                         .append(text(log.getAction()))), ComponentBuilder::append, ComponentBuilder::build));
     }
 
-    private Area.Builder sel(UUID playerId) {
+    public static Area.Builder sel(UUID playerId) {
         return selections.computeIfAbsent(playerId, $ -> Area.builder());
     }
 
-    private void clearSel(UUID playerId) {
+    public static void clearSel(UUID playerId) {
         sel(playerId)
                 .x1(null).y1(null).z1(null)
                 .x2(null).y2(null).z2(null)

@@ -2,7 +2,6 @@ package com.ampznetwork.worldmod.core.event;
 
 import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.libmod.api.entity.Player;
-import com.ampznetwork.libmod.api.util.chat.BroadcastWrapper;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.WandType;
@@ -10,6 +9,7 @@ import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.mini.EventState;
 import com.ampznetwork.worldmod.api.model.region.Region;
+import com.ampznetwork.worldmod.core.WorldModCommands;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import lombok.extern.java.Log;
@@ -17,10 +17,12 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
-import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -43,6 +45,7 @@ public class EventDispatchBase {
             default -> null;
         };
     }
+
     WorldMod mod;
 
     public EventState dependsOnFlag(IPropagationAdapter cancellable, Player player, Vector.N3 location, String worldName, Flag flagChain) {
@@ -104,13 +107,44 @@ public class EventDispatchBase {
         return tryGetAsPlayer(mod, it);
     }
 
-    public boolean tryDispatchWandEvent(IPropagationAdapter cancellable, String worldName, Player player, Vector.N3 location, WandType type) {
+    public boolean tryDispatchWandEvent(IPropagationAdapter cancellable, String worldName, Player player, Vector.N3 location, WandType type, byte modifier) {
         if (mod.getLib().getPlayerAdapter().checkPermission(player.getId(), type.usePermission) != TriState.TRUE) {
             // not permitted
             // todo: send 'not permitted' message?
             return false;
         }
-        // todo
+        switch (type) {
+            case selection:
+                var selection = WorldModCommands.sel(player.getId());
+                switch (modifier) {
+                    case 0:
+                        selection.x1((int) location.getX()).y1((int) location.getY()).z1((int) location.getZ());
+                        break;
+                    case 1:
+                        selection.x2((int) location.getX()).y2((int) location.getY()).z2((int) location.getZ());
+                        break;
+                    default:
+                        return false;
+                }
+                // todo: send selection info
+                break;
+            case lookup:
+                mod.getLib().getEntityService().getAccessor(LogEntry.TYPE)
+                        .querySelect("""
+                                select * from worldmod_world_log log
+                                    where timestamp > :timestamp
+                                    and ( x = :x and y = :y and z = :z )
+                                    order by timestamp desc
+                                """, Map.of(
+                                        "timestamp", Instant.now().minus(Duration.ofDays(3)),
+                                        "x", location.getX(),
+                                        "y", location.getY(),
+                                        "z", location.getZ()
+                                ))
+                        .limit(8)
+                        .forEachOrdered(log -> mod.getLib().getPlayerAdapter().send(player.getId(), Component.text(log.toString())));
+                break;
+        }
         cancellable.cancel();
         return true;
     }

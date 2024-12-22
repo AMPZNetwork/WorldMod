@@ -2,6 +2,7 @@ package com.ampznetwork.worldmod.core.event;
 
 import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.libmod.api.entity.Player;
+import com.ampznetwork.libmod.api.util.chat.BroadcastType;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.WandType;
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -126,7 +128,9 @@ public class EventDispatchBase {
                     default:
                         return false;
                 }
-                // todo: send selection info
+                var tmp=selection.build();
+                mod.getChat().target(player).sendMessage("Selection changed: ({},{},{}) -> ({},{},{})",
+                        tmp.getX1(),tmp.getY1(),tmp.getZ1(), tmp.getX2(),tmp.getY2(),tmp.getZ2());
                 break;
             case lookup:
                 mod.getLib().getEntityService().getAccessor(LogEntry.TYPE)
@@ -142,7 +146,13 @@ public class EventDispatchBase {
                                         "z", location.getZ()
                                 ))
                         .limit(8)
-                        .forEachOrdered(log -> mod.getLib().getPlayerAdapter().send(player.getId(), Component.text(log.toString())));
+                        .forEachOrdered(log -> mod.getChat().target(player).sendMessage(BroadcastType.HINT,
+                                "[{}] {} was {} by {} ({})",
+                                DateTimeFormatter.ofPattern("dd.MM.yyyy mm:HH"),
+                                Optional.ofNullable(log.getTarget()).map(Player::getName).orElseGet(log::getNonPlayerTarget),
+                                log.getAction(),
+                                Optional.ofNullable(log.getPlayer()).map(Player::getName).orElseGet(log::getNonPlayerSource),
+                                log.getResult()));
                 break;
         }
         cancellable.cancel();

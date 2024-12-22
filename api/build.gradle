@@ -13,13 +13,6 @@ group = 'com.ampznetwork.worldmod'
 sourceCompatibility = 21
 targetCompatibility = 21
 
-sourceSets {
-    main.java.srcDirs = files("${parent.projectDir}/src/$project.name/main/java")
-    main.resources.srcDirs = files("${parent.projectDir}/src/$project.name/main/resources")
-    test.java.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
-    test.resources.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
-}
-
 apply from: "$parent.projectDir/gradle/publishing.gradle"
 
 repositories {

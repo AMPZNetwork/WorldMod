@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'org.comroid.codegen.spigot'
 }
 
 ext {
@@ -13,16 +14,6 @@ group = 'com.ampznetwork.worldmod'
 sourceCompatibility = 21
 targetCompatibility = 21
 
-sourceSets {
-    main.java.srcDirs = files("${parent.projectDir}/src/$project.name/main/java")
-    main.resources.srcDirs = files(
-            parent.projectDir.toString() + "/src/core/main/resources",
-            parent.projectDir.toString() + "/src/core/main/antlr"
-    )
-    test.java.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
-    test.resources.srcDirs = files("${parent.projectDir}/src/$project.name/test/java")
-}
-
 apply from: "$parent.projectDir/gradle/publishing.gradle"
 
 repositories {
@@ -34,9 +25,6 @@ repositories {
 
 dependencies {
     api project("$prefix:api")
-
-    // antlr
-    implementation 'antlr:antlr:2.7.7'
 
     // logger
     compileOnly 'org.apache.logging.log4j:log4j-core:2.+'

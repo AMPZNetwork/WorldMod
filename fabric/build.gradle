@@ -1,11 +1,11 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-	id 'com.github.johnrengelman.shadow' version '8.1.1'
-	id "de.undercouch.download" version "5.5.0"
 	id 'fabric-loom' version '1.6-SNAPSHOT'
 	id 'maven-publish'
 }
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'de.undercouch.download'
 
 version = '0.1'
 group = project.maven_group + '.worldmod'

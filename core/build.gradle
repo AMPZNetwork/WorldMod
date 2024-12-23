@@ -1,42 +1,16 @@
-plugins {
-    id 'java-library'
-    //id 'org.comroid.codegen.spigot'
+import org.comroid.codegen.spigot.GenerateSpigotResourceClassesTask
+
+buildscript {
+    dependencies {
+        classpath 'com.ampznetwork.modsuite:spigotResourceGenerator'
+    }
 }
 
-ext {
-    artifactName = 'worldmod-core'
-    projectDescription = 'Minecraft World Protection Mod'
-    userbase = 'AMPZNetwork'
-}
+plugins { id 'org.comroid.codegen.spigot' }
+apply from: "$rootProject.projectDir/gradle/scripts/java-lib.gradle"
 
 group = 'com.ampznetwork.worldmod'
-sourceCompatibility = 21
-targetCompatibility = 21
 
-apply from: "$parent.projectDir/gradle/publishing.gradle"
-
-repositories {
-    maven { url 'https://maven.comroid.org' }
-    mavenLocal()
-    mavenCentral()
-    maven { url 'https://jitpack.io' }
-}
-
-dependencies {
-    api project("$prefix:api")
-
-    // logger
-    compileOnly 'org.apache.logging.log4j:log4j-core:2.+'
-
-    // utility
-    compileOnly 'org.projectlombok:lombok:+'
-    annotationProcessor 'org.projectlombok:lombok:+'
-}
-
-task simplifyArtifact(type: Copy) {
-    // api module should be slim, and only contain worldmod's own api
-    dependsOn test, jar
-    from jar.outputs.files.singleFile
-    into "$rootDir/build/libs/"
-    rename { n -> "WorldMod-core.jar" }
+tasks.named('generateSpigotResourceClasses', GenerateSpigotResourceClassesTask) { GenerateSpigotResourceClassesTask task ->
+    task.resourceInputDirectory parent.project(':spigot').extensions.getByType(SourceSetContainer).named('main').get().resources
 }

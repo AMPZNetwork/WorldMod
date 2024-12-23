@@ -3,7 +3,6 @@ plugins {
     id 'org.comroid.codegen.spigot'
 }
 apply from: "$rootProject.projectDir/gradle/scripts/java-lib.gradle"
-apply from: "$rootProject.projectDir/gradle/scripts/setup/spigot-codegen.gradle"
 
 group = 'com.ampznetwork.worldmod'
 
@@ -16,18 +15,11 @@ dependencies {
     // persistence
     api 'javax.persistence:javax.persistence-api:2.2'
 
-    // kyori
-    api 'net.kyori:adventure-api:4.11.+'
-
-    //todo: move db dependencies to LibMod
-    compileOnly 'org.hibernate:hibernate-core:5.6.0.Final'
-    compileOnly 'org.jboss:jandex:2.4.5.Final'
-    compileOnly 'com.zaxxer:HikariCP:4.0.3'
-    compileOnly 'org.mariadb.jdbc:mariadb-java-client:3.4.0'
-    compileOnly 'com.mysql:mysql-connector-j:8.4.0'
-    compileOnly 'com.h2database:h2:2.2.224'
-
     // utility
     compileOnly 'org.projectlombok:lombok:+'
     annotationProcessor 'org.projectlombok:lombok:+'
+
+    generatedCompileOnly project(':japi')
+    generatedCompileOnly 'org.projectlombok:lombok:+'
+    generatedAnnotationProcessor 'org.projectlombok:lombok:+'
 }

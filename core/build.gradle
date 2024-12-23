@@ -1,10 +1,3 @@
-import org.comroid.codegen.spigot.GenerateSpigotResourceClassesTask
-
-plugins { id 'org.comroid.codegen.spigot' }
 apply from: "$rootProject.projectDir/gradle/scripts/java-lib.gradle"
 
 group = 'com.ampznetwork.worldmod'
-
-tasks.named('generateSpigotResourceClasses', GenerateSpigotResourceClassesTask) { GenerateSpigotResourceClassesTask task ->
-    task.resourceInputDirectory parent.project(':spigot').extensions.getByType(SourceSetContainer).named('main').get().resources
-}

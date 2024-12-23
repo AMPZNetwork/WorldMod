@@ -1,11 +1,5 @@
 import org.comroid.codegen.spigot.GenerateSpigotResourceClassesTask
 
-buildscript {
-    dependencies {
-        classpath 'com.ampznetwork.modsuite:spigotResourceGenerator'
-    }
-}
-
 plugins { id 'org.comroid.codegen.spigot' }
 apply from: "$rootProject.projectDir/gradle/scripts/java-lib.gradle"
 

@@ -1,93 +1,13 @@
-plugins {
-    id 'java'
-}
-apply plugin: 'com.github.johnrengelman.shadow'
+apply from: "$rootProject.projectDir/gradle/scripts/java-lib.gradle"
+apply from: "$rootProject.projectDir/gradle/scripts/setup/spigot.gradle"
+apply from: "$rootProject.projectDir/gradle/scripts/deploy/shadowJar.gradle"
 
 group = 'com.ampznetwork.worldmod'
 
-shadowJar {
-    setProperty("zip64", true)
-
-    from(project(":${prefix}:api").sourceSets.main.output)
-    from(project(":${prefix}:core").sourceSets.main.output)
-
-    configurations = [project.configurations.shadow]
-}
-
-tasks.register('testPlugin', Copy) {
-    dependsOn shadowJar//, dlArclightServerJar, dlPaperServerJar, dlSpigotServerJar
-    from shadowJar.outputs.files.singleFile
-    into "${projectDir}/run/plugins"
-    rename { n -> "WorldMod-spigot.jar" }
-}
-
-task simplifyArtifact(type: Copy) {
-    dependsOn test, shadowJar
-    from shadowJar.outputs.files.singleFile
-    into "$rootDir/build/libs/"
-    rename { n -> "WorldMod-spigot.jar" }
-}
-
-repositories {
-    mavenCentral()
-    maven {
-        name = "papermc-repo"
-        url = "https://repo.papermc.io/repository/maven-public/"
-    }
-    maven {
-        name = "sonatype"
-        url = "https://oss.sonatype.org/content/groups/public/"
-    }
-    maven {
-        name = "spigotmc-repo"
-        url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
-    }
-    maven {
-        name = "sonatype"
-        url = "https://oss.sonatype.org/content/groups/public/"
-    }
-    maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
-}
-
 dependencies {
-    // spigot
-    implementation 'org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT'
-    implementation 'net.kyori:adventure-platform-bungeecord:4.3.3'
-
-    // worldmod api
-    implementation project("$prefix:core")
-
     // rabbit
     runtimeOnly 'com.rabbitmq:amqp-client:5.+'
 
-    // logger
-    implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
-
     // placeholderapi
     compileOnly 'me.clip:placeholderapi:2.+'
-}
-
-def targetJavaVersion = 21
-java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
-        options.release = targetJavaVersion
-    }
-}
-
-processResources {
-    def props = [version: version]
-    inputs.properties props
-    filteringCharset 'UTF-8'
-    filesMatching('paper-plugin.yml') {
-        expand props
-    }
 }

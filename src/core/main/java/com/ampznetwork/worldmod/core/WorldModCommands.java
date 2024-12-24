@@ -11,6 +11,7 @@ import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.core.ui.ClaimMenuBook;
+import com.ampznetwork.worldmod.generated.PluginYml.Permission.worldmod;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentBuilder;
@@ -40,7 +41,7 @@ public class WorldModCommands {
     private static final Map<UUID, Area.Builder> selections = new ConcurrentHashMap<>();
 
     @Alias("sel")
-    @Command(permission = WorldMod.Permission.Selection, ephemeral = true)
+    @Command(permission = worldmod.SELECTION, ephemeral = true)
     public String select(UUID playerId, @Command.Arg @Nullable Shape type) {
         if (type == null) {
             selections.remove(playerId);
@@ -77,7 +78,7 @@ public class WorldModCommands {
     }
 
     @Alias("pos")
-    @Command(permission = WorldMod.Permission.Selection, ephemeral = true)
+    @Command(permission = worldmod.SELECTION, ephemeral = true)
     public static class position {
         @Command
         public static String $(WorldMod worldMod, UUID playerId, @Command.Arg(autoFill = { "1", "2" }) int index) {
@@ -98,7 +99,7 @@ public class WorldModCommands {
     @Command
     @Alias("region")
     public static class claim {
-        @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
+        @Command(permission = worldmod.CLAIM, ephemeral = true)
         public static String $(WorldMod worldMod, UUID playerId, @Nullable @Command.Arg String name) {
             var player = worldMod.getLib().getPlayerAdapter()
                     .getPlayer(playerId).orElseThrow();
@@ -118,7 +119,7 @@ public class WorldModCommands {
             return "Area claimed!";
         }
 
-        @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
+        @Command(permission = worldmod.CLAIM, ephemeral = true)
         public static String info(@Nullable Region region) {
             isClaimed(region);
             return Optional.ofNullable(region)
@@ -130,7 +131,7 @@ public class WorldModCommands {
                     .orElse("This area is not claimed");
         }
 
-        @Command(permission = WorldMod.Permission.Claiming, ephemeral = true)
+        @Command(permission = worldmod.CLAIM, ephemeral = true)
         public static void menu(WorldMod worldMod, Player player, @Nullable Region region) {
             isClaimed(region);
             var menu = new ClaimMenuBook(worldMod.getLib(), region, player);

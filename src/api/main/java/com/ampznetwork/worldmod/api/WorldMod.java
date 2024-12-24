@@ -97,9 +97,4 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
                         Stream.of(Region.global("world")))
                 .sorted(Region.BY_PRIORITY);
     }
-
-    interface Permission {
-        String Selection = "worldmod.selection";
-        String Claiming  = "worldmod.region.claim";
-    }
 }

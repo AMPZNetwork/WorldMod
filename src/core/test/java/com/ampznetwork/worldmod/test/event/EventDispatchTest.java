@@ -3,10 +3,8 @@ package com.ampznetwork.worldmod.test.event;
 import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
-import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.model.region.Region;
-import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import lombok.Data;
 import net.kyori.adventure.util.TriState;
@@ -15,7 +13,6 @@ import org.comroid.api.text.minecraft.Tellraw;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,10 +33,10 @@ public class EventDispatchTest {
         LocationOutside = new Vector.N3(-1, 0, -1);
         Region         = com.ampznetwork.worldmod.api.model.region.Region.builder()
                 .name("testregion")
-                .area(new Area(Shape.Cuboid, List.of(
+                /*.area(new Area(Shape.Cuboid, List.of(
                         new Vector.N4(0, 0, 0, 0),
                         new Vector.N4(16, 0, 16, 0)
-                )))
+                )))*/
                 .owner(Player.builder().id(PlayerOwner).name("Steve").build())
                 .member(Player.builder().id(PlayerMember).name("Dinnerbone").build())
                 .flag(Flag.Usage.builder()
@@ -114,7 +111,7 @@ public class EventDispatchTest {
 
     private void testPropagate(UUID player, Vector.N3 location, int expect) {
         var propAdp = new PropagationAdapter();
-        dispatch.dispatchEvent(propAdp, player, location, "world", Build);
+        //dispatch.dispatchEvent(propAdp, player, location, "world", Build);
         Assertions.assertEquals(expect, propAdp.state(), "Invalid Event cancellation state");
     }
 

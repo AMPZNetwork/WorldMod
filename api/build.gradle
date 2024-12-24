@@ -18,8 +18,7 @@ dependencies {
     // utility
     compileOnly 'org.projectlombok:lombok:+'
     annotationProcessor 'org.projectlombok:lombok:+'
-
-    generatedCompileOnly project(':japi')
-    generatedCompileOnly 'org.projectlombok:lombok:+'
-    generatedAnnotationProcessor 'org.projectlombok:lombok:+'
 }
+
+// workaround to get generated classes because gradle will not fucking work properly
+sourceSets.main.java.srcDir "${project.layout.buildDirectory.get().asFile.absolutePath}/generated/sources/r"

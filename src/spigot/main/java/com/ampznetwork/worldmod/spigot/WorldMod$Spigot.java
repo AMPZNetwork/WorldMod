@@ -54,7 +54,7 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
         getPluginManager().registerEvents(eventDispatch, this);
     }
 
-    @Command(ephemeral = true)
+    @Command(privacy = Command.PrivacyLevel.PRIVATE)
     public String reload() {
         onDisable();
         onEnable();

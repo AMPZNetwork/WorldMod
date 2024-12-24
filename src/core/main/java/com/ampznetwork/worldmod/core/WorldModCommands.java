@@ -41,7 +41,7 @@ public class WorldModCommands {
     private static final Map<UUID, Area.Builder> selections = new ConcurrentHashMap<>();
 
     @Alias("sel")
-    @Command(permission = worldmod.SELECTION, ephemeral = true)
+    @Command(permission = worldmod.SELECTION, privacy = Command.PrivacyLevel.PRIVATE)
     public String select(UUID playerId, @Command.Arg @Nullable Shape type) {
         if (type == null) {
             selections.remove(playerId);
@@ -78,7 +78,7 @@ public class WorldModCommands {
     }
 
     @Alias("pos")
-    @Command(permission = worldmod.SELECTION, ephemeral = true)
+    @Command(permission = worldmod.SELECTION, privacy = Command.PrivacyLevel.PRIVATE)
     public static class position {
         @Command
         public static String $(WorldMod worldMod, UUID playerId, @Command.Arg(autoFill = { "1", "2" }) int index) {
@@ -99,7 +99,7 @@ public class WorldModCommands {
     @Command
     @Alias("region")
     public static class claim {
-        @Command(permission = worldmod.CLAIM, ephemeral = true)
+        @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
         public static String $(WorldMod worldMod, UUID playerId, @Nullable @Command.Arg String name) {
             var player = worldMod.getLib().getPlayerAdapter()
                     .getPlayer(playerId).orElseThrow();
@@ -119,7 +119,7 @@ public class WorldModCommands {
             return "Area claimed!";
         }
 
-        @Command(permission = worldmod.CLAIM, ephemeral = true)
+        @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
         public static String info(@Nullable Region region) {
             isClaimed(region);
             return Optional.ofNullable(region)
@@ -131,7 +131,7 @@ public class WorldModCommands {
                     .orElse("This area is not claimed");
         }
 
-        @Command(permission = worldmod.CLAIM, ephemeral = true)
+        @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
         public static void menu(WorldMod worldMod, Player player, @Nullable Region region) {
             isClaimed(region);
             var menu = new ClaimMenuBook(worldMod.getLib(), region, player);

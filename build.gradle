@@ -44,7 +44,7 @@ subprojects {
             api project("$prefix:api")
 
         if (project.name != 'japi')
-            api project(":japi")
+            api 'org.comroid:japi:+'
 
         // utility
         compileOnly 'org.projectlombok:lombok:+'

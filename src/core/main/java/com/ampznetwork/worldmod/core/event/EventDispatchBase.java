@@ -34,12 +34,14 @@ import static com.ampznetwork.worldmod.api.game.Flag.*;
 @Log
 @Value
 @NonFinal
-public class EventDispatchBase {
+public abstract class EventDispatchBase {
+    @Deprecated(forRemoval = true)
     public static @Nullable Object tryGetAsPlayer(WorldMod mod, Object it, Object or) {
         var r = tryGetAsPlayer(mod, it);
         return r != null ? r : or;
     }
 
+    @Deprecated(forRemoval = true)
     public static @Nullable Player tryGetAsPlayer(WorldMod mod, Object it) {
         return it == null ? null : switch (it) {
             case Player plr -> plr;
@@ -105,6 +107,7 @@ public class EventDispatchBase {
                 .isPresent();
     }
 
+    @Deprecated(forRemoval = true)
     private @Nullable Player tryGetAsPlayer(Object it) {
         return tryGetAsPlayer(mod, it);
     }

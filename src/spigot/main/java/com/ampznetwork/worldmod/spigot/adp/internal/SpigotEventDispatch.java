@@ -160,7 +160,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(block.getLocation());
         dispatchEvent(event,
                 block.getTranslationKey(),
-                tryGetAsPlayer(mod, tryConvertPlayer(event.getTargetEntity()), event.getItem().getTranslationKey()),
+                mod.getPlayerAdapter().convertNativePlayer(event.getTargetEntity()).orElse(null),
                 location,
                 block.getWorld().getName(),
                 Dispense);
@@ -192,7 +192,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
         dispatchEvent(event,
-                tryGetAsPlayer(mod, tryConvertPlayer(event.getPlayer())),
+                mod.getPlayerAdapter().convertNativePlayer(event.getPlayer()).orElse(null),
                 block.getTranslationKey(),
                 location,
                 block.getWorld().getName(),
@@ -218,7 +218,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
         dispatchEvent(event,
-                Optional.<Object>ofNullable(tryGetAsPlayer(mod, event.getPlayer()))
+                Optional.<Object>ofNullable(mod.getPlayerAdapter().convertNativePlayer(event.getPlayer()).orElse(null))
                         .or(() -> Optional.<Translatable>ofNullable(event.getIgnitingBlock())
                                 .or(() -> Optional.ofNullable(event.getIgnitingEntity())
                                         .map(Entity::getType))
@@ -793,7 +793,8 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean tryDispatchWandEvent(Cancellable event, String worldName, Player player, Vector.N3 location, Material wandMaterial, byte modifier) {
         return mod.findWandType(wandMaterial.getKey().toString())
-                .filter(type -> tryDispatchWandEvent(new SpigotPropagationAdapter(event), worldName, tryGetAsPlayer(mod, player), location, type, modifier))
+                .filter(type -> tryDispatchWandEvent(new SpigotPropagationAdapter(event), worldName,
+                        mod.getPlayerAdapter().convertNativePlayer(player).orElse(null), location, type, modifier))
                 .isPresent();
     }
 

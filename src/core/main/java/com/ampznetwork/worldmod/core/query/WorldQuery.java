@@ -2,7 +2,6 @@ package com.ampznetwork.worldmod.core.query;
 
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
-import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import com.ampznetwork.worldmod.core.query.condition.BlockTypeCondition;
 import com.ampznetwork.worldmod.core.query.condition.FlagCondition;
 import com.ampznetwork.worldmod.core.query.condition.PositionCondition;
@@ -135,7 +134,7 @@ select e.* from world_log e where e.id = p.id
                 .findAny()
                 .ifPresent(source -> {
                     append.add("and (e.player.id = :playerId or e.nonPlayerSource = :source)");
-                    params.put("playerId", EventDispatchBase.tryGetAsPlayer(mod, source.source()));
+                    params.put("playerId", source.source()); // todo this needs name->uuid conversion
                     params.put("source", source.source());
                 });
         /* todo: target condition

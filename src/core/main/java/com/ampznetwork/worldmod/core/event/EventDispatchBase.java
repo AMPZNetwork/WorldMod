@@ -19,14 +19,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Streams;
-import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Predicate;
 
 import static com.ampznetwork.worldmod.api.game.Flag.*;
@@ -35,21 +33,6 @@ import static com.ampznetwork.worldmod.api.game.Flag.*;
 @Value
 @NonFinal
 public abstract class EventDispatchBase {
-    @Deprecated(forRemoval = true)
-    public static @Nullable Object tryGetAsPlayer(WorldMod mod, Object it, Object or) {
-        var r = tryGetAsPlayer(mod, it);
-        return r != null ? r : or;
-    }
-
-    @Deprecated(forRemoval = true)
-    public static @Nullable Player tryGetAsPlayer(WorldMod mod, Object it) {
-        return it == null ? null : switch (it) {
-            case Player plr -> plr;
-            case UUID playerId -> mod.getEntityService().getAccessor(Player.TYPE).getOrCreate(playerId).orElseThrow();
-            default -> null;
-        };
-    }
-
     WorldMod mod;
 
     public EventState dependsOnFlag(IPropagationAdapter cancellable, Player player, Vector.N3 location, String worldName, Flag flagChain) {
@@ -65,7 +48,7 @@ public abstract class EventDispatchBase {
             Streams.OP chainOp_force,
             Flag flag
     ) {
-        var     player   = tryGetAsPlayer(source);
+        var player = mod.getPlayerAdapter().convertNativePlayer(source).orElse(null);
         var     playerId = player == null ? null : player.getId();
         var     iter     = mod.findRegions(location, worldName).iterator();
         boolean cancel   = false, force = false;
@@ -107,13 +90,8 @@ public abstract class EventDispatchBase {
                 .isPresent();
     }
 
-    @Deprecated(forRemoval = true)
-    private @Nullable Player tryGetAsPlayer(Object it) {
-        return tryGetAsPlayer(mod, it);
-    }
-
     public boolean tryDispatchWandEvent(IPropagationAdapter cancellable, String worldName, Player player, Vector.N3 location, WandType type, byte modifier) {
-        if (mod.getLib().getPlayerAdapter().checkPermission(player.getId(), type.usePermission) != TriState.TRUE) {
+        if (player == null || mod.getLib().getPlayerAdapter().checkPermission(player.getId(), type.usePermission) != TriState.TRUE) {
             // not permitted
             // todo: send 'not permitted' message?
             return false;
@@ -165,7 +143,7 @@ public abstract class EventDispatchBase {
     public void dispatchEvent(IPropagationAdapter cancellable, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {
         if (passthrough(location, worldName))
             return;
-        Player playerSource = tryGetAsPlayer(source);
+        Player playerSource = mod.getPlayerAdapter().convertNativePlayer(source).orElse(null);
         var    result       = dependsOnFlag(cancellable, playerSource, location, worldName, flag);
         if (result == EventState.Cancelled && playerSource != null)
             mod.getLib().getPlayerAdapter().send(playerSource.getId(),
@@ -195,11 +173,11 @@ public abstract class EventDispatchBase {
                 .y((int) location.getY())
                 .z((int) location.getZ())
                 .result(result);
-        Player playerSource = tryGetAsPlayer(source);
+        Player playerSource = mod.getPlayerAdapter().convertNativePlayer(source).orElse(null);
         if (playerSource != null)
             builder.player(playerSource);
         else builder.nonPlayerSource(String.valueOf(source));
-        Player playerTarget = tryGetAsPlayer(target);
+        Player playerTarget = mod.getPlayerAdapter().convertNativePlayer(target).orElse(null);
         if (playerTarget != null)
             builder.target(playerTarget);
         else builder.nonPlayerTarget(String.valueOf(target));

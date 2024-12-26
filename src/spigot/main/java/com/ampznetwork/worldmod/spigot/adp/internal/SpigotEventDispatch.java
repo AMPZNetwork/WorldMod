@@ -13,6 +13,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockCookEvent;
@@ -338,11 +339,14 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerInteractEvent event) {
-        var player    = event.getPlayer();
-        var worldName = player.getWorld().getName();
-        var location = vec(Optional.ofNullable(event.getClickedBlock()).map(Block::getLocation).orElseGet(player::getEyeLocation));
-        var itemInUse = event.getItem();
-        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, location, itemInUse.getType(), (byte) switch (event.getAction()) {
+        var player       = event.getPlayer();
+        var worldName    = player.getWorld().getName();
+        var location     = vec(Optional.ofNullable(event.getClickedBlock()).map(Block::getLocation).orElseGet(player::getEyeLocation));
+        var itemInUse    = event.getItem();
+        var wandLocation = location;
+        if (itemInUse != null && event.getAction() == Action.RIGHT_CLICK_BLOCK)
+            wandLocation = vec(event.getClickedBlock().getLocation().toVector().add(event.getBlockFace().getDirection()));
+        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, wandLocation, itemInUse.getType(), (byte) switch (event.getAction()) {
             case LEFT_CLICK_BLOCK -> 1;
             case RIGHT_CLICK_BLOCK -> 2;
             default -> 0;
@@ -833,6 +837,10 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
             case UUID id -> mod.getLib().getPlayerAdapter().getPlayer(id).orElseThrow();
             default -> object;
         };
+    }
+
+    private static Vector.N3 vec(org.bukkit.util.Vector location) {
+        return new Vector.N3(location.getX(), location.getY(), location.getZ());
     }
 
     private static Vector.N3 vec(Location location) {

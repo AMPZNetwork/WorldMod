@@ -118,7 +118,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var player    = event.getPlayer();
         var location  = vec(block.getLocation());
         var worldName = block.getWorld().getName();
-        dispatchEvent(event, player, block.getType().getKey().toString(), location, worldName, Build);
+        dispatchEvent(event, player, block.getType().getKey().toString(), location, worldName, Place);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -127,7 +127,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var player    = event.getPlayer();
         var location  = vec(block.getLocation());
         var worldName = block.getWorld().getName();
-        dispatchEvent(event, player, block.getType().getKey().toString(), location, worldName, Build);
+        dispatchEvent(event, player, block.getType().getKey().toString(), location, worldName, Break);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

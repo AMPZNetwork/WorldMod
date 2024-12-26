@@ -17,14 +17,12 @@ import org.comroid.api.attr.Described;
 import org.comroid.api.attr.Named;
 import org.comroid.api.data.seri.type.ValueType;
 import org.comroid.api.func.util.Bitmask;
-import org.comroid.api.func.util.Command;
 import org.comroid.api.info.Constraint;
 import org.comroid.api.text.minecraft.Tellraw;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,12 +52,9 @@ public class Flag implements Named, Described, Prioritized {
             "Manage",
             "Enable to allow players to manage claim",
             false);
-    public static final  Flag                     Build               = new Flag("build",
-            50,
-            BOOLEAN,
-            "Building",
-            "Enable to force WorldMod to not handle any events",
-            false);
+    public static final Flag Build = new Flag("build", 50, BOOLEAN, "Building", "Enable to force WorldMod to not handle any events", false);
+    public static final Flag Place = new Flag(Build, "place", 50, BOOLEAN, "Placing Blocks", "Enable to force WorldMod to not handle any events", false);
+    public static final Flag Break = new Flag(Build, "break", 50, BOOLEAN, "Breaking Blocks", "Enable to force WorldMod to not handle any events", false);
     public static final  Flag                     Spawn               = new Flag("spawn", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Spawn_Mobs          = new Flag(Spawn, "mobs", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Interact            = new Flag("interact",

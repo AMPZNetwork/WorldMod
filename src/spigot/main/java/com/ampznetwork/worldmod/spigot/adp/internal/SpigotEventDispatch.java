@@ -160,7 +160,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(block.getLocation());
         dispatchEvent(event,
                 block.getTranslationKey(),
-                tryGetAsPlayer(mod, event.getTargetEntity(), event.getItem().getTranslationKey()),
+                tryGetAsPlayer(mod, tryConvertPlayer(event.getTargetEntity()), event.getItem().getTranslationKey()),
                 location,
                 block.getWorld().getName(),
                 Dispense);
@@ -191,7 +191,12 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(BlockFertilizeEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event, tryGetAsPlayer(mod, event.getPlayer()), block.getTranslationKey(), location, block.getWorld().getName(), Fertilize);
+        dispatchEvent(event,
+                tryGetAsPlayer(mod, tryConvertPlayer(event.getPlayer())),
+                block.getTranslationKey(),
+                location,
+                block.getWorld().getName(),
+                Fertilize);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -788,7 +793,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean tryDispatchWandEvent(Cancellable event, String worldName, Player player, Vector.N3 location, Material wandMaterial, byte modifier) {
         return mod.findWandType(wandMaterial.getKey().toString())
-                .filter(type -> tryDispatchWandEvent(new SpigotPropagationAdapter(event), worldName, convertPlayer(player), location, type, modifier))
+                .filter(type -> tryDispatchWandEvent(new SpigotPropagationAdapter(event), worldName, tryGetAsPlayer(mod, player), location, type, modifier))
                 .isPresent();
     }
 

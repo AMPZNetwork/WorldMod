@@ -9,8 +9,10 @@ logging:
   skip-non-player: true
   # list of flags to skip on logging; wildcards supported
   skip:
+    # these defaults reduce logs that barely carry any useful information
     - move
+    - interact
+    # these defaults exist purely to reduce garbage data when setting 'skip-non-player: false'
     - grow
     - spread
-    - interact
     - spawn.mobs

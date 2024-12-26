@@ -6,7 +6,6 @@ import com.ampznetwork.worldmod.spigot.WorldMod$Spigot;
 import lombok.Value;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Translatable;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -237,9 +236,10 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(block.getLocation());
         dispatchEvent(event,
                 Optional.<Object>ofNullable(mod.getPlayerAdapter().convertNativePlayer(event.getPlayer()).orElse(null))
-                        .or(() -> Optional.<Translatable>ofNullable(event.getIgnitingBlock())
-                                .or(() -> Optional.ofNullable(event.getIgnitingEntity()).map(Entity::getType))
-                                .map(Translatable::getTranslationKey))
+                        .or(() -> Optional.ofNullable(event.getIgnitingBlock())
+                                .map(b0 -> b0.getType().getKey().toString())
+                                .or(() -> Optional.ofNullable(event.getIgnitingEntity()).map(Entity::getType)
+                                        .map(e0 -> e0.getKey().toString())))
                         .orElse(event.getCause().name()),
                 block.getType().getKey().toString(),
                 location,
@@ -348,7 +348,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
             default -> 0;
         })) dispatchEvent(event,
                 player,
-                Optional.ofNullable(event.getClickedBlock()).map(Translatable::getTranslationKey).orElse(event.getAction().name()),
+                Optional.ofNullable(event.getClickedBlock()).map(block -> block.getType().getKey().toString()).orElse(event.getAction().name()),
                 location,
                 worldName,
                 Interact);

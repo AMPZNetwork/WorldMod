@@ -5,6 +5,7 @@ import com.ampznetwork.libmod.api.SubMod;
 import com.ampznetwork.worldmod.api.model.TextResourceProvider;
 import com.ampznetwork.worldmod.api.model.WandType;
 import com.ampznetwork.worldmod.api.model.region.Region;
+import com.ampznetwork.worldmod.api.model.sel.Area;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.comroid.api.data.Vector;
@@ -70,7 +71,11 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
 
     default boolean addRegion(Region region) {
         try {
-            getEntityService().save(region);
+            var entityService = getEntityService();
+            region.getAreas().stream()
+                    .filter(a -> entityService.getAccessor(Area.TYPE).get(a.getId()).isEmpty())
+                    .forEach(entityService::save);
+            entityService.save(region);
             return true;
         } catch (Throwable t) {
             Log.at(Level.WARNING, "Could not save region " + region, t);

@@ -5,6 +5,10 @@ import lombok.Value;
 import lombok.experimental.NonFinal;
 
 public interface IPropagationAdapter {
+    boolean isCancelled();
+
+    boolean isForced();
+
     void cancel();
 
     void force();

@@ -95,6 +95,7 @@ public abstract class EventDispatchBase {
     }
 
     public boolean tryDispatchWandEvent(IPropagationAdapter cancellable, Player player, Vector.N3 location, WandType type, byte modifier) {
+        if (cancellable.isCancelled()) return false;
         if (modifier == 0 || player == null || !mod.getLib().getPlayerAdapter()
                 .checkPermission(player.getId(), type.usePermission.toString())
                 .toBooleanOrElse(PluginYml.Permission.worldmod.lookup.wand.getDefaultValue())) {
@@ -154,6 +155,7 @@ public abstract class EventDispatchBase {
     }
 
     public void dispatchEvent(IPropagationAdapter cancellable, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {
+        if (cancellable.isCancelled()) return;
         if (passthrough(location, worldName))
             return;
         var player = source instanceof Player p0 ? p0 : null;

@@ -2,6 +2,7 @@ package com.ampznetwork.worldmod.api;
 
 import com.ampznetwork.libmod.api.LibMod;
 import com.ampznetwork.libmod.api.SubMod;
+import com.ampznetwork.worldmod.api.model.TextResourceProvider;
 import com.ampznetwork.worldmod.api.model.WandType;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -97,4 +98,6 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
                         Stream.of(Region.global("world")))
                 .sorted(Region.BY_PRIORITY);
     }
+
+    TextResourceProvider text();
 }

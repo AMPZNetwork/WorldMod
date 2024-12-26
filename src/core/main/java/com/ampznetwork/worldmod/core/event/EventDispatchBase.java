@@ -2,7 +2,6 @@ package com.ampznetwork.worldmod.core.event;
 
 import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.libmod.api.entity.Player;
-import com.ampznetwork.libmod.api.util.chat.BroadcastType;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.WandType;
@@ -23,9 +22,6 @@ import org.comroid.api.func.util.Streams;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -118,6 +114,7 @@ public abstract class EventDispatchBase {
                         tmp.getX1(), tmp.getY1(), tmp.getZ1(), tmp.getX2(), tmp.getY2(), tmp.getZ2());
                 break;
             case lookup:
+                mod.getPlayerAdapter().send(player.getId(), mod.text().getLookupHeader());
                 mod.getLib().getEntityService().getAccessor(LogEntry.TYPE)
                         .querySelect("""
                                 select * from worldmod_world_log log
@@ -131,13 +128,9 @@ public abstract class EventDispatchBase {
                                 "z", location.getZ()
                         ))
                         .limit(8)
-                        .forEachOrdered(log -> mod.getChat().target(player).sendMessage(BroadcastType.HINT,
-                                "[{}] {} was {} by {} ({})",
-                                DateTimeFormatter.ofPattern("dd.MM.yyyy mm:HH").format(LocalDateTime.ofInstant(log.getTimestamp(), ZoneId.systemDefault())),
-                                Optional.ofNullable(log.getTarget()).map(Player::getName).orElseGet(log::getNonPlayerTarget),
-                                log.getAction(),
-                                Optional.ofNullable(log.getPlayer()).map(Player::getName).orElseGet(log::getNonPlayerSource),
-                                log.getResult()));
+                        .map(mod.text()::ofLookupEntry)
+                        .collect(Streams.atLeastOneOrElseGet(mod.text()::getEmptyListEntry))
+                        .forEachOrdered(comp -> mod.getPlayerAdapter().send(player.getId(), comp));
                 break;
         }
         cancellable.cancel();

@@ -2,6 +2,7 @@ package com.ampznetwork.worldmod.spigot;
 
 import com.ampznetwork.libmod.spigot.SubMod$Spigot;
 import com.ampznetwork.worldmod.api.WorldMod;
+import com.ampznetwork.worldmod.api.model.TextResourceProvider;
 import com.ampznetwork.worldmod.api.model.WandType;
 import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.region.Group;
@@ -85,5 +86,10 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
             map.put(type, itemResourceKey);
         }
         return map;
+    }
+
+    @Override
+    public TextResourceProvider text() {
+        return new TextResourceProvider(this);
     }
 }

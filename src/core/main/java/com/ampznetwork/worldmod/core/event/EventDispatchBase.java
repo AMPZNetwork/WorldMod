@@ -11,6 +11,7 @@ import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.mini.EventState;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.core.WorldModCommands;
+import com.ampznetwork.worldmod.generated.PluginYml;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import lombok.extern.java.Log;
@@ -91,7 +92,9 @@ public abstract class EventDispatchBase {
     }
 
     public boolean tryDispatchWandEvent(IPropagationAdapter cancellable, String worldName, Player player, Vector.N3 location, WandType type, byte modifier) {
-        if (player == null || mod.getLib().getPlayerAdapter().checkPermission(player.getId(), type.usePermission) != TriState.TRUE) {
+        if (modifier == 0 || player == null || !mod.getLib().getPlayerAdapter()
+                .checkPermission(player.getId(), type.usePermission)
+                .toBooleanOrElse(PluginYml.Permission.worldmod.lookup.wand.getDefaultValue())) {
             // not permitted
             // todo: send 'not permitted' message?
             return false;
@@ -100,18 +103,18 @@ public abstract class EventDispatchBase {
             case selection:
                 var selection = WorldModCommands.sel(player.getId());
                 switch (modifier) {
-                    case 0:
+                    case 1:
                         selection.x1((int) location.getX()).y1((int) location.getY()).z1((int) location.getZ());
                         break;
-                    case 1:
+                    case 2:
                         selection.x2((int) location.getX()).y2((int) location.getY()).z2((int) location.getZ());
                         break;
                     default:
                         return false;
                 }
-                var tmp=selection.build();
+                var tmp = selection.build();
                 mod.getChat().target(player).sendMessage("Selection changed: ({},{},{}) -> ({},{},{})",
-                        tmp.getX1(),tmp.getY1(),tmp.getZ1(), tmp.getX2(),tmp.getY2(),tmp.getZ2());
+                        tmp.getX1(), tmp.getY1(), tmp.getZ1(), tmp.getX2(), tmp.getY2(), tmp.getZ2());
                 break;
             case lookup:
                 mod.getLib().getEntityService().getAccessor(LogEntry.TYPE)
@@ -121,11 +124,11 @@ public abstract class EventDispatchBase {
                                     and ( x = :x and y = :y and z = :z )
                                     order by timestamp desc
                                 """, Map.of(
-                                        "timestamp", Instant.now().minus(Duration.ofDays(3)),
-                                        "x", location.getX(),
-                                        "y", location.getY(),
-                                        "z", location.getZ()
-                                ))
+                                "timestamp", Instant.now().minus(Duration.ofDays(3)),
+                                "x", location.getX(),
+                                "y", location.getY(),
+                                "z", location.getZ()
+                        ))
                         .limit(8)
                         .forEachOrdered(log -> mod.getChat().target(player).sendMessage(BroadcastType.HINT,
                                 "[{}] {} was {} by {} ({})",

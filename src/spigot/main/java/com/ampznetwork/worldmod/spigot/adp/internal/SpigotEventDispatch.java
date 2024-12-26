@@ -118,8 +118,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var player    = event.getPlayer();
         var location  = vec(block.getLocation());
         var worldName = block.getWorld().getName();
-        if (!tryDispatchWandEvent(event, worldName, player, location, block.getType(), (byte) 1))
-            dispatchEvent(event, player, block.getTranslationKey(), location, worldName, Build);
+        dispatchEvent(event, player, block.getTranslationKey(), location, worldName, Build);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -128,9 +127,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var player    = event.getPlayer();
         var location  = vec(block.getLocation());
         var worldName = block.getWorld().getName();
-        var itemInUse = player.getItemInUse();
-        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, location, itemInUse.getType(), (byte) 0))
-            dispatchEvent(event, player, block.getTranslationKey(), location, worldName, Build);
+        dispatchEvent(event, player, block.getTranslationKey(), location, worldName, Build);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -322,13 +319,14 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
                 .map(Block::getLocation)
                 .orElseGet(player::getEyeLocation));
         var itemInUse = event.getItem();
-        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, location, itemInUse.getType(), (byte) 1))
-            dispatchEvent(event,
-                    player,
+        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, location, itemInUse.getType(), (byte) switch (event.getAction()) {
+            case LEFT_CLICK_BLOCK -> 1;
+            case RIGHT_CLICK_BLOCK -> 2;
+            default -> 0;
+        }))
+            dispatchEvent(event, player,
                     Optional.ofNullable(event.getClickedBlock()).map(Translatable::getTranslationKey).orElse(event.getAction().name()),
-                    location,
-                    worldName,
-                    Interact);
+                    location, worldName, Interact);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -336,9 +334,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var player    = event.getPlayer();
         var worldName = player.getWorld().getName();
         var location  = vec(event.getRightClicked().getLocation());
-        var itemInUse = player.getItemInUse();
-        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, location, itemInUse.getType(), (byte) 1))
-            dispatchEvent(event, player, event.getRightClicked().getType().getTranslationKey(), location, worldName, Interact);
+        dispatchEvent(event, player, event.getRightClicked().getType().getTranslationKey(), location, worldName, Interact);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -346,9 +342,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var player    = event.getPlayer();
         var worldName = player.getWorld().getName();
         var location  = vec(event.getRightClicked().getLocation());
-        var itemInUse = player.getItemInUse();
-        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, location, itemInUse.getType(), (byte) 1))
-            dispatchEvent(event, player, event.getRightClicked().getType().getTranslationKey(), location, worldName, Interact);
+        dispatchEvent(event, player, event.getRightClicked().getType().getTranslationKey(), location, worldName, Interact);
     }
 
     //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerJoinEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Join);}
@@ -805,7 +799,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @Deprecated(forRemoval = true)
     private Object tryConvertPlayer(Object object) {
         return object == null ? null : switch (object) {
-            case org.bukkit.entity.Player player -> tryConvertPlayer(player.getUniqueId());
+            case Player player -> tryConvertPlayer(player.getUniqueId());
             case UUID id -> mod.getLib().getPlayerAdapter().getPlayer(id).orElseThrow();
             default -> object;
         };

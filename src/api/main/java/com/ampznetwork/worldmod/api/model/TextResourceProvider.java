@@ -7,8 +7,10 @@ import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import lombok.Value;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.Polyfill;
+import org.comroid.api.data.Vector;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -28,23 +30,32 @@ public class TextResourceProvider {
             .append(text(" - ").color(WHITE))
             .append(text("(no entries)").color(GRAY))
             .build();
-    Component LookupHeader   = text()
-            .append(text("The following events have been recorded:").color(BLUE))
-            .build();
 
-    public Component ofState(TriState triState) {
-        // ✅✳❌
-        return switch (triState) {
-            case NOT_SET -> text("✳").color(YELLOW)
-                    .hoverEvent(HoverEvent.showText(text()
-                            .append(text("Value was not changed"))));
-            case FALSE -> text("❌").color(RED)
-                    .hoverEvent(HoverEvent.showText(text()
-                            .append(text("Value was forced to be FALSE"))));
-            case TRUE -> text("✅").color(GREEN)
-                    .hoverEvent(HoverEvent.showText(text()
-                            .append(text("Value was forced to be TRUE"))));
-        };
+    public Component getLookupHeader(Vector.N3 location) {
+        return text()
+                .append(text("Recorded events at position ").color(BLUE))
+                .append(text("(").color(GRAY))
+                .append(text(location.getX()).color(AQUA))
+                .append(text(", ").color(GRAY))
+                .append(text(location.getY()).color(AQUA))
+                .append(text(", ").color(GRAY))
+                .append(text(location.getZ()).color(AQUA))
+                .append(text(")").color(GRAY))
+                .build();
+    }
+
+    public Component getLookupFooter(int page, int totalPages) {
+        return text()
+                .append(text("Use again for ").color(BLUE))
+                .append(text(page == totalPages ? "first page" : "next page").color(BLUE))
+                .append(text("; hold SHIFT for reverse").color(BLUE))
+                .append(text(" (").color(GRAY))
+                .append(text(page).color(AQUA))
+                .append(text("/").color(GRAY))
+                .append(text(totalPages).color(AQUA))
+                .append(text(")").color(GRAY))
+                .decorate(TextDecoration.ITALIC)
+                .build();
     }
 
     @SuppressWarnings("DataFlowIssue")
@@ -77,5 +88,20 @@ public class TextResourceProvider {
                                     .append(text("Causing entity")))))
                     .append(text(")")));
         return text.build();
+    }
+
+    public Component ofState(TriState triState) {
+        // ✅✳❌
+        return switch (triState) {
+            case NOT_SET -> text("✳").color(YELLOW)
+                    .hoverEvent(HoverEvent.showText(text()
+                            .append(text("Value was not changed"))));
+            case FALSE -> text("❌").color(RED)
+                    .hoverEvent(HoverEvent.showText(text()
+                            .append(text("Value was forced to be FALSE"))));
+            case TRUE -> text("✅").color(GREEN)
+                    .hoverEvent(HoverEvent.showText(text()
+                            .append(text("Value was forced to be TRUE"))));
+        };
     }
 }

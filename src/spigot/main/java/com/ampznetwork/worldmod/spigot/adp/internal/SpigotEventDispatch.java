@@ -346,16 +346,17 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var wandLocation = location;
         if (itemInUse != null && event.getAction() == Action.RIGHT_CLICK_BLOCK)
             wandLocation = vec(event.getClickedBlock().getLocation().toVector().add(event.getBlockFace().getDirection()));
-        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, wandLocation, itemInUse.getType(), (byte) switch (event.getAction()) {
+        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, wandLocation, itemInUse.getType(), (byte) ((byte) (switch (event.getAction()) {
             case LEFT_CLICK_BLOCK -> 1;
             case RIGHT_CLICK_BLOCK -> 2;
             default -> 0;
-        })) dispatchEvent(event,
-                player,
-                Optional.ofNullable(event.getClickedBlock()).map(block -> block.getType().getKey().toString()).orElse(event.getAction().name()),
-                location,
-                worldName,
-                Interact);
+        }) | (event.getPlayer().isSneaking() ? 0x80 : 0))))
+            dispatchEvent(event,
+                    player,
+                    Optional.ofNullable(event.getClickedBlock()).map(block -> block.getType().getKey().toString()).orElse(event.getAction().name()),
+                    location,
+                    worldName,
+                    Interact);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

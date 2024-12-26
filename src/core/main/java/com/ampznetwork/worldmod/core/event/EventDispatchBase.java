@@ -14,25 +14,31 @@ import com.ampznetwork.worldmod.generated.PluginYml;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import lombok.extern.java.Log;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Streams;
+import org.comroid.api.func.util.Tuple;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static com.ampznetwork.worldmod.api.game.Flag.*;
+import static net.kyori.adventure.text.Component.*;
 
 @Log
 @Value
 @NonFinal
 public abstract class EventDispatchBase {
-    WorldMod mod;
+    public static final int PER_PAGE = 8;
+    Map<Player, Tuple.N2<Vector.N3, @NotNull Integer>> lookupRepeatCounter = new ConcurrentHashMap<>();
+    WorldMod                                           mod;
 
     public EventState dependsOnFlag(IPropagationAdapter cancellable, Player player, Vector.N3 location, String worldName, Flag flagChain) {
         return dependsOnFlag(cancellable, player, location, worldName, Streams.OP.LogicalOr, Streams.OP.LogicalOr, flagChain);
@@ -96,6 +102,8 @@ public abstract class EventDispatchBase {
             // todo: send 'not permitted' message?
             return false;
         }
+        var alt = (0x80 & modifier) == 0x80;
+        modifier = (byte) (modifier & ~0x80);
         switch (type) {
             case selection:
                 var selection = WorldModCommands.sel(player.getId());
@@ -114,8 +122,9 @@ public abstract class EventDispatchBase {
                         tmp.getX1(), tmp.getY1(), tmp.getZ1(), tmp.getX2(), tmp.getY2(), tmp.getZ2());
                 break;
             case lookup:
-                mod.getPlayerAdapter().send(player.getId(), mod.text().getLookupHeader());
-                mod.getLib().getEntityService().getAccessor(LogEntry.TYPE)
+                var txt = text();
+                txt.append(mod.text().getLookupHeader(location)).append(text("\n"));
+                var entries = mod.getLib().getEntityService().getAccessor(LogEntry.TYPE)
                         .querySelect("""
                                 select * from worldmod_world_log log
                                     where timestamp > :timestamp
@@ -126,11 +135,18 @@ public abstract class EventDispatchBase {
                                 "x", location.getX(),
                                 "y", location.getY(),
                                 "z", location.getZ()
-                        ))
-                        .limit(8)
+                        )).toList();
+                var totalPages = (entries.size() / 8) + 1;
+                var page = pollUseCounter(player, location, totalPages, alt);
+                entries.stream()
+                        .skip((long) (page - 1) * PER_PAGE)
+                        .limit(PER_PAGE)
                         .map(mod.text()::ofLookupEntry)
                         .collect(Streams.atLeastOneOrElseGet(mod.text()::getEmptyListEntry))
-                        .forEachOrdered(comp -> mod.getPlayerAdapter().send(player.getId(), comp));
+                        .flatMap(each -> Stream.of(each, text("\n")))
+                        .forEachOrdered(txt::append);
+                txt.append(mod.text().getLookupFooter(page, totalPages));
+                mod.getPlayerAdapter().send(player.getId(), txt.build());
                 break;
         }
         cancellable.cancel();
@@ -144,7 +160,7 @@ public abstract class EventDispatchBase {
         var result = dependsOnFlag(cancellable, player, location, worldName, flag);
         if (result == EventState.Cancelled && player != null)
             mod.getLib().getPlayerAdapter().send(player.getId(),
-                    Component.text("You don't have permission to do that here").color(NamedTextColor.RED));
+                    text("You don't have permission to do that here").color(NamedTextColor.RED));
         mod.getLib().getScheduler().execute(() -> triggerLog(source, target, location, worldName, flag, result));
         log.finer(() -> "%s by %s at %s towards %s resulted in %s".formatted(cancellable, source, location, target, result));
     }
@@ -179,5 +195,17 @@ public abstract class EventDispatchBase {
             builder.target(playerTarget);
         else builder.nonPlayerTarget(String.valueOf(target));
         mod.getEntityService().save(builder.build());
+    }
+
+    private int pollUseCounter(Player player, Vector.N3 location, int limit, boolean reverse) {
+        return lookupRepeatCounter.compute(player, ($, pair) -> {
+            if (pair == null || !pair.a.equals(location))
+                return new Tuple.N2<>(location, 1);
+            int n = pair.b;
+            pair.b = reverse
+                     ? (n > 1 ? n - 1 : limit)
+                     : (n < limit ? n + 1 : 1);
+            return pair;
+        }).b;
     }
 }

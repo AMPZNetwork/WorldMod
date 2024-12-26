@@ -217,8 +217,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         dispatchEvent(event,
                 Optional.<Object>ofNullable(mod.getPlayerAdapter().convertNativePlayer(event.getPlayer()).orElse(null))
                         .or(() -> Optional.<Translatable>ofNullable(event.getIgnitingBlock())
-                                .or(() -> Optional.ofNullable(event.getIgnitingEntity())
-                                        .map(Entity::getType))
+                                .or(() -> Optional.ofNullable(event.getIgnitingEntity()).map(Entity::getType))
                                 .map(Translatable::getTranslationKey))
                         .orElse(event.getCause().name()),
                 block.getTranslationKey(),
@@ -285,12 +284,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerDropItemEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event,
-                event.getPlayer(),
-                event.getItemDrop().getItemStack().getTranslationKey(),
-                location,
-                event.getPlayer().getWorld().getName(),
-                Drop);
+        dispatchEvent(event, event.getPlayer(), event.getItemDrop().getItemStack().getTranslationKey(), location, event.getPlayer().getWorld().getName(), Drop);
     }
 
     //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerEggThrowEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Use_Egg);}
@@ -315,18 +309,18 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(PlayerInteractEvent event) {
         var player    = event.getPlayer();
         var worldName = player.getWorld().getName();
-        var location = vec(Optional.ofNullable(event.getClickedBlock())
-                .map(Block::getLocation)
-                .orElseGet(player::getEyeLocation));
+        var location = vec(Optional.ofNullable(event.getClickedBlock()).map(Block::getLocation).orElseGet(player::getEyeLocation));
         var itemInUse = event.getItem();
         if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, location, itemInUse.getType(), (byte) switch (event.getAction()) {
             case LEFT_CLICK_BLOCK -> 1;
             case RIGHT_CLICK_BLOCK -> 2;
             default -> 0;
-        }))
-            dispatchEvent(event, player,
-                    Optional.ofNullable(event.getClickedBlock()).map(Translatable::getTranslationKey).orElse(event.getAction().name()),
-                    location, worldName, Interact);
+        })) dispatchEvent(event,
+                player,
+                Optional.ofNullable(event.getClickedBlock()).map(Translatable::getTranslationKey).orElse(event.getAction().name()),
+                location,
+                worldName,
+                Interact);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -515,8 +509,12 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityDropItemEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), event.getItemDrop().getItemStack().getTranslationKey(), location,
-                event.getEntity().getWorld().getName(), Drop);
+        dispatchEvent(event,
+                event.getEntity().getType().getTranslationKey(),
+                event.getItemDrop().getItemStack().getTranslationKey(),
+                location,
+                event.getEntity().getWorld().getName(),
+                Drop);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -674,8 +672,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(ItemDespawnEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getItemStack().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(),
-                Despawn);
+        dispatchEvent(event, event.getEntity().getItemStack().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Despawn);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -736,8 +733,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(ProjectileHitEvent event) {
         var location = vec(Optional.ofNullable(event.getHitEntity())
                 .map(Entity::getLocation)
-                .or(() -> Optional.ofNullable(event.getHitBlock())
-                        .map(Block::getLocation))
+                .or(() -> Optional.ofNullable(event.getHitBlock()).map(Block::getLocation))
                 .orElse(event.getEntity().getLocation()));
         dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Combat_Ranged);
     }
@@ -787,8 +783,11 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean tryDispatchWandEvent(Cancellable event, String worldName, Player player, Vector.N3 location, Material wandMaterial, byte modifier) {
         return mod.findWandType(wandMaterial.getKey().toString())
-                .filter(type -> tryDispatchWandEvent(new SpigotPropagationAdapter(event), worldName,
-                        mod.getPlayerAdapter().convertNativePlayer(player).orElse(null), location, type, modifier))
+                .filter(type -> tryDispatchWandEvent(new SpigotPropagationAdapter(event),
+                        mod.getPlayerAdapter().convertNativePlayer(player).orElse(null),
+                        location,
+                        type,
+                        modifier))
                 .isPresent();
     }
 

@@ -23,6 +23,8 @@ import org.comroid.api.func.util.Streams;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Optional;
@@ -49,10 +51,9 @@ public abstract class EventDispatchBase {
             Streams.OP chainOp_force,
             Flag flag
     ) {
-        var player = mod.getPlayerAdapter().convertNativePlayer(source).orElse(null);
-        var     playerId = player == null ? null : player.getId();
-        var     iter     = mod.findRegions(location, worldName).iterator();
-        boolean cancel   = false, force = false;
+        var     player = source instanceof Player p0 ? p0 : null;
+        var     iter   = mod.findRegions(location, worldName).iterator();
+        boolean cancel = false, force = false;
         while (iter.hasNext()) {
             var region   = iter.next();
             var usage    = region.getEffectiveFlagValueForPlayer(flag, player);
@@ -61,9 +62,9 @@ public abstract class EventDispatchBase {
                 continue; // exception for build flag on global region
             var state = usage.getState();
             if (state == TriState.NOT_SET) {
-                if (playerId != null && Optional.ofNullable(region.getClaimOwner())
+                if (player != null && Optional.ofNullable(region.getClaimOwner())
                         .map(DbObject::getId)
-                        .filter(Predicate.not(playerId::equals))
+                        .filter(Predicate.not(player.getId()::equals))
                         .isPresent())
                     //noinspection DataFlowIssue
                     cancel = chainOp_cancel.test(cancel, !(boolean) usage.getFlag().getDefaultValue());
@@ -91,7 +92,7 @@ public abstract class EventDispatchBase {
                 .isPresent();
     }
 
-    public boolean tryDispatchWandEvent(IPropagationAdapter cancellable, String worldName, Player player, Vector.N3 location, WandType type, byte modifier) {
+    public boolean tryDispatchWandEvent(IPropagationAdapter cancellable, Player player, Vector.N3 location, WandType type, byte modifier) {
         if (modifier == 0 || player == null || !mod.getLib().getPlayerAdapter()
                 .checkPermission(player.getId(), type.usePermission)
                 .toBooleanOrElse(PluginYml.Permission.worldmod.lookup.wand.getDefaultValue())) {
@@ -132,7 +133,7 @@ public abstract class EventDispatchBase {
                         .limit(8)
                         .forEachOrdered(log -> mod.getChat().target(player).sendMessage(BroadcastType.HINT,
                                 "[{}] {} was {} by {} ({})",
-                                DateTimeFormatter.ofPattern("dd.MM.yyyy mm:HH"),
+                                DateTimeFormatter.ofPattern("dd.MM.yyyy mm:HH").format(LocalDateTime.ofInstant(log.getTimestamp(), ZoneId.systemDefault())),
                                 Optional.ofNullable(log.getTarget()).map(Player::getName).orElseGet(log::getNonPlayerTarget),
                                 log.getAction(),
                                 Optional.ofNullable(log.getPlayer()).map(Player::getName).orElseGet(log::getNonPlayerSource),
@@ -146,10 +147,10 @@ public abstract class EventDispatchBase {
     public void dispatchEvent(IPropagationAdapter cancellable, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {
         if (passthrough(location, worldName))
             return;
-        Player playerSource = mod.getPlayerAdapter().convertNativePlayer(source).orElse(null);
-        var    result       = dependsOnFlag(cancellable, playerSource, location, worldName, flag);
-        if (result == EventState.Cancelled && playerSource != null)
-            mod.getLib().getPlayerAdapter().send(playerSource.getId(),
+        var player = source instanceof Player p0 ? p0 : null;
+        var result = dependsOnFlag(cancellable, player, location, worldName, flag);
+        if (result == EventState.Cancelled && player != null)
+            mod.getLib().getPlayerAdapter().send(player.getId(),
                     Component.text("You don't have permission to do that here").color(NamedTextColor.RED));
         mod.getLib().getScheduler().execute(() -> triggerLog(source, target, location, worldName, flag, result));
         log.finer(() -> "%s by %s at %s towards %s resulted in %s".formatted(cancellable, source, location, target, result));
@@ -176,15 +177,13 @@ public abstract class EventDispatchBase {
                 .y((int) location.getY())
                 .z((int) location.getZ())
                 .result(result);
-        Player playerSource = mod.getPlayerAdapter().convertNativePlayer(source).orElse(null);
-        if (playerSource != null)
-            builder.player(playerSource);
+        if (source instanceof Player player)
+            builder.player(player);
         else builder.nonPlayerSource(String.valueOf(source));
-        Player playerTarget = mod.getPlayerAdapter().convertNativePlayer(target).orElse(null);
-        if (playerTarget != null)
+        if (target instanceof Player playerTarget)
             builder.target(playerTarget);
         else builder.nonPlayerTarget(String.valueOf(target));
-        if (mod.loggingSkipsNonPlayer() && playerSource == null && playerTarget == null)
+        if (mod.loggingSkipsNonPlayer() && source instanceof Player && target instanceof Player)
             return;
         mod.getEntityService().save(builder.build());
     }

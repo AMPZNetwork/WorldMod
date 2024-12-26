@@ -157,6 +157,8 @@ public abstract class EventDispatchBase {
     }
 
     private void triggerLog(Object source, Object target, Vector.N3 location, String worldName, Flag flag, EventState result) {
+        if (mod.loggingSkipsNonPlayer() && !(source instanceof Player) && !(target instanceof Player))
+            return;
         final var fNames = flag.getCanonicalName().split("\\.");
         if (mod.loggingSkipFlagNames()
                 .map(name -> name.split("\\."))
@@ -183,8 +185,6 @@ public abstract class EventDispatchBase {
         if (target instanceof Player playerTarget)
             builder.target(playerTarget);
         else builder.nonPlayerTarget(String.valueOf(target));
-        if (mod.loggingSkipsNonPlayer() && source instanceof Player && target instanceof Player)
-            return;
         mod.getEntityService().save(builder.build());
     }
 }

@@ -11,4 +11,5 @@ logging:
   skip:
     - move
     - grow
+    - interact
     - spawn.mobs

@@ -190,10 +190,10 @@ public abstract class EventDispatchBase {
                 .result(result);
         if (source instanceof Player player)
             builder.player(player);
-        else builder.nonPlayerSource(String.valueOf(source));
+        else builder.nonPlayerSource(source == null ? null : String.valueOf(source));
         if (target instanceof Player playerTarget)
             builder.target(playerTarget);
-        else builder.nonPlayerTarget(String.valueOf(target));
+        else builder.nonPlayerTarget(target == null ? null : String.valueOf(target));
         mod.getEntityService().save(builder.build());
     }
 

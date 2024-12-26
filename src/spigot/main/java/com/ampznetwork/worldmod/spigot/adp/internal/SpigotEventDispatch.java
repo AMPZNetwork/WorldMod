@@ -118,7 +118,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var player    = event.getPlayer();
         var location  = vec(block.getLocation());
         var worldName = block.getWorld().getName();
-        dispatchEvent(event, player, block.getTranslationKey(), location, worldName, Build);
+        dispatchEvent(event, player, block.getType().getKey().toString(), location, worldName, Build);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -127,28 +127,33 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var player    = event.getPlayer();
         var location  = vec(block.getLocation());
         var worldName = block.getWorld().getName();
-        dispatchEvent(event, player, block.getTranslationKey(), location, worldName, Build);
+        dispatchEvent(event, player, block.getType().getKey().toString(), location, worldName, Build);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockBurnEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event, null, block.getTranslationKey(), location, block.getWorld().getName(), Fire_Damage);
+        dispatchEvent(event, null, block.getType().getKey().toString(), location, block.getWorld().getName(), Fire_Damage);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockCookEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event, block.getTranslationKey(), event.getSource().getTranslationKey(), location, block.getWorld().getName(), Cook);
+        dispatchEvent(event, block.getType().getKey().toString(), event.getSource().getType().getKey().toString(), location, block.getWorld().getName(), Cook);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockDispenseEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event, block.getTranslationKey(), event.getItem().getTranslationKey(), location, block.getWorld().getName(), Dispense);
+        dispatchEvent(event,
+                block.getType().getKey().toString(),
+                event.getItem().getType().getKey().toString(),
+                location,
+                block.getWorld().getName(),
+                Dispense);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -156,7 +161,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
         dispatchEvent(event,
-                block.getTranslationKey(),
+                block.getType().getKey().toString(),
                 mod.getPlayerAdapter().convertNativePlayer(event.getTargetEntity()).orElse(null),
                 location,
                 block.getWorld().getName(),
@@ -168,21 +173,26 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
         for (var item : event.getItems())
-            dispatchEvent(event, event.getPlayer(), item.getItemStack().getType().getItemTranslationKey(), location, block.getWorld().getName(), Drop);
+            dispatchEvent(event, event.getPlayer(), item.getItemStack().getType().getKey().toString(), location, block.getWorld().getName(), Drop);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockExplodeEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event, block.getTranslationKey(), null, location, block.getWorld().getName(), Explode);
+        dispatchEvent(event, block.getType().getKey().toString(), null, location, block.getWorld().getName(), Explode);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockFadeEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event, block.getTranslationKey(), event.getNewState().getType().getTranslationKey(), location, block.getWorld().getName(), Fade);
+        dispatchEvent(event,
+                block.getType().getKey().toString(),
+                event.getNewState().getType().getKey().toString(),
+                location,
+                block.getWorld().getName(),
+                Fade);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -191,7 +201,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(block.getLocation());
         dispatchEvent(event,
                 mod.getPlayerAdapter().convertNativePlayer(event.getPlayer()).orElse(null),
-                block.getTranslationKey(),
+                block.getType().getKey().toString(),
                 location,
                 block.getWorld().getName(),
                 Fertilize);
@@ -201,14 +211,24 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(BlockFormEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event, block.getTranslationKey(), event.getNewState().getType().getTranslationKey(), location, block.getWorld().getName(), Form);
+        dispatchEvent(event,
+                block.getType().getKey().toString(),
+                event.getNewState().getType().getKey().toString(),
+                location,
+                block.getWorld().getName(),
+                Form);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockGrowEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event, block.getTranslationKey(), event.getNewState().getType().getTranslationKey(), location, block.getWorld().getName(), Grow);
+        dispatchEvent(event,
+                block.getType().getKey().toString(),
+                event.getNewState().getType().getKey().toString(),
+                location,
+                block.getWorld().getName(),
+                Grow);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -221,7 +241,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
                                 .or(() -> Optional.ofNullable(event.getIgnitingEntity()).map(Entity::getType))
                                 .map(Translatable::getTranslationKey))
                         .orElse(event.getCause().name()),
-                block.getTranslationKey(),
+                block.getType().getKey().toString(),
                 location,
                 block.getWorld().getName(),
                 Fire);
@@ -232,8 +252,8 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
         dispatchEvent(event,
-                event.getTool().getType().getTranslationKey(),
-                event.getEntity().getType().getTranslationKey(),
+                event.getTool().getType().getKey().toString(),
+                event.getEntity().getType().getKey().toString(),
                 location,
                 block.getWorld().getName(),
                 Shear);
@@ -243,7 +263,12 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(BlockSpreadEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event, block.getTranslationKey(), event.getNewState().getType().getTranslationKey(), location, block.getWorld().getName(), Spread);
+        dispatchEvent(event,
+                block.getType().getKey().toString(),
+                event.getNewState().getType().getKey().toString(),
+                location,
+                block.getWorld().getName(),
+                Spread);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -261,13 +286,13 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerBedEnterEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer(), event.getBed().getTranslationKey(), location, event.getPlayer().getWorld().getName(), Sleep);
+        dispatchEvent(event, event.getPlayer(), event.getBed().getType().getKey().toString(), location, event.getPlayer().getWorld().getName(), Sleep);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerBucketEmptyEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer(), event.getBucket().getTranslationKey(), location, event.getPlayer().getWorld().getName(), Build);
+        dispatchEvent(event, event.getPlayer(), event.getBucket().getKey().toString(), location, event.getPlayer().getWorld().getName(), Build);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -275,7 +300,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getPlayer().getLocation());
         dispatchEvent(event,
                 event.getPlayer(),
-                event.getBlockClicked().getTranslationKey() /*todo: what about cauldrons etc*/,
+                event.getBlockClicked().getType().getKey().toString() /*todo: what about cauldrons etc*/,
                 location,
                 event.getPlayer().getWorld().getName(),
                 Build);
@@ -285,7 +310,12 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerDropItemEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer(), event.getItemDrop().getItemStack().getTranslationKey(), location, event.getPlayer().getWorld().getName(), Drop);
+        dispatchEvent(event,
+                event.getPlayer(),
+                event.getItemDrop().getItemStack().getType().getKey().toString(),
+                location,
+                event.getPlayer().getWorld().getName(),
+                Drop);
     }
 
     //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerEggThrowEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Use_Egg);}
@@ -300,7 +330,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getPlayer().getLocation());
         dispatchEvent(event,
                 event.getPlayer(),
-                event.getHarvestedBlock().getTranslationKey(),
+                event.getHarvestedBlock().getType().getKey().toString(),
                 location,
                 event.getPlayer().getWorld().getName(),
                 Interact_Harvest);
@@ -329,7 +359,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var player    = event.getPlayer();
         var worldName = player.getWorld().getName();
         var location  = vec(event.getRightClicked().getLocation());
-        dispatchEvent(event, player, event.getRightClicked().getType().getTranslationKey(), location, worldName, Interact);
+        dispatchEvent(event, player, event.getRightClicked().getType().getKey().toString(), location, worldName, Interact);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -337,7 +367,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var player    = event.getPlayer();
         var worldName = player.getWorld().getName();
         var location  = vec(event.getRightClicked().getLocation());
-        dispatchEvent(event, player, event.getRightClicked().getType().getTranslationKey(), location, worldName, Interact);
+        dispatchEvent(event, player, event.getRightClicked().getType().getKey().toString(), location, worldName, Interact);
     }
 
     //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerJoinEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Join);}
@@ -353,7 +383,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getPlayer().getLocation());
         dispatchEvent(event,
                 event.getPlayer(),
-                event.getItem().getItemStack().getTranslationKey(),
+                event.getItem().getItemStack().getType().getKey().toString(),
                 location,
                 event.getPlayer().getWorld().getName(),
                 Pickup_Arrow);
@@ -371,7 +401,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getPlayer().getLocation());
         dispatchEvent(event,
                 event.getPlayer(),
-                event.getEntity().getType().getTranslationKey(),
+                event.getEntity().getType().getKey().toString(),
                 location,
                 event.getPlayer().getWorld().getName(),
                 Interact_Shear);
@@ -382,7 +412,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getPlayer().getLocation());
         dispatchEvent(event,
                 event.getPlayer(),
-                event.getLectern().getBlock().getTranslationKey(),
+                event.getLectern().getBlock().getType().getKey().toString(),
                 location,
                 event.getPlayer().getWorld().getName(),
                 Interact_Lectern);
@@ -397,35 +427,35 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerUnleashEntityEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event, event.getPlayer(), event.getEntityType().getTranslationKey(), location, event.getPlayer().getWorld().getName(), Interact_Leash);
+        dispatchEvent(event, event.getPlayer(), event.getEntityType().getKey().toString(), location, event.getPlayer().getWorld().getName(), Interact_Leash);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(AreaEffectCloudApplyEvent event) {
         // todo???
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Lingering_Apply);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Lingering_Apply);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(CreatureSpawnEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Spawn_Mobs);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Spawn_Mobs);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(CreeperPowerEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Charge_Creeper);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Charge_Creeper);
     }
 
-    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(EntityAirChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getType().getTranslationKey(), location, Chat_Send);}
+    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(EntityAirChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getType().getKey().toString(), location, Chat_Send);}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityBreakDoorEvent event) {
         var location = vec(event.getBlock().getLocation());
         dispatchEvent(event,
-                event.getEntity().getType().getTranslationKey(),
-                event.getBlock().getTranslationKey(),
+                event.getEntity().getType().getKey().toString(),
+                event.getBlock().getType().getKey().toString(),
                 location,
                 event.getBlock().getWorld().getName(),
                 MobGriefing);
@@ -436,7 +466,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getEntity().getLocation());
         var breeder  = event.getBreeder();
         dispatchEvent(event,
-                event.getEntity().getType().getTranslationKey(),
+                event.getEntity().getType().getKey().toString(),
                 breeder == null ? null : breeder.getName(),
                 location,
                 event.getEntity().getWorld().getName(),
@@ -447,7 +477,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityCombustEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, null, event.getEntity().getType().getTranslationKey(), location, event.getEntity().getWorld().getName(), Combust);
+        dispatchEvent(event, null, event.getEntity().getType().getKey().toString(), location, event.getEntity().getWorld().getName(), Combust);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -455,8 +485,8 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var combuster = event.getCombuster();
         var location  = vec((combuster == null ? event.getEntity().getLocation() : combuster.getLocation()));
         dispatchEvent(event,
-                combuster == null ? null : combuster.getTranslationKey(),
-                event.getEntity().getType().getTranslationKey(),
+                combuster == null ? null : combuster.getType().getKey().toString(),
+                event.getEntity().getType().getKey().toString(),
                 location,
                 event.getEntity().getWorld().getName(),
                 Combust_ByBlock);
@@ -466,8 +496,8 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(EntityCombustByEntityEvent event) {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event,
-                event.getCombuster().getType().getTranslationKey(),
-                event.getEntity().getType().getTranslationKey(),
+                event.getCombuster().getType().getKey().toString(),
+                event.getEntity().getType().getKey().toString(),
                 location,
                 event.getEntity().getWorld().getName(),
                 Combust_ByEntity);
@@ -478,7 +508,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event,
                 event.getCause().name(),
-                event.getEntity().getType().getTranslationKey(),
+                event.getEntity().getType().getKey().toString(),
                 location,
                 event.getEntity().getWorld().getName(),
                 Damage);
@@ -489,8 +519,8 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var damager  = event.getDamager();
         var location = vec((damager == null ? event.getEntity().getLocation() : damager.getLocation()));
         dispatchEvent(event,
-                damager == null ? null : damager.getTranslationKey(),
-                event.getEntity().getType().getTranslationKey(),
+                damager == null ? null : damager.getType().getKey().toString(),
+                event.getEntity().getType().getKey().toString(),
                 location,
                 event.getEntity().getWorld().getName(),
                 Damage_ByBlock);
@@ -500,8 +530,8 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(EntityDamageByEntityEvent event) {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event,
-                event.getDamager().getType().getTranslationKey(),
-                event.getEntity().getType().getTranslationKey(),
+                event.getDamager().getType().getKey().toString(),
+                event.getEntity().getType().getKey().toString(),
                 location,
                 event.getEntity().getWorld().getName(),
                 Damage_ByEntity);
@@ -511,8 +541,8 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(EntityDropItemEvent event) {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event,
-                event.getEntity().getType().getTranslationKey(),
-                event.getItemDrop().getItemStack().getTranslationKey(),
+                event.getEntity().getType().getKey().toString(),
+                event.getItemDrop().getItemStack().getType().getKey().toString(),
                 location,
                 event.getEntity().getWorld().getName(),
                 Drop);
@@ -522,8 +552,8 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(EntityEnterBlockEvent event) {
         var location = vec(event.getBlock().getLocation());
         dispatchEvent(event,
-                event.getEntity().getType().getTranslationKey(),
-                event.getBlock().getType().getTranslationKey(),
+                event.getEntity().getType().getKey().toString(),
+                event.getBlock().getType().getKey().toString(),
                 location,
                 event.getEntity().getWorld().getName(),
                 Hide);
@@ -532,27 +562,27 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityEnterLoveModeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Romance);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Romance);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityExhaustionEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Exhaust);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Exhaust);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityExplodeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Explode);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Explode);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityInteractEvent event) {
         var location = vec(event.getBlock().getLocation());
         dispatchEvent(event,
-                event.getEntity().getType().getTranslationKey(),
-                event.getBlock().getTranslationKey(),
+                event.getEntity().getType().getKey().toString(),
+                event.getBlock().getType().getKey().toString(),
                 location,
                 event.getEntity().getWorld().getName(),
                 Interact);
@@ -561,38 +591,38 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityPickupItemEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Pickup);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Pickup);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityPortalEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, null, event.getEntity().getType().getTranslationKey(), location, event.getEntity().getWorld().getName(), Portal);
+        dispatchEvent(event, null, event.getEntity().getType().getKey().toString(), location, event.getEntity().getWorld().getName(), Portal);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityRegainHealthEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, null, event.getEntity().getType().getTranslationKey(), location, event.getEntity().getWorld().getName(), Regenerate);
+        dispatchEvent(event, null, event.getEntity().getType().getKey().toString(), location, event.getEntity().getWorld().getName(), Regenerate);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityResurrectEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, null, event.getEntity().getType().getTranslationKey(), location, event.getEntity().getWorld().getName(), Resurrect);
+        dispatchEvent(event, null, event.getEntity().getType().getKey().toString(), location, event.getEntity().getWorld().getName(), Resurrect);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityShootBowEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Combat_Ranged);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Combat_Ranged);
     }
 
-    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(EntitySpawnEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getType().getTranslationKey(), location, Spawn);}
+    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(EntitySpawnEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getType().getKey().toString(), location, Spawn);}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntitySpellCastEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), SpellCast);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), SpellCast);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -600,7 +630,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event,
                 event.getOwner().getUniqueId(),
-                event.getEntity().getType().getTranslationKey(),
+                event.getEntity().getType().getKey().toString(),
                 location,
                 event.getEntity().getWorld().getName(),
                 Tame);
@@ -611,8 +641,8 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getEntity().getLocation());
         var target   = event.getTarget();
         dispatchEvent(event,
-                event.getEntity().getType().getTranslationKey(),
-                target == null ? null : target.getType().getTranslationKey(),
+                event.getEntity().getType().getKey().toString(),
+                target == null ? null : target.getType().getKey().toString(),
                 location,
                 event.getEntity().getWorld().getName(),
                 Target);
@@ -623,8 +653,8 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location = vec(event.getEntity().getLocation());
         var target   = event.getTarget();
         dispatchEvent(event,
-                event.getEntity().getType().getTranslationKey(),
-                target == null ? null : target.getType().getTranslationKey(),
+                event.getEntity().getType().getKey().toString(),
+                target == null ? null : target.getType().getKey().toString(),
                 location,
                 event.getEntity().getWorld().getName(),
                 Target_Living);
@@ -634,66 +664,66 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(EntityTeleportEvent event) {
         if (event.getTo() == null) return; // nothing i can do
         var location = vec(event.getTo());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Teleport);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Teleport);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityToggleGlideEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Glide);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Glide);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityToggleSwimEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Swim);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Swim);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityTransformEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Transform);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Transform);
     }
 
-    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(EntityUnleashEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getType().getTranslationKey(), location, Chat_Send);}
-    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(ExpBottleEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getType().getTranslationKey(), location, Chat_Send);}
+    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(EntityUnleashEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getType().getKey().toString(), location, Chat_Send);}
+    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(ExpBottleEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getType().getKey().toString(), location, Chat_Send);}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(ExplosionPrimeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Explode);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Explode);
     }
 
-    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(FoodLevelChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getType().getTranslationKey(), location, );}
+    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(FoodLevelChangeEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getType().getKey().toString(), location, );}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(HorseJumpEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), HorseJump);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), HorseJump);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(ItemDespawnEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getItemStack().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Despawn);
+        dispatchEvent(event, event.getEntity().getItemStack().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Despawn);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(ItemSpawnEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getItemStack().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Spawn);
+        dispatchEvent(event, event.getEntity().getItemStack().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Spawn);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(LingeringPotionSplashEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Lingering);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Lingering);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PiglinBarterEvent event) {
         var location = vec(event.getEntity().getLocation());
         dispatchEvent(event,
-                event.getInput().getType().getTranslationKey(),
-                event.getEntity().getType().getTranslationKey(),
+                event.getInput().getType().getKey().toString(),
+                event.getEntity().getType().getKey().toString(),
                 location,
                 event.getEntity().getWorld().getName(),
                 Barter);
@@ -702,16 +732,16 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PigZapEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Charge);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Charge);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PigZombieAngerEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Anger);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Anger);
     }
 
-    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerDeathEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getType().getTranslationKey(), location, Chat_Send);}
+    //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerDeathEvent event) {var location = vec(event.getEntity().getLocation());dispatchEvent(event, event.getEntity().getType().getKey().toString(), location, Chat_Send);}
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerLeashEntityEvent event) {
         var location = vec(event.getPlayer().getLocation());
@@ -721,13 +751,13 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PotionSplashEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Splash);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Splash);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(ProjectileLaunchEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Combat_Ranged);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Combat_Ranged);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -736,49 +766,49 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
                 .map(Entity::getLocation)
                 .or(() -> Optional.ofNullable(event.getHitBlock()).map(Block::getLocation))
                 .orElse(event.getEntity().getLocation()));
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Combat_Ranged);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Combat_Ranged);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(SheepRegrowWoolEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Regrow);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Regrow);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(SlimeSplitEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), SlimeSplit);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), SlimeSplit);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(SpawnerSpawnEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Spawn);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Spawn);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(StriderTemperatureChangeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), TemperatureChange);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), TemperatureChange);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(VillagerAcquireTradeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Villager_Acquire);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Villager_Acquire);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(VillagerCareerChangeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Villager_Career);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Villager_Career);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(VillagerReplenishTradeEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event, event.getEntity().getType().getTranslationKey(), null, location, event.getEntity().getWorld().getName(), Villager_Replenish);
+        dispatchEvent(event, event.getEntity().getType().getKey().toString(), null, location, event.getEntity().getWorld().getName(), Villager_Replenish);
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")

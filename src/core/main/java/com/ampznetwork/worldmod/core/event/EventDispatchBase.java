@@ -96,7 +96,7 @@ public abstract class EventDispatchBase {
 
     public boolean tryDispatchWandEvent(IPropagationAdapter cancellable, Player player, Vector.N3 location, WandType type, byte modifier) {
         if (modifier == 0 || player == null || !mod.getLib().getPlayerAdapter()
-                .checkPermission(player.getId(), type.usePermission)
+                .checkPermission(player.getId(), type.usePermission.toString())
                 .toBooleanOrElse(PluginYml.Permission.worldmod.lookup.wand.getDefaultValue())) {
             // not permitted
             // todo: send 'not permitted' message?

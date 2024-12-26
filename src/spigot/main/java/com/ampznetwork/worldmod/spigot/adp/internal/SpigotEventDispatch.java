@@ -167,7 +167,8 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(BlockDropItemEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event, event.getPlayer(), null /*todo: too many items*/, location, block.getWorld().getName(), Drop);
+        for (var item : event.getItems())
+            dispatchEvent(event, event.getPlayer(), item.getItemStack().getType().getItemTranslationKey(), location, block.getWorld().getName(), Drop);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

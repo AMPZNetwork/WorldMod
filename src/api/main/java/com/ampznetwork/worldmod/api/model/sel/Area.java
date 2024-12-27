@@ -17,6 +17,7 @@ import javax.persistence.PostLoad;
 import javax.persistence.PostUpdate;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -54,11 +55,8 @@ public final class Area extends DbObject implements ShapeCollider {
                         new Integer[]{ x7, y7, z7 },
                         new Integer[]{ x8, y8, z8 })
                 .filter(vec -> IntStream.range(0, 3).anyMatch(j -> vec[j] != null))
-                .map(vec -> {
-                    var out = new Vector.N3();
-                    IntStream.range(0, 3).forEach(j -> out.set(j, Objects.requireNonNullElse(vec[j], 0)));
-                    return out;
-                }).toArray(Vector.N3[]::new);
+                .map(vec -> new Vector.N3(vec[0], vec[1], vec[2]))
+                .toArray(Vector.N3[]::new);
     }
 
     private int getShapeMask() {
@@ -96,5 +94,20 @@ public final class Area extends DbObject implements ShapeCollider {
     @Transient
     public boolean isPointInside(Vector.N3 point) {
         return getShape().isPointInside(getSpatialAnchors(), point);
+    }
+
+    public Vector.N3[] toVectors() {
+        return Stream.of(
+                        new Integer[]{ getX1(), getY1(), getZ1() },
+                        new Integer[]{ getX2(), getY2(), getZ2() },
+                        new Integer[]{ getX3(), getY3(), getZ3() },
+                        new Integer[]{ getX4(), getY4(), getZ4() },
+                        new Integer[]{ getX5(), getY5(), getZ5() },
+                        new Integer[]{ getX6(), getY6(), getZ6() },
+                        new Integer[]{ getX7(), getY7(), getZ7() },
+                        new Integer[]{ getX8(), getY8(), getZ8() })
+                .filter(vec -> Arrays.stream(vec).allMatch(Objects::nonNull))
+                .map(vec -> new Vector.N3(vec[0], vec[1], vec[2]))
+                .toArray(Vector.N3[]::new);
     }
 }

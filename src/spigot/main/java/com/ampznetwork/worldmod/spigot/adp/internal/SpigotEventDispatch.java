@@ -344,9 +344,9 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location     = vec(Optional.ofNullable(event.getClickedBlock()).map(Block::getLocation).orElseGet(player::getEyeLocation));
         var itemInUse    = event.getItem();
         var wandLocation = location;
-        if (itemInUse != null && event.getAction() == Action.RIGHT_CLICK_BLOCK)
+        if (itemInUse != null && itemInUse.getType().isBlock() && event.getAction() == Action.RIGHT_CLICK_BLOCK)
             wandLocation = vec(event.getClickedBlock().getLocation().toVector().add(event.getBlockFace().getDirection()));
-        if (itemInUse == null || !tryDispatchWandEvent(event, worldName, player, wandLocation, itemInUse.getType(), (byte) ((byte) (switch (event.getAction()) {
+        if (itemInUse == null || !tryDispatchWandEvent(event, player, wandLocation, itemInUse.getType(), (byte) ((byte) (switch (event.getAction()) {
             case LEFT_CLICK_BLOCK -> 1;
             case RIGHT_CLICK_BLOCK -> 2;
             default -> 0;
@@ -817,7 +817,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private boolean tryDispatchWandEvent(Cancellable event, String worldName, Player player, Vector.N3 location, Material wandMaterial, byte modifier) {
+    private boolean tryDispatchWandEvent(Cancellable event, Player player, Vector.N3 location, Material wandMaterial, byte modifier) {
         return mod.findWandType(wandMaterial.getKey().toString())
                 .filter(type -> tryDispatchWandEvent(new SpigotPropagationAdapter(event),
                         mod.getPlayerAdapter().convertNativePlayer(player).orElse(null),

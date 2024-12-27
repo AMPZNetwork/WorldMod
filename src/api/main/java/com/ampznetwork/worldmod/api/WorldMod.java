@@ -70,12 +70,13 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
     }
 
     default boolean addRegion(Region region) {
+        if (region.findOverlaps(this).findAny().isPresent())
+            throw new Command.Error("The selected area is overlapping with another claim");
         try {
-            var entityService = getEntityService();
             region.getAreas().stream()
-                    .filter(a -> entityService.getAccessor(Area.TYPE).get(a.getId()).isEmpty())
-                    .forEach(entityService::save);
-            entityService.save(region);
+                    .filter(a -> getEntityService().getAccessor(Area.TYPE).get(a.getId()).isEmpty())
+                    .forEach(getEntityService()::save);
+            getEntityService().save(region);
             return true;
         } catch (Throwable t) {
             Log.at(Level.WARNING, "Could not save region " + region, t);

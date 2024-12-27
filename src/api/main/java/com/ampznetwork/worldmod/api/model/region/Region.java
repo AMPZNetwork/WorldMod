@@ -2,9 +2,11 @@ package com.ampznetwork.worldmod.api.model.region;
 
 import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.libmod.api.entity.Player;
+import com.ampznetwork.libmod.api.model.API;
 import com.ampznetwork.libmod.api.model.EntityType;
 import com.ampznetwork.libmod.api.util.NameGenerator;
 import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.PointCollider;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.mini.PropagationController;
@@ -22,6 +24,7 @@ import lombok.experimental.SuperBuilder;
 import org.comroid.api.Polyfill;
 import org.comroid.api.attr.Named;
 import org.comroid.api.data.Vector;
+import org.comroid.api.func.util.Tuple;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.CollectionTable;
@@ -40,7 +43,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.lang.Integer.*;
@@ -94,6 +99,10 @@ public class Region extends DbObject implements PropagationController, ShapeColl
         return Stream.concat(Stream.of(claimOwner), owners.stream()).filter(Objects::nonNull).collect(Collectors.toUnmodifiableSet());
     }
 
+    public boolean isGlobal() {
+        return GlobalRegionName.equals(name);
+    }
+
     @Override
     public Stream<Chunk> streamChunks() {
         return areas.stream().flatMap(Area::streamChunks);
@@ -111,5 +120,31 @@ public class Region extends DbObject implements PropagationController, ShapeColl
                 ? declaredFags.stream()
                 : concat(declaredFags.stream(), group.streamDeclaredFlags())).sorted(Comparator.<Flag.Usage>comparingLong(value -> -value.getFlag()
                 .getPriority()).thenComparingLong(value -> -value.getPriority()));
+    }
+
+    public Stream<Region> findOverlaps(API api) {
+        var chunks = streamChunks().collect(Collectors.toUnmodifiableSet());
+        var points = getAreas().stream().map(area -> {
+                    assert area.getShape() == Shape.Cuboid;
+
+                    var vecs = area.toVectors();
+                    if (vecs.length != 2) throw new IllegalArgumentException("vecs length must be 2");
+
+                    var a   = vecs[0];
+                    var b   = vecs[1];
+                    var min = new Vector.N3(Math.min(a.getX(), b.getX()), Math.min(a.getY(), b.getY()), Math.min(a.getZ(), b.getZ()));
+                    var max = new Vector.N3(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY()), Math.max(a.getZ(), b.getZ()));
+                    return new Tuple.N2<>(min, max);
+                })
+                .flatMap(lim -> IntStream.rangeClosed((int) lim.a.getX(), (int) lim.b.getX()).boxed().parallel().flatMap(x ->
+                        IntStream.rangeClosed((int) lim.a.getY(), (int) lim.b.getY()).boxed().parallel().flatMap(y ->
+                                IntStream.rangeClosed((int) lim.a.getZ(), (int) lim.b.getZ()).parallel().mapToObj(z -> new Vector.N3(x, y, z)))))
+                .peek(System.out::println)
+                .collect(Collectors.toUnmodifiableSet());
+        return api.getEntityService().getAccessor(Region.TYPE)
+                .all().parallel()
+                .filter(Predicate.not(Region::isGlobal))
+                .filter(region -> region.streamChunks().anyMatch(chunks::contains))
+                .filter(region -> points.stream().anyMatch(region::isPointInside));
     }
 }

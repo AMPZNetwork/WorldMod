@@ -167,7 +167,7 @@ public class WorldModCommands {
                 region.setClaimOwner(null);
                 return "Owner removed";
             }
-            var targetId = worldMod.getLib().getPlayerAdapter().getId(arg);
+            var targetId = worldMod.getLib().getPlayerAdapter().getIdOrThrow(arg);
             var target = worldMod.getLib().getPlayerAdapter()
                     .getPlayer(targetId).orElseThrow();
             region.setClaimOwner(target);
@@ -205,7 +205,7 @@ public class WorldModCommands {
                 isClaimed(region);
                 if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player).getState() != TriState.TRUE)
                     notPermitted();
-                var targetId = worldMod.getLib().getPlayerAdapter().getId(targetName);
+                var targetId = worldMod.getLib().getPlayerAdapter().getIdOrThrow(targetName);
                 var target = worldMod.getLib().getPlayerAdapter()
                         .getPlayer(targetId).orElseThrow();
                 (switch (type) {
@@ -226,7 +226,7 @@ public class WorldModCommands {
                 isClaimed(region);
                 if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player).getState() != TriState.TRUE)
                     notPermitted();
-                var targetId = worldMod.getLib().getPlayerAdapter().getId(targetName);
+                var targetId = worldMod.getLib().getPlayerAdapter().getIdOrThrow(targetName);
                 var wasOwner  = region.getOwners().remove(targetId);
                 var wasMember = region.getMembers().remove(targetId);
                 return "%s was removed from the list of %s".formatted(targetName, concat(

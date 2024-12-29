@@ -106,7 +106,7 @@ public class EventDispatchTest {
             }
         };
          */
-        this.dispatch = new EventDispatchBase(mod);
+//        this.dispatch = new EventDispatchBase(mod);
     }
 
     private void testPropagate(UUID player, Vector.N3 location, int expect) {
@@ -138,6 +138,16 @@ public class EventDispatchTest {
     public static class PropagationAdapter implements Cancellable {
         private boolean cancel = false;
         private boolean force = false;
+
+        @Override
+        public boolean isCancelled() {
+            return false;
+        }
+
+        @Override
+        public boolean isForced() {
+            return false;
+        }
 
         @Override
         public void cancel() {

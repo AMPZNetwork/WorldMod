@@ -1,15 +1,15 @@
 package com.ampznetwork.worldmod.spigot.adp.internal;
 
-import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
+import com.ampznetwork.libmod.api.model.delegate.Cancellable;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.experimental.NonFinal;
-import org.bukkit.event.Cancellable;
 
 @Value
 @RequiredArgsConstructor
-public class SpigotPropagationAdapter implements IPropagationAdapter {
-    Cancellable cancellable;
+@Deprecated(forRemoval = true)
+public class SpigotPropagationAdapter implements Cancellable {
+    org.bukkit.event.Cancellable cancellable;
     @NonFinal boolean forced = false;
 
     @Override

@@ -1,9 +1,9 @@
 package com.ampznetwork.worldmod.test.event;
 
 import com.ampznetwork.libmod.api.entity.Player;
+import com.ampznetwork.libmod.api.model.delegate.Cancellable;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
-import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import lombok.Data;
@@ -135,7 +135,7 @@ public class EventDispatchTest {
 
     @Data
     @SuppressWarnings("ConstantValue")
-    public static class PropagationAdapter implements IPropagationAdapter {
+    public static class PropagationAdapter implements Cancellable {
         private boolean cancel = false;
         private boolean force = false;
 

@@ -2,10 +2,10 @@ package com.ampznetwork.worldmod.core.event;
 
 import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.libmod.api.entity.Player;
+import com.ampznetwork.libmod.api.model.delegate.Cancellable;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.WandType;
-import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.mini.EventState;
 import com.ampznetwork.worldmod.api.model.region.Region;
@@ -40,12 +40,12 @@ public abstract class EventDispatchBase {
     Map<Player, Tuple.N2<Vector.N3, @NotNull Integer>> lookupRepeatCounter = new ConcurrentHashMap<>();
     WorldMod                                           mod;
 
-    public EventState dependsOnFlag(IPropagationAdapter cancellable, Player player, Vector.N3 location, String worldName, Flag flagChain) {
+    public EventState dependsOnFlag(Cancellable cancellable, Player player, Vector.N3 location, String worldName, Flag flagChain) {
         return dependsOnFlag(cancellable, player, location, worldName, Streams.OP.LogicalOr, Streams.OP.LogicalOr, flagChain);
     }
 
     public EventState dependsOnFlag(
-            IPropagationAdapter adp,
+            Cancellable adp,
             Object source,
             Vector.N3 location,
             String worldName,
@@ -94,7 +94,7 @@ public abstract class EventDispatchBase {
                 .isPresent();
     }
 
-    public boolean tryDispatchWandEvent(IPropagationAdapter cancellable, Player player, Vector.N3 location, WandType type, byte modifier) {
+    public boolean tryDispatchWandEvent(Cancellable cancellable, Player player, Vector.N3 location, WandType type, byte modifier) {
         if (cancellable.isCancelled()) return false;
         if (modifier == 0 || player == null || !mod.getLib().getPlayerAdapter()
                 .checkPermission(player.getId(), type.usePermission.toString())
@@ -154,7 +154,7 @@ public abstract class EventDispatchBase {
         return true;
     }
 
-    public void dispatchEvent(IPropagationAdapter cancellable, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {
+    public void dispatchEvent(Cancellable cancellable, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {
         if (cancellable.isCancelled()) return;
         if (passthrough(location, worldName))
             return;

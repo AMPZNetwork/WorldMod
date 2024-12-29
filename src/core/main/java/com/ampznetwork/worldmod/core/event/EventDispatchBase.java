@@ -19,6 +19,7 @@ import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Streams;
 import org.comroid.api.func.util.Tuple;
+import org.comroid.api.model.minecraft.model.DefaultPermissionValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
@@ -98,7 +99,7 @@ public abstract class EventDispatchBase {
         if (cancellable.isCancelled()) return false;
         if (modifier == 0 || player == null || !mod.getLib().getPlayerAdapter()
                 .checkPermission(player.getId(), type.usePermission.toString())
-                .toBooleanOrElse(PluginYml.Permission.worldmod.lookup.wand.getDefaultValue())) {
+                .toBooleanOrElse(PluginYml.Permission.worldmod.lookup.wand.getDefault() == DefaultPermissionValue.TRUE)) {
             // not permitted
             // todo: send 'not permitted' message?
             return false;

@@ -1,5 +1,6 @@
 package com.ampznetwork.worldmod.spigot.adp.internal;
 
+import com.ampznetwork.libmod.spigot.adapter.SpigotPropagationAdapter;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import com.ampznetwork.worldmod.spigot.WorldMod$Spigot;
@@ -239,8 +240,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
                 Optional.<Object>ofNullable(mod.getPlayerAdapter().convertNativePlayer(event.getPlayer()).orElse(null))
                         .or(() -> Optional.ofNullable(event.getIgnitingBlock())
                                 .map(b0 -> b0.getType().getKey().toString())
-                                .or(() -> Optional.ofNullable(event.getIgnitingEntity()).map(Entity::getType)
-                                        .map(e0 -> e0.getKey().toString())))
+                                .or(() -> Optional.ofNullable(event.getIgnitingEntity()).map(Entity::getType).map(e0 -> e0.getKey().toString())))
                         .orElse(event.getCause().name()),
                 block.getType().getKey().toString(),
                 location,
@@ -344,19 +344,20 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var location     = vec(Optional.ofNullable(event.getClickedBlock()).map(Block::getLocation).orElseGet(player::getEyeLocation));
         var itemInUse    = event.getItem();
         var wandLocation = location;
-        if (itemInUse != null && itemInUse.getType().isBlock() && event.getAction() == Action.RIGHT_CLICK_BLOCK)
-            wandLocation = vec(event.getClickedBlock().getLocation().toVector().add(event.getBlockFace().getDirection()));
+        if (itemInUse != null && itemInUse.getType().isBlock() && event.getAction() == Action.RIGHT_CLICK_BLOCK) wandLocation = vec(event.getClickedBlock()
+                .getLocation()
+                .toVector()
+                .add(event.getBlockFace().getDirection()));
         if (itemInUse == null || !tryDispatchWandEvent(event, player, wandLocation, itemInUse.getType(), (byte) ((byte) (switch (event.getAction()) {
             case LEFT_CLICK_BLOCK -> 1;
             case RIGHT_CLICK_BLOCK -> 2;
             default -> 0;
-        }) | (event.getPlayer().isSneaking() ? 0x80 : 0))))
-            dispatchEvent(event,
-                    player,
-                    Optional.ofNullable(event.getClickedBlock()).map(block -> block.getType().getKey().toString()).orElse(event.getAction().name()),
-                    location,
-                    worldName,
-                    Interact);
+        }) | (event.getPlayer().isSneaking() ? 0x80 : 0)))) dispatchEvent(event,
+                player,
+                Optional.ofNullable(event.getClickedBlock()).map(block -> block.getType().getKey().toString()).orElse(event.getAction().name()),
+                location,
+                worldName,
+                Interact);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -828,7 +829,12 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     }
 
     private void dispatchEvent(Cancellable cancellable, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {
-        dispatchEvent(new SpigotPropagationAdapter(cancellable), tryConvertPlayer(source), tryConvertPlayer(target), location, worldName, flag);
+        dispatchEvent((com.ampznetwork.libmod.api.model.delegate.Cancellable) new SpigotPropagationAdapter(cancellable),
+                tryConvertPlayer(source),
+                tryConvertPlayer(target),
+                location,
+                worldName,
+                flag);
     }
 
     @Deprecated(forRemoval = true)

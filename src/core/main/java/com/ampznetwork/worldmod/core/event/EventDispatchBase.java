@@ -120,7 +120,7 @@ public abstract class EventDispatchBase {
                         return false;
                 }
                 var tmp = selection.build();
-                mod.getChat().target(player).sendMessage("Selection changed: ({},{},{}) -> ({},{},{})",
+                mod.chat().target(player).sendMessage("Selection changed: ({},{},{}) -> ({},{},{})",
                         tmp.getX1(), tmp.getY1(), tmp.getZ1(), tmp.getX2(), tmp.getY2(), tmp.getZ2());
                 break;
             case lookup:

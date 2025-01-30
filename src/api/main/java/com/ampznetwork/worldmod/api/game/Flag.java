@@ -52,9 +52,26 @@ public class Flag implements Named, Described, Prioritized {
             "Manage",
             "Enable to allow players to manage claim",
             false);
-    public static final Flag Build = new Flag("build", 50, BOOLEAN, "Building", "Enable to force WorldMod to not handle any events", false);
-    public static final Flag Place = new Flag(Build, "place", 50, BOOLEAN, "Placing Blocks", "Enable to force WorldMod to not handle any events", false);
-    public static final Flag Break = new Flag(Build, "break", 50, BOOLEAN, "Breaking Blocks", "Enable to force WorldMod to not handle any events", false);
+    public static final Flag Build = new Flag("build",
+            50,
+            BOOLEAN,
+            "Building",
+            "Enable to force WorldMod to not handle any events",
+            false);
+    public static final Flag Place = new Flag(Build,
+            "place",
+            50,
+            BOOLEAN,
+            "Placing Blocks",
+            "Enable to force WorldMod to not handle any events",
+            false);
+    public static final Flag Break = new Flag(Build,
+            "break",
+            50,
+            BOOLEAN,
+            "Breaking Blocks",
+            "Enable to force WorldMod to not handle any events",
+            false);
     public static final  Flag                     Spawn               = new Flag("spawn", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Spawn_Mobs          = new Flag(Spawn, "mobs", 20, BOOLEAN, "", "", true);
     public static final  Flag                     Interact            = new Flag("interact",
@@ -173,6 +190,17 @@ public class Flag implements Named, Described, Prioritized {
             "Disable to disallow users from leaving the area",
             true);
 
+    public static Flag getForName(String canonical) {
+        var nodes = canonical.split("\\.");
+        if (nodes.length == 0) throw new IllegalArgumentException(canonical);
+        Flag flag = VALUES.getOrDefault(nodes[0], null);
+        for (var i = 1; i < nodes.length; i++) {
+            var blob = nodes[i];
+            flag = flag.children.stream().filter(f -> f.name.equals(blob)).findAny().orElse(flag);
+        }
+        return flag;
+    }
+
     @Nullable Flag   parent;
     @NotNull  String name;
     long priority;
@@ -180,27 +208,14 @@ public class Flag implements Named, Described, Prioritized {
     @Nullable String       displayName;
     @Nullable String       description;
     @Nullable Object       defaultValue;
-    @NotNull
-    List<Flag> children = new ArrayList<>();
+    @NotNull List<Flag> children = new ArrayList<>();
 
-    public Flag(
-            String name,
-            long priority,
-            ValueType<?> type,
-            @Nullable String displayName,
-            @Nullable String description,
-            @NotNull Object defaultValue
-    ) {
+    public Flag(String name, long priority, ValueType<?> type, @Nullable String displayName, @Nullable String description, @NotNull Object defaultValue) {
         this(null, name, priority, type, displayName, description, defaultValue);
     }
 
     public Flag(
-            @Nullable Flag parent,
-            @NotNull String name,
-            long priority,
-            @NotNull ValueType<?> type,
-            @Nullable String displayName,
-            @Nullable String description,
+            @Nullable Flag parent, @NotNull String name, long priority, @NotNull ValueType<?> type, @Nullable String displayName, @Nullable String description,
             @Nullable Object defaultValue
     ) {
         this.parent      = parent;
@@ -211,13 +226,13 @@ public class Flag implements Named, Described, Prioritized {
         this.description = description;
         this.defaultValue = defaultValue;
 
-        if (parent != null)
-            parent.children.add(this);
+        if (parent != null) parent.children.add(this);
 
         Constraint.decide($.containsKey(getCanonicalName()), "cached Flag '" + getBestName() + "'")
                 .setExpected("nonexistent")
                 .setActual("exists already")
-                .invert().run();
+                .invert()
+                .run();
         $.put(getCanonicalName(), this);
     }
 
@@ -241,17 +256,14 @@ public class Flag implements Named, Described, Prioritized {
         @Override
         @SneakyThrows
         public Flag convertToEntityAttribute(String dbData) {
-            var i = 0;
+            var i    = 0;
             var keys = dbData.split("\\.");
             var current = VALUES.getOrDefault(keys[i], null);
             while (current != null && ++i < keys.length) {
                 var name = keys[i];
-                current = current.getChildren().stream()
-                        .filter(it-> name.equals(it.getName()))
-                        .findAny().orElse(null);
+                current = current.getChildren().stream().filter(it -> name.equals(it.getName())).findAny().orElse(null);
             }
-            if (current == null)
-                throw new RuntimeException("Unable to parse flag name: " + dbData);
+            if (current == null) throw new RuntimeException("Unable to parse flag name: " + dbData);
             return current;
         }
     }
@@ -263,23 +275,16 @@ public class Flag implements Named, Described, Prioritized {
     @AllArgsConstructor
     @RequiredArgsConstructor
     public static class Usage implements Prioritized {
-        @NotNull Flag flag;
-        @lombok.Builder.Default
-        @NotNull
-        TriState state = TriState.NOT_SET;
-        @lombok.Builder.Default
-        @Nullable   String value  = null;
-        @lombok.Builder.Default
-        @Deprecated long   target = Bitmask.combine(Usage.Target.Guests, Usage.Target.Members);
-        @lombok.Builder.Default
-        Set<Tellraw.Selector> selectors = Set.of(Tellraw.Selector.builder()
+        @NotNull                            Flag                  flag;
+        @lombok.Builder.Default @NotNull    TriState              state     = TriState.NOT_SET;
+        @lombok.Builder.Default @Nullable   String                value     = null;
+        @lombok.Builder.Default @Deprecated long                  target    = Bitmask.combine(Usage.Target.Guests, Usage.Target.Members);
+        @lombok.Builder.Default             Set<Tellraw.Selector> selectors = Set.of(Tellraw.Selector.builder()
                 .base(Tellraw.Selector.Base.NEAREST_PLAYER)
                 .type("guest")
                 .build());
-        @lombok.Builder.Default
-        boolean force    = false;
-        @lombok.Builder.Default
-        long    priority = 0;
+        @lombok.Builder.Default             boolean               force     = false;
+        @lombok.Builder.Default             long                  priority  = 0;
 
         public long getPriority() {
             return force ? Long.MAX_VALUE : priority;
@@ -289,17 +294,13 @@ public class Flag implements Named, Described, Prioritized {
         public boolean appliesToUser(OwnedByParty target, UUID playerId) {
             var owner  = target.getOwners().stream().map(DbObject::getId).anyMatch(playerId::equals);
             var member = target.getMembers().stream().map(DbObject::getId).anyMatch(playerId::equals);
-            var mask  = this.target;
-            return owner ? Usage.Target.Owners.isFlagSet(mask)
-                         : member ? Usage.Target.Members.isFlagSet(mask)
-                                  : Usage.Target.Guests.isFlagSet(mask);
+            var mask = this.target;
+            return owner ? Usage.Target.Owners.isFlagSet(mask) : member ? Usage.Target.Members.isFlagSet(mask) : Usage.Target.Guests.isFlagSet(mask);
         }
 
         @Deprecated
         public enum Target implements Named, Bitmask.Attribute<Usage.Target> {
-            Guests,
-            Members,
-            Owners
+            Guests, Members, Owners
         }
 
         @Value

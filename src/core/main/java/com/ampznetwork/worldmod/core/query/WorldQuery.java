@@ -65,7 +65,7 @@ public class WorldQuery {
                     case "world" -> new WorldCondition(value, comparator(str, key, value));
                     case "since" -> new TimeCondition(wrapParseArg("duration", () -> Instant.now().minus(Polyfill.parseDuration(value))));
                     case "type" -> new BlockTypeCondition(value, comparator(str, key, value));
-                    case "flag" -> new FlagCondition(wrapParseArg("flag", () -> Flag.VALUES.get(value)));
+                    case "flag" -> new FlagCondition(wrapParseArg("flag", () -> Flag.getForName(value)));
                     case "tag" -> new TagCondition(value, comparator(str, key, value));
                     case "x", "y", "z" -> wrapParseArg("coordinate", () -> {
                         // find bounds from available condition

@@ -12,8 +12,8 @@ public record BlockTypeCondition(String identifier, WorldQuery.Comparator compar
     public boolean test(WorldMod mod, WorldQuery query, QueryInputData data, @Nullable UUID executor) {
         var targetResourceKey = data.getTargetResourceKey();
         return targetResourceKey == null || (
-                comparator.test(identifier, identifier.contains(":")
-                                            ? targetResourceKey.asString()
-                                            : targetResourceKey.value()));
+                comparator.test(identifier.contains(":")
+                                ? targetResourceKey.asString()
+                                : targetResourceKey.value(), identifier));
     }
 }

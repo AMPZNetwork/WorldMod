@@ -9,13 +9,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-public record SourceCondition(String source, WorldQuery.Comparator comparator) implements QueryCondition {
+public record TargetCondition(String target, WorldQuery.Comparator comparator) implements QueryCondition {
     public static final String TAG = "#";
 
     @Override
     public boolean test(WorldMod mod, WorldQuery query, QueryInputData data, @Nullable UUID executor) {
         var player = data.getPlayer();
-        var tagged = source.startsWith(TAG);
-        return !tagged && player == null || comparator.test(tagged ? data.getNonPlayerSource() : Optional.of(player).map(Player::getName).orElse(null), source);
+        var tagged = target.startsWith(TAG);
+        return !tagged && player == null || comparator.test(tagged ? data.getNonPlayerSource() : Optional.of(player).map(Player::getName).orElse(null), target);
     }
 }

@@ -23,7 +23,7 @@ public class PositionCondition implements QueryCondition {
             return true;
         if (b == null) {
             for (var i = 0; i < 3; i++)
-                if (!comparators[i].test(a.get(i), position.get(i)))
+                if (!comparators[i].test(position.get(i), a.get(i)))
                     return false;
             return true;
         }

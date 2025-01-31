@@ -133,18 +133,18 @@ select e.* from world_log e where e.id = p.id
                 .flatMap(Streams.cast(SourceCondition.class))
                 .findAny()
                 .ifPresent(source -> {
-                    append.add("and (e.player.id = :playerId or e.nonPlayerSource = :source)");
+                    append.add("and (e.player.id = :playerId or e.nonPlayerSource = :target)");
                     params.put("playerId", source.source()); // todo this needs name->uuid conversion
-                    params.put("source", source.source());
+                    params.put("target", source.source());
                 });
         /* todo: target condition
         conditions.stream()
                 .flatMap(Streams.cast(SourceCondition.class))
                 .findAny()
-                .ifPresent(source -> {
-                    append.add("and (e.player.id = :playerId or e.nonPlayerSource = :source)");
-                    params.put("playerId", EventDispatchBase.tryGetAsPlayer(mod, source.source()));
-                    params.put("source", source.source());
+                .ifPresent(target -> {
+                    append.add("and (e.player.id = :playerId or e.nonPlayerSource = :target)");
+                    params.put("playerId", EventDispatchBase.tryGetAsPlayer(mod, target.target()));
+                    params.put("target", target.target());
                 });
          */
 

@@ -109,6 +109,7 @@ public class WorldModCommands {
             sel.validateShapeMask();
             var world = worldMod.getLib().getPlayerAdapter().getWorldName(playerId);
             var rg = Region.builder()
+                    .serverName(worldMod.getLib().getServerName())
                     .area(sel)
                     .worldName(world)
                     .claimOwner(player);

@@ -19,6 +19,7 @@ import java.util.List;
 @Value
 @Builder
 public class QueryInputData {
+    @NotNull String serverName;
     @NotNull            String       worldName;
     @NotNull            Instant      timestamp;
     @Nullable @Singular List<Region> regions;

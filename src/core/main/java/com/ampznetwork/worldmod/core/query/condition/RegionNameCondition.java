@@ -17,7 +17,7 @@ public record RegionNameCondition(String name, boolean group, WorldQuery.Compara
                         .filter($ -> group)
                         .or(() -> Optional.of(rg))
                         .map(Named::getName)
-                        .filter(it -> comparator.test(name, it))
+                        .filter(it -> comparator.test(it, name))
                         .isPresent());
     }
 }

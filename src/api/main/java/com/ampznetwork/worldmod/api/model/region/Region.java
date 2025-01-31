@@ -25,6 +25,7 @@ import org.comroid.api.Polyfill;
 import org.comroid.api.attr.Named;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Tuple;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.CollectionTable;
@@ -70,6 +71,7 @@ public class Region extends DbObject implements PropagationController, ShapeColl
     public static Region global(String worldName) {
         return GlobalRegions.computeIfAbsent(worldName,
                 $ -> Region.builder()
+                        .serverName("")
                         .name(GlobalRegionName)
                         .worldName(worldName)
                         .priority(Long.MIN_VALUE)
@@ -84,6 +86,7 @@ public class Region extends DbObject implements PropagationController, ShapeColl
                         .build());
     }
 
+    @NotNull                                                                       String    serverName;
     @Default                                                                                 String          name       = NameGenerator.POI.get();
     @Default                                                                                 String          worldName  = "world";
     @Singular("owner") @ManyToMany @CollectionTable(name = "worldmod_region_owners")         Set<Player>     owners;

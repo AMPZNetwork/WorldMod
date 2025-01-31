@@ -185,6 +185,7 @@ public abstract class EventDispatchBase {
                 }))
             return;
         var builder = LogEntry.builder()
+                .serverName(mod.getLib().getServerName())
                 .worldName(worldName)
                 .action(flag.getCanonicalName())
                 .x((int) location.getX())

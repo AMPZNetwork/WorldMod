@@ -118,7 +118,7 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
     }
 
     private void reloadQueryManagers() {
-        queryManagers.clear();
+        if (queryManagers != null) queryManagers.clear();
         this.queryManagers = getWorlds().stream()
                 .map(WorldInfo::getName)
                 .map(mod -> QueryManager.init(this, mod))

@@ -2,6 +2,7 @@ package com.ampznetwork.worldmod.spigot;
 
 import com.ampznetwork.libmod.spigot.SubMod$Spigot;
 import com.ampznetwork.worldmod.api.WorldMod;
+import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.TextResourceProvider;
 import com.ampznetwork.worldmod.api.model.WandType;
 import com.ampznetwork.worldmod.api.model.log.LogEntry;
@@ -88,6 +89,16 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
     @Override
     public TextResourceProvider text() {
         return new TextResourceProvider(this);
+    }
+
+    @Override
+    public Stream<String> flagNames() {
+        return Flag.VALUES.values().stream().flatMap(this::ownAndChildFlagNames);
+    }
+
+    private Stream<String> ownAndChildFlagNames(Flag flag) {
+        var name = flag.getName();
+        return Stream.concat(Stream.of(name), flag.getChildren().stream().flatMap(this::ownAndChildFlagNames).map(str -> name + str));
     }
 
     @Override

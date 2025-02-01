@@ -1,10 +1,13 @@
 package com.ampznetwork.worldmod.core.query;
 
+import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.query.IWorldQuery;
 import com.ampznetwork.worldmod.api.model.query.QueryInputData;
 import com.ampznetwork.worldmod.api.model.query.QueryVerb;
+import com.ampznetwork.worldmod.api.model.region.Group;
+import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.core.query.condition.BlockTypeCondition;
 import com.ampznetwork.worldmod.core.query.condition.FlagCondition;
 import com.ampznetwork.worldmod.core.query.condition.PositionCondition;
@@ -27,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.comroid.api.Polyfill;
+import org.comroid.api.attr.Named;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.exc.ThrowingSupplier;
 import org.comroid.api.func.util.Command;
@@ -47,11 +51,16 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Value
 @Slf4j
 @Builder
 public class WorldQuery implements IWorldQuery {
+    private static final String kvPairPattern = "[<>]?=";
+
     public static WorldQuery parseLookup(String query) {
         return parse(query.startsWith("lookup ") ? query : "lookup " + query);
     }
@@ -65,7 +74,7 @@ public class WorldQuery implements IWorldQuery {
 
             for (int i = 1; i < split.length; i++) {
                 var str   = split[i];
-                var pair  = str.split("([<>]?=)|~");
+                var pair = str.split(kvPairPattern);
                 var key   = pair[0];
                 var value = pair[1];
                 var add = switch (key) {
@@ -167,12 +176,87 @@ public class WorldQuery implements IWorldQuery {
     }
 
     @Override
+    public String toString() {
+        return verb.name().toLowerCase() + ' ' + conditions.stream().map(Object::toString).collect(Collectors.joining(" ")) + (messageKey == null
+                                                                                                                               ? ""
+                                                                                                                               : " message=" + messageKey);
+    }
+
+    @Override
     public boolean test(WorldMod mod, QueryInputData data) {
         try {
             return conditions.stream().allMatch(cond -> cond.test(mod, this, data, null));
         } catch (Throwable t) {
             Log.at(Level.WARNING, "Could not evaluate " + this, t);
             return false;
+        }
+    }
+
+    public enum ConditionType implements ValueAutofillOptionsProvider {
+        REGION("#global") {
+            @Override
+            public Stream<String> autoFillValue(Command.Usage usage, String argName, WorldMod mod, String value) {
+                return mod.getEntityService().getAccessor(Region.TYPE).all().map(Named::getName);
+            }
+        }, GROUP {
+            @Override
+            public Stream<String> autoFillValue(Command.Usage usage, String argName, WorldMod mod, String value) {
+                return mod.getEntityService().getAccessor(Group.TYPE).all().map(Named::getName);
+            }
+        }, SOURCE("@a") {
+            @Override
+            public Stream<String> autoFillValue(Command.Usage usage, String argName, WorldMod mod, String value) {
+                return Stream.concat(
+                        // player names, todo: selectors
+                        mod.getPlayerAdapter().getCurrentPlayers().map(Player::getName),
+                        // entity types
+                        mod.getLib().entityTypes());
+            }
+        }, TARGET("@a") {
+            @Override
+            public Stream<String> autoFillValue(Command.Usage usage, String argName, WorldMod mod, String value) {
+                return Stream.concat(
+                        // player names, todo: selectors
+                        mod.getPlayerAdapter().getCurrentPlayers().map(Player::getName),
+                        // material keys
+                        mod.getLib().materials());
+            }
+        }, RADIUS(NUMERICS), WORLD {
+            @Override
+            public Stream<String> autoFillValue(Command.Usage usage, String argName, WorldMod mod, String value) {
+                return mod.getLib().worldNames();
+            }
+        }, SINCE {
+            @Override
+            public Stream<String> autoFillValue(Command.Usage usage, String argName, WorldMod mod, String value) {
+                return Command.AutoFillProvider.Duration.INSTANCE.autoFill(usage, argName, value);
+            }
+        }, TYPE, FLAG {
+            @Override
+            public Stream<String> autoFillValue(Command.Usage usage, String argName, WorldMod mod, String value) {
+                return mod.flagNames();
+            }
+        }, TAG, X(NUMERICS), Y(NUMERICS), Z(NUMERICS), MESSAGE {
+            @Override
+            public Stream<String> autoFillValue(Command.Usage usage, String argName, WorldMod mod, String value) {
+                return mod.getMessages().keySet().stream().map(String::valueOf);
+            }
+        };
+        private final @Nullable ValueAutofillOptionsProvider delegate;
+        private final           String[]                     constants;
+
+        ConditionType(String... constants) {
+            this(null, constants);
+        }
+
+        ConditionType(@Nullable ValueAutofillOptionsProvider delegate, String... constants) {
+            this.delegate  = delegate;
+            this.constants = constants;
+        }
+
+        @Override
+        public Stream<String> autoFillValue(Command.Usage usage, String argName, WorldMod mod, String value) {
+            return Stream.concat(Arrays.stream(constants), delegate == null ? Stream.of(value) : delegate.autoFillValue(usage, argName, mod, value));
         }
     }
 
@@ -230,6 +314,38 @@ public class WorldQuery implements IWorldQuery {
 
         @Override
         public abstract boolean test(Object base, Object key);
+    }
+
+    public interface ValueAutofillOptionsProvider {
+        ValueAutofillOptionsProvider NUMERICS = ($0, $1, mod, value) -> Stream.of(value)
+                .flatMap(num -> Stream.concat(Stream.of(num), IntStream.range(0, 10).mapToObj(digit -> num + digit)))
+                .flatMap(num -> Stream.concat(Stream.of(num),
+                        Stream.of(num)
+                                .map(str -> str + "..")
+                                .flatMap(str -> Stream.concat(Stream.of(str), IntStream.range(0, 10).mapToObj(digit -> str + digit)))))
+                .map(str -> str.replaceAll("\\.{3,}", ".."))
+                .distinct()
+                .sorted(java.util.Comparator.comparingInt(String::length));
+
+        Stream<String> autoFillValue(Command.Usage usage, String argName, WorldMod mod, String value);
+    }
+
+    @Value
+    public class AutoFillProvider implements Command.AutoFillProvider {
+        @Override
+        public Stream<String> autoFill(Command.Usage usage, String argName, String currentValue) {
+            var split = currentValue.split(" ");
+            if (split.length <= 1)
+                // return possible verbs
+                return Arrays.stream(QueryVerb.values()).map(java.lang.Enum::name).map(String::toLowerCase);
+            split = split[split.length - 1].split(kvPairPattern);
+            return split.length <= 1 ?
+                   // return possible condition keys
+                   Arrays.stream(ConditionType.values()).map(java.lang.Enum::name).map(String::toLowerCase) :
+                   // else return value-dependent autofill
+                   ConditionType.valueOf(split[0].toUpperCase())
+                           .autoFillValue(usage, argName, usage.getContext().stream().flatMap(Streams.cast(WorldMod.class)).findAny().orElseThrow(), split[1]);
+        }
     }
 
     private static Comparator comparator(String str, String key, String value) {

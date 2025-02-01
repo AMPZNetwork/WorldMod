@@ -13,23 +13,27 @@ import org.comroid.api.java.ResourceLoader;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.util.Collection;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Value
 public class QueryManager implements IQueryManager {
-    private final static Map<String, QueryManager> instances = new ConcurrentHashMap<>();
+    private final static Map<String, QueryManager> instances    = new ConcurrentHashMap<>();
+    public static final  String                    INFO_COMMENT = "# Documentation: https://github.com/AMPZNetwork/WorldMod";
 
     public static QueryManager init(WorldMod mod, String worldName) {
         return instances.computeIfAbsent(worldName, k -> new QueryManager(mod, k));
     }
 
-    WorldMod                mod;
-    String                  worldName;
-    Collection<IWorldQuery> queries;
+    WorldMod          mod;
+    String            worldName;
+    List<IWorldQuery> queries;
 
     @SneakyThrows
     public QueryManager(WorldMod mod, String worldName) {
@@ -40,7 +44,7 @@ public class QueryManager implements IQueryManager {
         if (!cfg.mkdirs() && !cfg.exists()) throw new RuntimeException("Failed to create queries base directory: " + cfg.getAbsolutePath());
         cfg = cfg.createSubFile(worldName + ".wmq");
 
-        ResourceLoader.assertFile(QueryManager.class, "template.wmq", cfg, () -> "# Documentation: https://github.com/AMPZNetwork/WorldMod");
+        ResourceLoader.assertFile(QueryManager.class, "template.wmq", cfg, () -> INFO_COMMENT);
 
         try (
                 var fis = new FileInputStream(cfg); var wrap = new TrailingCommentOmittingInputStream(fis); var isr = new InputStreamReader(wrap);
@@ -50,7 +54,21 @@ public class QueryManager implements IQueryManager {
                     .filter(Predicate.not(String::isBlank))
                     .map(ThrowingFunction.logging(Log.get(), WorldQuery::parse))
                     .map(IWorldQuery.class::cast)
-                    .toList();
+                    .collect(Collectors.toList());
+        }
+    }
+
+    @Override
+    @SneakyThrows
+    public void save() {
+        var str = INFO_COMMENT + '\n' + queries.stream().map(Object::toString).collect(Collectors.joining("\n"));
+
+        var cfg = new FileHandle(mod.getConfigDir()).createSubDir("worlds");
+        if (!cfg.mkdirs() && !cfg.exists()) throw new RuntimeException("Failed to create queries base directory: " + cfg.getAbsolutePath());
+        cfg = cfg.createSubFile(worldName + ".wmq");
+
+        try (var fos = new FileOutputStream(cfg)) {
+            fos.write(str.getBytes(StandardCharsets.US_ASCII));
         }
     }
 }

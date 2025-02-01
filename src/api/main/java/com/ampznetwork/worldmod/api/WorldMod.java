@@ -103,4 +103,6 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
     }
 
     TextResourceProvider text();
+
+    Stream<String> flagNames();
 }

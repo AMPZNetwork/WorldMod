@@ -31,6 +31,9 @@ commands:
   wand:
     description: Toggle wand item
     permission: worldmod.wand
+  query:
+    description: Query Management
+    permission: worldmod.query
 permissions:
   worldmod:
     description: WorldMod root permission node
@@ -71,3 +74,6 @@ permissions:
           worldmod.wand.lookup:
             description: Permission for toggling the lookup wand item
             default: op
+      worldmod.query:
+        description: Permission for managing world queries
+        default: op

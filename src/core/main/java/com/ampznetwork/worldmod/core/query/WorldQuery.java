@@ -2,6 +2,9 @@ package com.ampznetwork.worldmod.core.query;
 
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.model.query.IWorldQuery;
+import com.ampznetwork.worldmod.api.model.query.QueryInputData;
+import com.ampznetwork.worldmod.api.model.query.QueryVerb;
 import com.ampznetwork.worldmod.core.query.condition.BlockTypeCondition;
 import com.ampznetwork.worldmod.core.query.condition.FlagCondition;
 import com.ampznetwork.worldmod.core.query.condition.PositionCondition;
@@ -10,23 +13,29 @@ import com.ampznetwork.worldmod.core.query.condition.RadiusCondition;
 import com.ampznetwork.worldmod.core.query.condition.RegionNameCondition;
 import com.ampznetwork.worldmod.core.query.condition.SourceCondition;
 import com.ampznetwork.worldmod.core.query.condition.TagCondition;
+import com.ampznetwork.worldmod.core.query.condition.TargetCondition;
 import com.ampznetwork.worldmod.core.query.condition.TimeCondition;
 import com.ampznetwork.worldmod.core.query.condition.WorldCondition;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.RequiredArgsConstructor;
 import lombok.Singular;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.comroid.api.Polyfill;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.exc.ThrowingSupplier;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Debug;
 import org.comroid.api.func.util.Streams;
+import org.comroid.api.info.Log;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.Query;
 import java.time.Instant;
@@ -37,11 +46,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
+import java.util.logging.Level;
 
 @Value
 @Slf4j
 @Builder
-public class WorldQuery {
+public class WorldQuery implements IWorldQuery {
     public static WorldQuery parseLookup(String query) {
         return parse(query.startsWith("lookup ") ? query : "lookup " + query);
     }
@@ -51,7 +61,7 @@ public class WorldQuery {
             var builder = builder();
             var split   = query.split(" ");
 
-            builder.verb(Verb.valueOf(split[0].toUpperCase()));
+            builder.verb(QueryVerb.valueOf(split[0].toUpperCase()));
 
             for (int i = 1; i < split.length; i++) {
                 var str   = split[i];
@@ -60,7 +70,8 @@ public class WorldQuery {
                 var value = pair[1];
                 var add = switch (key) {
                     case "region", "group" -> new RegionNameCondition(value, "group".equals(key), comparator(str, key, value));
-                    case "from" -> new SourceCondition(value, comparator(str, key, value));
+                    case "source" -> new SourceCondition(value, comparator(str, key, value));
+                    case "target" -> new TargetCondition(value, comparator(str, key, value));
                     case "radius" -> new RadiusCondition(wrapParseArg("radius", () -> Integer.parseInt(value)));
                     case "world" -> new WorldCondition(value, comparator(str, key, value));
                     case "since" -> new TimeCondition(wrapParseArg("duration", () -> Instant.now().minus(Polyfill.parseDuration(value))));
@@ -91,6 +102,10 @@ public class WorldQuery {
                         else condition.getComparators()[dim] = comparator(str, key, value);
                         return condition;
                     });
+                    case "message" -> {
+                        builder.messageKey(value);
+                        yield null;
+                    }
                     default -> throw new IllegalStateException("Unexpected value: " + key);
                 };
                 if (add != null && (builder.conditions == null || !builder.conditions.contains(add))) builder.condition(add);
@@ -102,41 +117,36 @@ public class WorldQuery {
         }
     }
 
-    @NotNull  Verb                 verb;
-    @Singular List<QueryCondition> conditions;
+    @NotNull           QueryVerb            verb;
+    @Nullable @Default String               messageKey = null;
+    @Singular          List<QueryCondition> conditions;
 
+    @Override
+    public Optional<TextComponent> getMessage(WorldMod mod) {
+        return Optional.ofNullable(messageKey).map(mod.getMessages()::getProperty).map(LegacyComponentSerializer.legacyAmpersand()::deserialize);
+    }
+
+    @Override
     public Query toLookupQuery(WorldMod mod) {
         @Language("SQL") String query = """
-select e.* from world_log e where e.id = p.id
-""";
+                select e.* from world_log e where e.id = p.id
+                """;
         var append = new ArrayList<String>();
         var params = new HashMap<String, Object>();
-        conditions.stream()
-                .flatMap(Streams.cast(PositionCondition.class))
-                .findAny()
-                .ifPresent(pos -> {/*todo*/});
-        conditions.stream()
-                .flatMap(Streams.cast(FlagCondition.class))
-                .findAny()
-                .ifPresent(flag -> {
-                    append.add("and e.action = :flag");
-                    params.put("flag", flag.flag().getName());
-                });
-        conditions.stream()
-                .flatMap(Streams.cast(TimeCondition.class))
-                .findAny()
-                .ifPresent(time -> {
-                    append.add("and e.timestamp > :since");
-                    params.put("since", time.since());
-                });
-        conditions.stream()
-                .flatMap(Streams.cast(SourceCondition.class))
-                .findAny()
-                .ifPresent(source -> {
-                    append.add("and (e.player.id = :playerId or e.nonPlayerSource = :target)");
-                    params.put("playerId", source.source()); // todo this needs name->uuid conversion
-                    params.put("target", source.source());
-                });
+        conditions.stream().flatMap(Streams.cast(PositionCondition.class)).findAny().ifPresent(pos -> {/*todo*/});
+        conditions.stream().flatMap(Streams.cast(FlagCondition.class)).findAny().ifPresent(flag -> {
+            append.add("and e.action = :flag");
+            params.put("flag", flag.flag().getName());
+        });
+        conditions.stream().flatMap(Streams.cast(TimeCondition.class)).findAny().ifPresent(time -> {
+            append.add("and e.timestamp > :since");
+            params.put("since", time.since());
+        });
+        conditions.stream().flatMap(Streams.cast(SourceCondition.class)).findAny().ifPresent(source -> {
+            append.add("and (e.player.id = :playerId or e.nonPlayerSource = :target)");
+            params.put("playerId", source.source()); // todo this needs name->uuid conversion
+            params.put("target", source.source());
+        });
         /* todo: target condition
         conditions.stream()
                 .flatMap(Streams.cast(SourceCondition.class))
@@ -156,7 +166,15 @@ select e.* from world_log e where e.id = p.id
         });
     }
 
-    public enum Verb {LOOKUP, DENY, ALLOW, FORCE, PASSTHROUGH}
+    @Override
+    public boolean test(WorldMod mod, QueryInputData data) {
+        try {
+            return conditions.stream().allMatch(cond -> cond.test(mod, this, data, null));
+        } catch (Throwable t) {
+            Log.at(Level.WARNING, "Could not evaluate " + this, t);
+            return false;
+        }
+    }
 
     @RequiredArgsConstructor
     @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)

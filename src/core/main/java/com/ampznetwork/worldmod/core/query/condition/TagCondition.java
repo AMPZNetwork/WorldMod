@@ -1,7 +1,7 @@
 package com.ampznetwork.worldmod.core.query.condition;
 
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.api.model.mini.QueryInputData;
+import com.ampznetwork.worldmod.api.model.query.QueryInputData;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;

@@ -1,4 +1,4 @@
-package com.ampznetwork.worldmod.api.model.mini;
+package com.ampznetwork.worldmod.api.model.query;
 
 import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.worldmod.api.game.Flag;

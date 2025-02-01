@@ -1,7 +1,7 @@
 package com.ampznetwork.worldmod.core.query.condition;
 
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.api.model.mini.QueryInputData;
+import com.ampznetwork.worldmod.api.model.query.QueryInputData;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;

@@ -97,14 +97,18 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
         super.onLoad();
 
         this.config = super.getConfig();
-        reloadQueryManagers();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+        if (queryManagers != null) queryManagers.clear();
     }
 
     @Override
     @SneakyThrows
     public void onEnable() {
         super.onEnable();
-
         getPluginManager().registerEvents(eventDispatch, this);
     }
 
@@ -117,8 +121,7 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
         return "Reload complete!";
     }
 
-    private void reloadQueryManagers() {
-        if (queryManagers != null) queryManagers.clear();
+    public void reloadQueryManagers() {
         this.queryManagers = getWorlds().stream()
                 .map(WorldInfo::getName)
                 .map(mod -> QueryManager.init(this, mod))

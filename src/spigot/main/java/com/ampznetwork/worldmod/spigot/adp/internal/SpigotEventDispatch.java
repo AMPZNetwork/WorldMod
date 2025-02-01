@@ -97,6 +97,7 @@ import org.bukkit.event.player.PlayerShearEntityEvent;
 import org.bukkit.event.player.PlayerTakeLecternBookEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerUnleashEntityEvent;
+import org.bukkit.event.server.ServerLoadEvent;
 import org.comroid.api.data.Vector;
 
 import java.util.Optional;
@@ -111,6 +112,11 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public SpigotEventDispatch(WorldMod$Spigot mod) {
         super(mod);
         this.mod = mod;
+    }
+
+    @EventHandler
+    public void dispatch(ServerLoadEvent event) {
+        mod.reloadQueryManagers();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

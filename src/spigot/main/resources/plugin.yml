@@ -1,6 +1,6 @@
 name: WorldMod
 version: '0.1.0'
-description: World Protection Mod, because EngineHub people are assholes
+description: World Protection Mod
 main: com.ampznetwork.worldmod.spigot.WorldMod$Spigot
 api-version: '1.18'
 load: STARTUP

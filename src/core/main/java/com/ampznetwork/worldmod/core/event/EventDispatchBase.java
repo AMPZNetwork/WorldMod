@@ -166,7 +166,7 @@ public abstract class EventDispatchBase {
         var queries = Optional.ofNullable(mod.getQueryManagers().getOrDefault(worldName, null))
                 .map(IQueryManager::getQueries)
                 .orElseGet(List::of);
-        final var          data   = qidBuilder(player, source, target, location, worldName, flag).build();
+        final var data = qidBuilder(player, source, target, location, worldName, flag).timestamp(Instant.now()).build();
         final EventState[] result = new EventState[]{ EventState.Unaffected };
 
         end:

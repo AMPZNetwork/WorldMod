@@ -37,7 +37,7 @@ public class QueryManager implements IQueryManager {
         this.worldName = worldName;
 
         var cfg = new FileHandle(mod.getConfigDir()).createSubDir("worlds");
-        if (!cfg.mkdirs()) throw new RuntimeException("Failed to create queries base directory: " + cfg.getAbsolutePath());
+        if (!cfg.mkdirs() && !cfg.exists()) throw new RuntimeException("Failed to create queries base directory: " + cfg.getAbsolutePath());
         cfg = cfg.createSubFile(worldName + ".wmq");
 
         ResourceLoader.assertFile(QueryManager.class, "template.wmq", cfg, () -> "# Documentation: https://github.com/AMPZNetwork/WorldMod");

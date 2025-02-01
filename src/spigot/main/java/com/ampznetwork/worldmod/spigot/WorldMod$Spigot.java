@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -126,5 +127,6 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
                 .map(WorldInfo::getName)
                 .map(mod -> QueryManager.init(this, mod))
                 .collect(Collectors.toMap(QueryManager::getWorldName, Function.identity()));
+        getLogger().log(Level.INFO, "Loaded %d query managers".formatted(queryManagers.size()));
     }
 }

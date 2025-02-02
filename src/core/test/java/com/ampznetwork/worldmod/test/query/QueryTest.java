@@ -1,15 +1,15 @@
 package com.ampznetwork.worldmod.test.query;
 
 import com.ampznetwork.worldmod.api.game.Flag;
-import com.ampznetwork.worldmod.core.query.condition.FlagCondition;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
-import com.ampznetwork.worldmod.core.query.condition.BlockTypeCondition;
-import com.ampznetwork.worldmod.core.query.condition.PositionCondition;
 import com.ampznetwork.worldmod.core.query.condition.QueryCondition;
-import com.ampznetwork.worldmod.core.query.condition.RadiusCondition;
-import com.ampznetwork.worldmod.core.query.condition.RegionNameCondition;
-import com.ampznetwork.worldmod.core.query.condition.SourceCondition;
-import com.ampznetwork.worldmod.core.query.condition.WorldCondition;
+import com.ampznetwork.worldmod.core.query.condition.impl.BlockTypeCondition;
+import com.ampznetwork.worldmod.core.query.condition.impl.FlagCondition;
+import com.ampznetwork.worldmod.core.query.condition.impl.PositionCondition;
+import com.ampznetwork.worldmod.core.query.condition.impl.RadiusCondition;
+import com.ampznetwork.worldmod.core.query.condition.impl.RegionNameCondition;
+import com.ampznetwork.worldmod.core.query.condition.impl.SourceCondition;
+import com.ampznetwork.worldmod.core.query.condition.impl.WorldCondition;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Streams;
 import org.jetbrains.annotations.Nullable;

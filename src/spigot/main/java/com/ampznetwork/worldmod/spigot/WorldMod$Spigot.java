@@ -136,7 +136,7 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
     public void reloadQueryManagers() {
         this.queryManagers = getWorlds().stream()
                 .map(WorldInfo::getName)
-                .map(mod -> QueryManager.init(this, mod))
+                .map(mod -> new QueryManager(this, mod))
                 .collect(Collectors.toMap(QueryManager::getWorldName, Function.identity()));
         getLogger().log(Level.INFO, "Loaded %d query managers".formatted(queryManagers.size()));
     }

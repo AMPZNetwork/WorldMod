@@ -17,19 +17,13 @@ import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Value
 public class QueryManager implements IQueryManager {
-    private final static Map<String, QueryManager> instances    = new ConcurrentHashMap<>();
-    public static final  String                    INFO_COMMENT = "# Documentation: https://github.com/AMPZNetwork/WorldMod";
-
-    public static QueryManager init(WorldMod mod, String worldName) {
-        return instances.computeIfAbsent(worldName, k -> new QueryManager(mod, k));
-    }
+    public static final String INFO_COMMENT = "# Documentation: https://github.com/AMPZNetwork/WorldMod";
 
     WorldMod          mod;
     String            worldName;
@@ -53,6 +47,7 @@ public class QueryManager implements IQueryManager {
             this.queries = br.lines()
                     .filter(Predicate.not(String::isBlank))
                     .map(ThrowingFunction.logging(Log.get(), WorldQuery::parse))
+                    .filter(Objects::nonNull)
                     .map(IWorldQuery.class::cast)
                     .collect(Collectors.toList());
         }

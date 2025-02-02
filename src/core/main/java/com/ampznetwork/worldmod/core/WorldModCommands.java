@@ -50,7 +50,7 @@ import static net.kyori.adventure.text.format.NamedTextColor.*;
 @UtilityClass
 public class WorldModCommands {
     private static final Map<UUID, Area.Builder> selections      = new ConcurrentHashMap<>();
-    public static final  int                     MAX_LINE_LENGTH = 30;
+    public static final int MAX_LINE_LENGTH = 45;
 
     @Alias("sel")
     @Command(permission = worldmod.SELECTION, privacy = Command.PrivacyLevel.PRIVATE)
@@ -262,24 +262,26 @@ public class WorldModCommands {
                     .append(mod.getQueryManagers()
                             .entrySet()
                             .stream()
-                            .filter(e -> worldName == null || worldName.equals(e.getKey()))
+                            .filter(e -> worldName == null || worldName.isBlank() || worldName.equals(e.getKey()))
                             .map(Map.Entry::getValue)
                             .map(IQueryManager::getQueries)
                             .flatMap(Collection::stream)
                             .map(Object::toString)
-                            .map(content -> content.length() < MAX_LINE_LENGTH ? content : content.substring(0, MAX_LINE_LENGTH) + "...")
-                            .map(content -> text("").append(text("["))
-                                    .append(text(++i[0], YELLOW))
-                                    .append(text("|"))
-                                    .append(text("#", AQUA).decorate(TextDecoration.BOLD)
-                                            .hoverEvent(HoverEvent.showText(text("Update Query...")))
-                                            .clickEvent(ClickEvent.suggestCommand("/worldmod:query edit %d %s".formatted(i[0], content))))
-                                    .append(text("|"))
-                                    .append(text("-", RED).decorate(TextDecoration.BOLD)
-                                            .hoverEvent(HoverEvent.showText(text("Remove Query")))
-                                            .clickEvent(ClickEvent.suggestCommand(("/worldmod:query remove %d").formatted(i[0]))))
-                                    .append(text("] "))
-                                    .append(text(content, GRAY)))
+                            .map(content -> {
+                                var shortened = content.length() < MAX_LINE_LENGTH ? content : content.substring(0, MAX_LINE_LENGTH) + "...";
+                                return text("").append(text("["))
+                                        .append(text(++i[0], YELLOW))
+                                        .append(text("|"))
+                                        .append(text("#", AQUA).decorate(TextDecoration.BOLD)
+                                                .hoverEvent(HoverEvent.showText(text("Update Query...")))
+                                                .clickEvent(ClickEvent.suggestCommand("/worldmod:query edit %d %s".formatted(i[0], content))))
+                                        .append(text("|"))
+                                        .append(text("-", RED).decorate(TextDecoration.BOLD)
+                                                .hoverEvent(HoverEvent.showText(text("Remove Query")))
+                                                .clickEvent(ClickEvent.suggestCommand(("/worldmod:query remove %d").formatted(i[0]))))
+                                        .append(text("] "))
+                                        .append(text(shortened, GRAY));
+                            })
                             .collect(Streams.atLeastOneOrElseGet(() -> mod.text().getEmptyListEntry()))
                             .collect(Util.Kyori.collector(dash)));
         }
@@ -293,7 +295,7 @@ public class WorldModCommands {
             mod.getQueryManagers()
                     .entrySet()
                     .stream()
-                    .filter(e -> worldName == null || worldName.equals(e.getKey()))
+                    .filter(e -> worldName == null || worldName.isBlank() || worldName.equals(e.getKey()))
                     .map(Map.Entry::getValue)
                     .map(IQueryManager::getQueries)
                     .forEach(ls -> ls.add(parse));
@@ -320,7 +322,7 @@ public class WorldModCommands {
                     mod.getQueryManagers()
                             .entrySet()
                             .stream()
-                            .filter(e -> worldName == null || worldName.equals(e.getKey()))
+                            .filter(e -> worldName == null || worldName.isBlank() || worldName.equals(e.getKey()))
                             .map(Map.Entry::getValue)
                             .map(IQueryManager::getQueries)
                             .filter(ls -> ls.size() <= number)
@@ -339,7 +341,7 @@ public class WorldModCommands {
                     mod.getQueryManagers()
                             .entrySet()
                             .stream()
-                            .filter(e -> worldName == null || worldName.equals(e.getKey()))
+                            .filter(e -> worldName == null || worldName.isBlank() || worldName.equals(e.getKey()))
                             .map(Map.Entry::getValue)
                             .map(IQueryManager::getQueries)
                             .mapToInt(ls -> {
@@ -360,7 +362,7 @@ public class WorldModCommands {
                     mod.getQueryManagers()
                             .entrySet()
                             .stream()
-                            .filter(e -> worldName == null || worldName.equals(e.getKey()))
+                            .filter(e -> worldName == null || worldName.isBlank() || worldName.equals(e.getKey()))
                             .map(Map.Entry::getValue)
                             .peek(IQueryManager::save)
                             .toList()

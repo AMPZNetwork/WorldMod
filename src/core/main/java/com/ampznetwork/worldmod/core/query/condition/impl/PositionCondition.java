@@ -1,16 +1,22 @@
-package com.ampznetwork.worldmod.core.query.condition;
+package com.ampznetwork.worldmod.core.query.condition.impl;
 
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.model.query.QueryInputData;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
-import lombok.Value;
+import com.ampznetwork.worldmod.core.query.condition.QueryCondition;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 import org.comroid.api.data.Vector;
 import org.comroid.util.MathUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-@Value
+@Getter
+@AllArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class PositionCondition implements QueryCondition {
     WorldQuery.Comparator[] comparators;
     Vector.N3               a;
@@ -28,5 +34,21 @@ public class PositionCondition implements QueryCondition {
             return true;
         }
         return MathUtil.aabb(a, b, position);
+    }
+
+    @Override
+    public String toString() {
+        var str = "";
+        for (var dim = 0; dim < 3; dim++) {
+            var v = a.get(dim);
+            if (v != 0)
+                str += " " + switch (dim) {
+                    case 0 -> 'x';
+                    case 1 -> 'y';
+                    case 2 -> 'z';
+                    default -> throw new IllegalStateException("Unexpected value: " + dim);
+                } + '=' + v;
+        }
+        return str;
     }
 }

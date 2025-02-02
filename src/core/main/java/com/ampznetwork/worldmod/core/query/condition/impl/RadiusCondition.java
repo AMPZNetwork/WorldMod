@@ -1,8 +1,13 @@
-package com.ampznetwork.worldmod.core.query.condition;
+package com.ampznetwork.worldmod.core.query.condition.impl;
 
 import com.ampznetwork.worldmod.api.WorldMod;
+import com.ampznetwork.worldmod.api.model.query.ConditionType;
 import com.ampznetwork.worldmod.api.model.query.QueryInputData;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
+import com.ampznetwork.worldmod.core.query.condition.AbstractCondition;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
 import org.jetbrains.annotations.Nullable;
@@ -10,7 +15,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
-public record RadiusCondition(int radius) implements QueryCondition {
+@Getter
+@FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
+public class RadiusCondition extends AbstractCondition {
+    int radius;
+
+    public RadiusCondition(int radius) {
+        super(ConditionType.RADIUS);
+        this.radius = radius;
+    }
+
     @Override
     public boolean test(WorldMod mod, WorldQuery query, QueryInputData data, @Nullable UUID executor) {
         var center = query.getConditions()
@@ -49,5 +63,10 @@ public record RadiusCondition(int radius) implements QueryCondition {
 
         // Compare squared distance with squared radius
         return distanceSquared <= Math.pow(radius, 2);
+    }
+
+    @Override
+    protected String valueToString() {
+        return String.valueOf(radius);
     }
 }

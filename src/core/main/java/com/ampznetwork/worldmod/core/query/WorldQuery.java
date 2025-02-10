@@ -196,11 +196,19 @@ public class WorldQuery implements IWorldQuery {
             public boolean test(Object l, Object r) {
                 return Objects.equals(l, r);
             }
-        }, SIMILAR("~") {
+        },
+        NOT_EQUALS("!=") {
+            @Override
+            public boolean test(Object l, Object r) {
+                return !EQUALS.test(l, r);
+            }
+        },
+        SIMILAR("~=") {
             @Override
             public boolean test(Object l, Object r) {
                 if (l instanceof String str) return str.contains(String.valueOf(r));
                 if (l instanceof Integer x && r instanceof Integer y) return Math.max(x, y) - Math.min(x, y) < 16;
+                if (l instanceof Long x && r instanceof Long y) return Math.max(x, y) - Math.min(x, y) < 16;
                 if (l instanceof Double x && r instanceof Double y) return Math.max(x, y) - Math.min(x, y) < 16;
                 return EQUALS.test(l, r);
             }
@@ -208,6 +216,7 @@ public class WorldQuery implements IWorldQuery {
             @Override
             public boolean test(Object l, Object r) {
                 if (l instanceof Integer x && r instanceof Integer y) return x > y;
+                if (l instanceof Long x && r instanceof Long y) return x > y;
                 if (l instanceof Double x && r instanceof Double y) return x > y;
                 return EQUALS.test(l, r);
             }
@@ -215,6 +224,7 @@ public class WorldQuery implements IWorldQuery {
             @Override
             public boolean test(Object l, Object r) {
                 if (l instanceof Integer x && r instanceof Integer y) return x >= y;
+                if (l instanceof Long x && r instanceof Long y) return x >= y;
                 if (l instanceof Double x && r instanceof Double y) return x >= y;
                 return EQUALS.test(l, r);
             }
@@ -222,6 +232,7 @@ public class WorldQuery implements IWorldQuery {
             @Override
             public boolean test(Object l, Object r) {
                 if (l instanceof Integer x && r instanceof Integer y) return x < y;
+                if (l instanceof Long x && r instanceof Long y) return x < y;
                 if (l instanceof Double x && r instanceof Double y) return x < y;
                 return EQUALS.test(l, r);
             }
@@ -229,6 +240,7 @@ public class WorldQuery implements IWorldQuery {
             @Override
             public boolean test(Object l, Object r) {
                 if (l instanceof Integer x && r instanceof Integer y) return x <= y;
+                if (l instanceof Long x && r instanceof Long y) return x <= y;
                 if (l instanceof Double x && r instanceof Double y) return x <= y;
                 return EQUALS.test(l, r);
             }

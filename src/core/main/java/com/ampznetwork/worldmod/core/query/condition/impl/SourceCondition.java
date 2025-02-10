@@ -4,6 +4,7 @@ import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.model.query.ConditionType;
 import com.ampznetwork.worldmod.api.model.query.QueryInputData;
+import com.ampznetwork.worldmod.core.query.ValueComparator;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.core.query.condition.AbstractComparatorCondition;
 import lombok.AccessLevel;
@@ -20,7 +21,7 @@ import java.util.stream.Stream;
 public class SourceCondition extends AbstractComparatorCondition {
     String[] sources;
 
-    public SourceCondition(WorldQuery.Comparator comparator, String... sources) {
+    public SourceCondition(ValueComparator comparator, String... sources) {
         super(ConditionType.SOURCE, comparator);
         this.sources = sources;
     }

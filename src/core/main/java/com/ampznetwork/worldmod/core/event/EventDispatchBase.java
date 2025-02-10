@@ -14,6 +14,7 @@ import com.ampznetwork.worldmod.api.model.query.QueryInputData;
 import com.ampznetwork.worldmod.api.model.query.QueryVerb;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.core.WorldModCommands;
+import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.generated.PluginYml;
 import lombok.Value;
 import lombok.experimental.NonFinal;
@@ -23,6 +24,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Debug;
+import org.comroid.api.func.util.Streams;
 import org.comroid.api.func.util.Tuple;
 import org.comroid.api.model.minecraft.model.DefaultPermissionValue;
 import org.jetbrains.annotations.NotNull;
@@ -168,9 +170,14 @@ public abstract class EventDispatchBase {
                 location,
                 worldName,
                 flag));
-        if (cancellable.isCancelled()) return;
+
+        //if (cancellable.isCancelled()) return;
         if (passthrough(location, worldName)) return;
-        var player = source instanceof Player p0 ? p0 : null;
+
+        var       player    = source instanceof Player p0 ? p0 : null;
+        final var queryVars = mod.flagInvokeCount(player);
+        queryVars.compute(flag.getCanonicalName(), (k, v) -> (v == null ? 0L : v) + 1);
+
         var queries = Optional.ofNullable(mod.getQueryManagers().getOrDefault(worldName, null))
                 .map(IQueryManager::getQueries)
                 .orElseGet(List::of);
@@ -189,11 +196,11 @@ public abstract class EventDispatchBase {
 
             // check for force queries
             if (queries.stream().filter(proxy(IWorldQuery::getVerb, QueryVerb.FORCE::equals)).anyMatch(query -> query.test(mod, data))) {
-                result[0] = EventState.Unaffected;
+                result[0] = EventState.Forced;
                 break end;
             }
 
-            // evaluate allow/deny queries when unaffected
+            // evaluate allow/deny and conditional queries when unaffected
             if (result[0] == EventState.Unaffected) {
                 queries.stream()
                         .filter(proxy(IWorldQuery::getVerb, Set.of(QueryVerb.ALLOW, QueryVerb.DENY)::contains))
@@ -203,6 +210,13 @@ public abstract class EventDispatchBase {
                                     .ifPresent(msg -> mod.getPlayerAdapter().send(player.getId(), msg));
                             result[0] = query.getVerb().apply(result[0]);
                         });
+                if (queries.stream()
+                        .filter(proxy(IWorldQuery::getVerb, QueryVerb.CONDITIONAL::equals))
+                        .filter(query -> query.test(mod, data))
+                        .flatMap(Streams.cast(WorldQuery.class))
+                        .flatMap(query -> Stream.ofNullable(query.getEvaluator()))
+                        .anyMatch(eval -> !eval.test(queryVars)))
+                    result[0] = EventState.Cancelled;
             }
         }
 

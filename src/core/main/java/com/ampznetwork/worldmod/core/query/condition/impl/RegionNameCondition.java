@@ -3,6 +3,7 @@ package com.ampznetwork.worldmod.core.query.condition.impl;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.model.query.ConditionType;
 import com.ampznetwork.worldmod.api.model.query.QueryInputData;
+import com.ampznetwork.worldmod.core.query.ValueComparator;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.core.query.condition.AbstractComparatorCondition;
 import lombok.AccessLevel;
@@ -21,7 +22,7 @@ public class RegionNameCondition extends AbstractComparatorCondition {
     String[] names;
     boolean  group;
 
-    public RegionNameCondition(WorldQuery.Comparator comparator, boolean group, String... names) {
+    public RegionNameCondition(ValueComparator comparator, boolean group, String... names) {
         super(group ? ConditionType.GROUP : ConditionType.REGION, comparator);
         this.names = names;
         this.group = group;

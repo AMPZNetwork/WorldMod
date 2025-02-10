@@ -18,13 +18,11 @@ import com.ampznetwork.worldmod.core.query.condition.impl.TagCondition;
 import com.ampznetwork.worldmod.core.query.condition.impl.TargetCondition;
 import com.ampznetwork.worldmod.core.query.condition.impl.TimeCondition;
 import com.ampznetwork.worldmod.core.query.condition.impl.WorldCondition;
-import lombok.AccessLevel;
+import com.ampznetwork.worldmod.core.query.eval.ConditionalQueryEvaluator;
 import lombok.Builder;
 import lombok.Builder.Default;
-import lombok.RequiredArgsConstructor;
 import lombok.Singular;
 import lombok.Value;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -46,9 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.BiPredicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -74,8 +70,8 @@ public class WorldQuery implements IWorldQuery {
                 var comp   = str.replaceFirst(kvPairPattern, "$&");
                 var add = switch (key) {
                     case "region", "group" -> new RegionNameCondition(comparator(comp), "group".equals(key), values);
-                    case "source" -> new SourceCondition(comparator(comp), values);
-                    case "target" -> new TargetCondition(comparator(comp), values);
+                    case "source", "expr", "expression" -> new SourceCondition(comparator(comp), values);
+                    case "target", "value" -> new TargetCondition(comparator(comp), values);
                     case "radius" -> new RadiusCondition(wrapParseArg("radius", () -> Integer.parseInt(values[0])));
                     case "world" -> new WorldCondition(comparator(comp), values);
                     case "since" -> new TimeCondition(wrapParseArg("duration", () -> Instant.now().minus(Polyfill.parseDuration(values[0]))));
@@ -92,7 +88,7 @@ public class WorldQuery implements IWorldQuery {
                         if (value.contains("..")) b = Optional.ofNullable(condition).map(PositionCondition::getB).orElseGet(Vector.N3::new);
                         if (condition == null) {
                             a         = new Vector.N3();
-                            condition = new PositionCondition(new Comparator[3], a, b);
+                            condition = new PositionCondition(new ValueComparator[3], a, b);
                         } else {
                             a = condition.getA();
                         }
@@ -122,9 +118,10 @@ public class WorldQuery implements IWorldQuery {
         }
     }
 
-    @NotNull           QueryVerb            verb;
-    @Nullable @Default String               messageKey = null;
-    @Singular          List<QueryCondition> conditions;
+    @NotNull           QueryVerb                 verb;
+    @Nullable @Default String                    messageKey = null;
+    @Nullable @Default ConditionalQueryEvaluator evaluator  = null;
+    @Singular          List<QueryCondition>      conditions;
 
     @Override
     public Optional<TextComponent> getMessage(WorldMod mod) {
@@ -181,160 +178,17 @@ public class WorldQuery implements IWorldQuery {
     @Override
     public boolean test(WorldMod mod, QueryInputData data) {
         try {
-            return conditions.stream().allMatch(cond -> cond.test(mod, this, data, null));
+            return conditions.stream()
+                    .filter(cond -> verb != QueryVerb.CONDITIONAL || !(cond instanceof SourceCondition || cond instanceof TargetCondition))
+                    .allMatch(cond -> cond.test(mod, this, data, null));
         } catch (Throwable t) {
             Log.at(Level.WARNING, "Could not evaluate " + this, t);
             return false;
         }
     }
 
-    @RequiredArgsConstructor
-    @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-    public enum Comparator implements BiPredicate<Object, Object> {
-        EQUALS("=") {
-            @Override
-            public boolean test(Object l, Object r) {
-                return Objects.equals(l, r);
-            }
-
-            @Override
-            protected boolean test(long l, long r) {
-                return l == r;
-            }
-
-            @Override
-            protected boolean test(double l, double r) {
-                return l == r;
-            }
-        }, NOT_EQUALS("!=") {
-            @Override
-            public boolean test(Object l, Object r) {
-                return !EQUALS.test(l, r);
-            }
-
-            @Override
-            protected boolean test(long l, long r) {
-                return l != r;
-            }
-
-            @Override
-            protected boolean test(double l, double r) {
-                return l != r;
-            }
-        }, SIMILAR("~=") {
-            @Override
-            public boolean test(Object l, Object r) {
-                if (l instanceof String str) return str.contains(String.valueOf(r));
-                return tryNumberComparison(l, r) || EQUALS.test(l, r);
-            }
-
-            @Override
-            protected boolean test(long l, long r) {
-                return Math.max(l, r) - Math.min(l, r) < 16;
-            }
-
-            @Override
-            protected boolean test(double l, double r) {
-                return Math.max(l, r) - Math.min(l, r) < 16;
-            }
-        }, GREATER(">") {
-            @Override
-            public boolean test(Object l, Object r) {
-                return tryNumberComparison(l, r) || EQUALS.test(l, r);
-            }
-
-            @Override
-            protected boolean test(long l, long r) {
-                return l > r;
-            }
-
-            @Override
-            protected boolean test(double l, double r) {
-                return l > r;
-            }
-        }, GREATER_EQUALS(">=") {
-            @Override
-            public boolean test(Object l, Object r) {
-                return tryNumberComparison(l, r) || EQUALS.test(l, r);
-            }
-
-            @Override
-            protected boolean test(long l, long r) {
-                return l >= r;
-            }
-
-            @Override
-            protected boolean test(double l, double r) {
-                return l >= r;
-            }
-        }, LESSER("<") {
-            @Override
-            public boolean test(Object l, Object r) {
-                return tryNumberComparison(l, r) || EQUALS.test(l, r);
-            }
-
-            @Override
-            protected boolean test(long l, long r) {
-                return l < r;
-            }
-
-            @Override
-            protected boolean test(double l, double r) {
-                return l < r;
-            }
-        }, LESSER_EQUALS("<=") {
-            @Override
-            public boolean test(Object l, Object r) {
-                return tryNumberComparison(l, r) || EQUALS.test(l, r);
-            }
-
-            @Override
-            protected boolean test(long l, long r) {
-                return l <= r;
-            }
-
-            @Override
-            protected boolean test(double l, double r) {
-                return l <= r;
-            }
-        };
-
-        public static Comparator find(String string) {
-            return Arrays.stream(values()).filter(comp -> comp.string.equals(string)).findAny().orElseThrow();
-        }
-
-        String string;
-
-        @Override
-        public abstract boolean test(Object base, Object key);
-
-        protected abstract boolean test(long l, long r);
-
-        protected abstract boolean test(double l, double r);
-
-        protected final boolean tryNumberComparison(Object l, Object r) {
-            l = upN(l).orElse(l);
-            r = upN(r).orElse(r);
-            if (l instanceof Double ld && r instanceof Number) return test((double) ld, (double) r);
-            if (l instanceof Long ll && r instanceof Number) return test((long) ll, (long) r);
-            return false;
-        }
-
-        private Optional<Object> upN(Object x) {
-            if (x instanceof Number) return Optional.ofNullable(i2l(x));
-            var it = String.valueOf(x);
-            if (it.matches("-?\\d+\\.\\d+")) return Optional.of(Double.parseDouble(it));
-            if (it.matches("-?\\d+")) return Optional.of(Long.parseLong(it));
-            return Optional.empty();
-        }
-
-        private Object i2l(Object x) {
-            return x instanceof Integer i ? (long) i : x;
-        }
-    }
-
-    private static Comparator comparator(String str) {
-        return wrapParseArg("comparator", () -> Comparator.find(str));
+    private static ValueComparator comparator(String str) {
+        return wrapParseArg("comparator", () -> ValueComparator.find(str));
     }
 
     private static <T> T wrapParseArg(String nameof, ThrowingSupplier<T, Throwable> parse) {

@@ -4,6 +4,7 @@ import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.model.query.ConditionType;
 import com.ampznetwork.worldmod.api.model.query.QueryInputData;
+import com.ampznetwork.worldmod.core.query.ValueComparator;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.core.query.condition.AbstractComparatorCondition;
 import lombok.AccessLevel;
@@ -20,7 +21,7 @@ import java.util.stream.Stream;
 public class TargetCondition extends AbstractComparatorCondition {
     String[] targets;
 
-    public TargetCondition(WorldQuery.Comparator comparator, String... targets) {
+    public TargetCondition(ValueComparator comparator, String... targets) {
         super(ConditionType.TARGET, comparator);
         this.targets = targets;
     }

@@ -79,6 +79,7 @@ import org.bukkit.event.entity.StriderTemperatureChangeEvent;
 import org.bukkit.event.entity.VillagerAcquireTradeEvent;
 import org.bukkit.event.entity.VillagerCareerChangeEvent;
 import org.bukkit.event.entity.VillagerReplenishTradeEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
@@ -276,6 +277,13 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
                 location,
                 block.getWorld().getName(),
                 Spread);
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void dispatch(CraftItemEvent event) {
+        var whoClicked = event.getWhoClicked();
+        var location   = vec(whoClicked.getLocation());
+        dispatchEvent(event, whoClicked, event.getRecipe().getResult().getType().getKey().toString(), location, whoClicked.getWorld().getName(), Craft);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

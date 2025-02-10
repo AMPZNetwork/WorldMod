@@ -22,6 +22,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
+import org.comroid.api.func.util.Debug;
 import org.comroid.api.func.util.Tuple;
 import org.comroid.api.model.minecraft.model.DefaultPermissionValue;
 import org.jetbrains.annotations.NotNull;
@@ -160,6 +161,13 @@ public abstract class EventDispatchBase {
     }
 
     public void dispatchEvent(Cancellable cancellable, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {
+        Debug.log("EventDispatchBase.dispatchEvent(cancellable = %s, source = %s, target = %s, location = %s, worldName = %s, flag = %s)".formatted(
+                cancellable,
+                source,
+                target,
+                location,
+                worldName,
+                flag));
         if (cancellable.isCancelled()) return;
         if (passthrough(location, worldName)) return;
         var player = source instanceof Player p0 ? p0 : null;

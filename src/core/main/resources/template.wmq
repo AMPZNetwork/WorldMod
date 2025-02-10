@@ -2,7 +2,7 @@
 #deny flag=explode
 
 # uncomment to deny crafting of any kind of hoe
-#deny flag=craft type=~hoe
+#deny flag=craft type~=hoe
 
 # (wip) uncomment to limit obsidian blocks that one user can have placed at a time to 14 (classic nether portal)
 #limit source block.place/block.break minecraft:obsidian 14 message=limit.obsidian

@@ -71,7 +71,7 @@ public class WorldQuery implements IWorldQuery {
                 var pair = str.split(kvPairPattern);
                 var key   = pair[0];
                 var value = pair[1];
-                var comp = str.substring(key.length(), str.indexOf(value, key.length()));
+                var comp = str.replaceFirst(kvPairPattern, "$&");
                 var add = switch (key) {
                     case "region", "group" -> new RegionNameCondition(comparator(comp), value, "group".equals(key));
                     case "source" -> new SourceCondition(comparator(comp), value);

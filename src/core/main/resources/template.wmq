@@ -5,7 +5,7 @@
 #deny flag=craft type~=hoe
 
 # (wip) uncomment to limit obsidian blocks that one user can have placed at a time to 14 (classic nether portal)
-#limit source block.place/block.break minecraft:obsidian 14 message=limit.obsidian
+#conditional source=block.place-block.break target<=14 type=obsidian message=limit.obsidian
 
 # (wip) uncomment to limit 1 hoe of any kind per user at a time, game statistics and events are used for item destruction
-#limit source item.craft/item.break ~hoe 1 message=limit.hoe
+#conditional source=item.craft-item.break target<=1 type~=hoe message=limit.hoe

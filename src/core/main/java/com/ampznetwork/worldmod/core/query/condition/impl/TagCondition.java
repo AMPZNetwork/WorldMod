@@ -3,6 +3,7 @@ package com.ampznetwork.worldmod.core.query.condition.impl;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.model.query.ConditionType;
 import com.ampznetwork.worldmod.api.model.query.QueryInputData;
+import com.ampznetwork.worldmod.core.query.ValueComparator;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.core.query.condition.AbstractComparatorCondition;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,7 +23,7 @@ import java.util.UUID;
 public class TagCondition extends AbstractComparatorCondition {
     String[] values;
 
-    public TagCondition(WorldQuery.Comparator comparator, String... values) {
+    public TagCondition(ValueComparator comparator, String... values) {
         super(ConditionType.TAG, comparator);
         this.values = values;
     }

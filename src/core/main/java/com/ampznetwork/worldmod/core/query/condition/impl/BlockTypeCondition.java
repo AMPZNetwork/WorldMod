@@ -3,6 +3,7 @@ package com.ampznetwork.worldmod.core.query.condition.impl;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.model.query.ConditionType;
 import com.ampznetwork.worldmod.api.model.query.QueryInputData;
+import com.ampznetwork.worldmod.core.query.ValueComparator;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.core.query.condition.AbstractComparatorCondition;
 import lombok.AccessLevel;
@@ -18,7 +19,7 @@ import java.util.UUID;
 public class BlockTypeCondition extends AbstractComparatorCondition {
     String[] identifiers;
 
-    public BlockTypeCondition(WorldQuery.Comparator comparator, String... identifiers) {
+    public BlockTypeCondition(ValueComparator comparator, String... identifiers) {
         super(ConditionType.TYPE, comparator);
         this.identifiers = identifiers;
     }

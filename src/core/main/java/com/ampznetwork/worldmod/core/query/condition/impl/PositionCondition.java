@@ -2,6 +2,7 @@ package com.ampznetwork.worldmod.core.query.condition.impl;
 
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.model.query.QueryInputData;
+import com.ampznetwork.worldmod.core.query.ValueComparator;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.core.query.condition.QueryCondition;
 import lombok.AccessLevel;
@@ -18,8 +19,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class PositionCondition implements QueryCondition {
-    WorldQuery.Comparator[] comparators;
-    Vector.N3               a;
+    ValueComparator[] comparators;
+    Vector.N3         a;
     Vector.@Nullable N3     b;
 
     @Override

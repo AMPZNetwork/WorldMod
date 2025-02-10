@@ -1,6 +1,7 @@
 package com.ampznetwork.worldmod.test.query;
 
 import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.core.query.ValueComparator;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.core.query.condition.QueryCondition;
 import com.ampznetwork.worldmod.core.query.condition.impl.BlockTypeCondition;
@@ -26,8 +27,8 @@ public class QueryTest {
         var query = WorldQuery.parse("lookup from=#fire radius=20");
         assertEquals(WorldQuery.Verb.LOOKUP, query.getVerb());
         assertEquals(2, query.getConditions().size());
-        assertCondition(query, SourceCondition.class, SourceCondition::source, "#fire", WorldQuery.Comparator.EQUALS);
-        assertCondition(query, RadiusCondition.class, RadiusCondition::radius, 20, WorldQuery.Comparator.EQUALS);
+        assertCondition(query, SourceCondition.class, SourceCondition::source, "#fire", ValueComparator.EQUALS);
+        assertCondition(query, RadiusCondition.class, RadiusCondition::radius, 20, ValueComparator.EQUALS);
     }
 
     @Test
@@ -35,8 +36,8 @@ public class QueryTest {
         var query = WorldQuery.parse("lookup x=10..20 z=30..50 since=2w");
         assertEquals(WorldQuery.Verb.LOOKUP, query.getVerb());
         assertEquals(2, query.getConditions().size());
-        assertCondition(query, PositionCondition.class, PositionCondition::getA, new Vector.N3(10, 0, 30), WorldQuery.Comparator.EQUALS);
-        assertCondition(query, PositionCondition.class, PositionCondition::getB, new Vector.N3(20, 0, 50), WorldQuery.Comparator.EQUALS);
+        assertCondition(query, PositionCondition.class, PositionCondition::getA, new Vector.N3(10, 0, 30), ValueComparator.EQUALS);
+        assertCondition(query, PositionCondition.class, PositionCondition::getB, new Vector.N3(20, 0, 50), ValueComparator.EQUALS);
         //assertCondition(query, TimeCondition.class, TimeCondition::since, );
     }
 
@@ -45,9 +46,9 @@ public class QueryTest {
         var query = WorldQuery.parse("lookup from=Kaleidox x=0 y=0 z=0 world=world type=minecraft:iron_block");
         assertEquals(WorldQuery.Verb.LOOKUP, query.getVerb());
         assertEquals(4, query.getConditions().size());
-        assertCondition(query, SourceCondition.class, SourceCondition::source, "Kaleidox", WorldQuery.Comparator.EQUALS);
-        assertCondition(query, WorldCondition.class, WorldCondition::worldName, "world", WorldQuery.Comparator.EQUALS);
-        assertCondition(query, BlockTypeCondition.class, BlockTypeCondition::identifier, "minecraft:iron_block", WorldQuery.Comparator.EQUALS);
+        assertCondition(query, SourceCondition.class, SourceCondition::source, "Kaleidox", ValueComparator.EQUALS);
+        assertCondition(query, WorldCondition.class, WorldCondition::worldName, "world", ValueComparator.EQUALS);
+        assertCondition(query, BlockTypeCondition.class, BlockTypeCondition::identifier, "minecraft:iron_block", ValueComparator.EQUALS);
     }
 
     @Test
@@ -63,7 +64,7 @@ public class QueryTest {
         var query = WorldQuery.parse("deny region=spawn");
         assertEquals(WorldQuery.Verb.DENY, query.getVerb());
         assertEquals(1, query.getConditions().size());
-        assertCondition(query, RegionNameCondition.class, RegionNameCondition::name, "spawn", WorldQuery.Comparator.EQUALS);
+        assertCondition(query, RegionNameCondition.class, RegionNameCondition::name, "spawn", ValueComparator.EQUALS);
         assertCondition(query, RegionNameCondition.class, RegionNameCondition::group, false);
     }
 
@@ -72,7 +73,7 @@ public class QueryTest {
         var query = WorldQuery.parse("deny type=minecraft:iron_block flag=build");
         assertEquals(WorldQuery.Verb.DENY, query.getVerb());
         assertEquals(2, query.getConditions().size());
-        assertCondition(query, BlockTypeCondition.class, BlockTypeCondition::identifier, "minecraft:iron_block", WorldQuery.Comparator.EQUALS);
+        assertCondition(query, BlockTypeCondition.class, BlockTypeCondition::identifier, "minecraft:iron_block", ValueComparator.EQUALS);
         assertCondition(query, FlagCondition.class, FlagCondition::flag, Flag.Build);
     }
 
@@ -81,7 +82,7 @@ public class QueryTest {
         var query = WorldQuery.parse("deny flag=craft type=diamond_hoe group~staff");
         assertEquals(WorldQuery.Verb.DENY, query.getVerb());
         assertEquals(3, query.getConditions().size());
-        assertCondition(query, RegionNameCondition.class, RegionNameCondition::name, "staff", WorldQuery.Comparator.SIMILAR);
+        assertCondition(query, RegionNameCondition.class, RegionNameCondition::name, "staff", ValueComparator.SIMILAR);
         assertCondition(query, RegionNameCondition.class, RegionNameCondition::group, true);
     }
 
@@ -97,7 +98,7 @@ public class QueryTest {
             Class<T> conditionType,
             Function<T, ? extends R> actual,
             R expected,
-            @Nullable WorldQuery.Comparator comparator
+            @Nullable ValueComparator comparator
     ) {
         var condition   = query.getConditions().stream().flatMap(Streams.cast(conditionType)).findAny().orElseGet(Assertions::fail);
         var actualValue = actual.apply(condition);

@@ -2,6 +2,7 @@ package com.ampznetwork.worldmod.api;
 
 import com.ampznetwork.libmod.api.LibMod;
 import com.ampznetwork.libmod.api.SubMod;
+import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.worldmod.api.model.TextResourceProvider;
 import com.ampznetwork.worldmod.api.model.WandType;
 import com.ampznetwork.worldmod.api.model.query.IQueryManager;
@@ -15,6 +16,7 @@ import org.comroid.api.func.util.Streams;
 import org.comroid.api.info.Log;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -105,4 +107,6 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
     TextResourceProvider text();
 
     Stream<String> flagNames();
+
+    Map<String, Long> flagInvokeCount(@Nullable Player player);
 }

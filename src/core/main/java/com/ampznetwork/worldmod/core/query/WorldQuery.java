@@ -71,16 +71,17 @@ public class WorldQuery implements IWorldQuery {
                 var pair = str.split(kvPairPattern);
                 var key   = pair[0];
                 var value = pair[1];
+                var comp = str.substring(key.length(), str.indexOf(value, key.length()));
                 var add = switch (key) {
-                    case "region", "group" -> new RegionNameCondition(comparator(str, key, value), value, "group".equals(key));
-                    case "source" -> new SourceCondition(comparator(str, key, value), value);
-                    case "target" -> new TargetCondition(comparator(str, key, value), value);
+                    case "region", "group" -> new RegionNameCondition(comparator(comp), value, "group".equals(key));
+                    case "source" -> new SourceCondition(comparator(comp), value);
+                    case "target" -> new TargetCondition(comparator(comp), value);
                     case "radius" -> new RadiusCondition(wrapParseArg("radius", () -> Integer.parseInt(value)));
-                    case "world" -> new WorldCondition(comparator(str, key, value), value);
+                    case "world" -> new WorldCondition(comparator(comp), value);
                     case "since" -> new TimeCondition(wrapParseArg("duration", () -> Instant.now().minus(Polyfill.parseDuration(value))));
-                    case "type" -> new BlockTypeCondition(comparator(str, key, value), value);
+                    case "type" -> new BlockTypeCondition(comparator(comp), value);
                     case "flag" -> new FlagCondition(wrapParseArg("flag", () -> Flag.getForName(value)));
-                    case "tag" -> new TagCondition(comparator(str, key, value), value);
+                    case "tag" -> new TagCondition(comparator(comp), value);
                     case "x", "y", "z" -> wrapParseArg("coordinate", () -> {
                         // find bounds from available condition
                         Vector.N3 a, b = null;
@@ -102,7 +103,7 @@ public class WorldQuery implements IWorldQuery {
                         int    dim   = key.toLowerCase().charAt(0) - 'x';
                         a.set(dim, aN);
                         if (b != null && bN != null) b.set(dim, bN);
-                        else condition.getComparators()[dim] = comparator(str, key, value);
+                        else condition.getComparators()[dim] = comparator(comp);
                         return condition;
                     });
                     case "message" -> {
@@ -242,8 +243,8 @@ public class WorldQuery implements IWorldQuery {
         public abstract boolean test(Object base, Object key);
     }
 
-    private static Comparator comparator(String str, String key, String value) {
-        return wrapParseArg("comparator", () -> Comparator.find(str.substring(key.length(), str.indexOf(value, key.length()))));
+    private static Comparator comparator(String str) {
+        return wrapParseArg("comparator", () -> Comparator.find(str));
     }
 
     private static <T> T wrapParseArg(String nameof, ThrowingSupplier<T, Throwable> parse) {

@@ -1,5 +1,6 @@
 package com.ampznetwork.worldmod.core.query.eval.decl;
 
+import com.ampznetwork.worldmod.core.query.eval.ExpressionParser;
 import com.ampznetwork.worldmod.core.query.eval.model.VarSupplier;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;

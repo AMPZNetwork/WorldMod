@@ -10,26 +10,30 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 @Getter
 @FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class BlockTypeCondition extends AbstractComparatorCondition {
-    String identifier;
+    String[] identifiers;
 
-    public BlockTypeCondition(WorldQuery.Comparator comparator, String identifier) {
+    public BlockTypeCondition(WorldQuery.Comparator comparator, String... identifiers) {
         super(ConditionType.TYPE, comparator);
-        this.identifier = identifier;
+        this.identifiers = identifiers;
     }
 
     @Override
     public boolean test(WorldMod mod, WorldQuery query, QueryInputData data, @Nullable UUID executor) {
         var targetResourceKey = data.getTargetResourceKey();
-        return targetResourceKey == null || (comparator.test(identifier.contains(":") ? targetResourceKey.asString() : targetResourceKey.value(), identifier));
+        return Arrays.stream(identifiers)
+                .anyMatch(identifier -> targetResourceKey == null || (comparator.test(identifier.contains(":")
+                                                                                      ? targetResourceKey.asString()
+                                                                                      : targetResourceKey.value(), identifier)));
     }
 
     @Override
     protected String valueToString() {
-        return identifier;
+        return String.join(",", identifiers);
     }
 }

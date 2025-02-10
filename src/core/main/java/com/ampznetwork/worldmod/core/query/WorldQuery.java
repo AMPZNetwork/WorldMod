@@ -67,22 +67,23 @@ public class WorldQuery implements IWorldQuery {
             builder.verb(QueryVerb.valueOf(split[0].toUpperCase()));
 
             for (int i = 1; i < split.length; i++) {
-                var str   = split[i];
-                var pair = str.split(kvPairPattern);
-                var key   = pair[0];
-                var value = pair[1];
-                var comp = str.replaceFirst(kvPairPattern, "$&");
+                var str    = split[i];
+                var pair   = str.split(kvPairPattern);
+                var key    = pair[0];
+                var values = pair[1].split(",");
+                var comp   = str.replaceFirst(kvPairPattern, "$&");
                 var add = switch (key) {
-                    case "region", "group" -> new RegionNameCondition(comparator(comp), value, "group".equals(key));
-                    case "source" -> new SourceCondition(comparator(comp), value);
-                    case "target" -> new TargetCondition(comparator(comp), value);
-                    case "radius" -> new RadiusCondition(wrapParseArg("radius", () -> Integer.parseInt(value)));
-                    case "world" -> new WorldCondition(comparator(comp), value);
-                    case "since" -> new TimeCondition(wrapParseArg("duration", () -> Instant.now().minus(Polyfill.parseDuration(value))));
-                    case "type" -> new BlockTypeCondition(comparator(comp), value);
-                    case "flag" -> new FlagCondition(wrapParseArg("flag", () -> Flag.getForName(value)));
-                    case "tag" -> new TagCondition(comparator(comp), value);
+                    case "region", "group" -> new RegionNameCondition(comparator(comp), "group".equals(key), values);
+                    case "source" -> new SourceCondition(comparator(comp), values);
+                    case "target" -> new TargetCondition(comparator(comp), values);
+                    case "radius" -> new RadiusCondition(wrapParseArg("radius", () -> Integer.parseInt(values[0])));
+                    case "world" -> new WorldCondition(comparator(comp), values);
+                    case "since" -> new TimeCondition(wrapParseArg("duration", () -> Instant.now().minus(Polyfill.parseDuration(values[0]))));
+                    case "type" -> new BlockTypeCondition(comparator(comp), values);
+                    case "flag" -> new FlagCondition(wrapParseArg("flag", () -> Arrays.stream(values).map(Flag::getForName).toArray(Flag[]::new)));
+                    case "tag" -> new TagCondition(comparator(comp), values);
                     case "x", "y", "z" -> wrapParseArg("coordinate", () -> {
+                        var value = values[0];
                         // find bounds from available condition
                         Vector.N3 a, b = null;
                         var condition = builder.conditions == null
@@ -107,7 +108,7 @@ public class WorldQuery implements IWorldQuery {
                         return condition;
                     });
                     case "message" -> {
-                        builder.messageKey(value);
+                        builder.messageKey(values[0]);
                         yield null;
                     }
                     default -> throw new IllegalStateException("Unexpected value: " + key);
@@ -138,18 +139,18 @@ public class WorldQuery implements IWorldQuery {
         var append = new ArrayList<String>();
         var params = new HashMap<String, Object>();
         conditions.stream().flatMap(Streams.cast(PositionCondition.class)).findAny().ifPresent(pos -> {/*todo*/});
-        conditions.stream().flatMap(Streams.cast(FlagCondition.class)).findAny().ifPresent(flag -> {
-            append.add("and e.action = :flag");
-            params.put("flag", flag.getFlag().getName());
-        });
+        //conditions.stream().flatMap(Streams.cast(FlagCondition.class)).findAny().ifPresent(flag -> {
+        //    append.add("and e.action = :flag");
+        //    params.put("flag", flag.getFlag().getName());
+        //});
         conditions.stream().flatMap(Streams.cast(TimeCondition.class)).findAny().ifPresent(time -> {
             append.add("and e.timestamp > :since");
             params.put("since", time.getSince());
         });
         conditions.stream().flatMap(Streams.cast(SourceCondition.class)).findAny().ifPresent(source -> {
             append.add("and (e.player.id = :playerId or e.nonPlayerSource = :target)");
-            params.put("playerId", source.getSource()); // todo this needs name->uuid conversion
-            params.put("target", source.getSource());
+            params.put("playerId", source.getSources()); // todo this needs name->uuid conversion
+            params.put("target", source.getSources());
         });
         /* todo: target condition
         conditions.stream()

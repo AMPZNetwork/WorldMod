@@ -11,18 +11,19 @@ import lombok.experimental.FieldDefaults;
 import org.comroid.api.attr.Named;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
 @Getter
 @FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class RegionNameCondition extends AbstractComparatorCondition {
-    String  name;
-    boolean group;
+    String[] names;
+    boolean  group;
 
-    public RegionNameCondition(WorldQuery.Comparator comparator, String name, boolean group) {
+    public RegionNameCondition(WorldQuery.Comparator comparator, boolean group, String... names) {
         super(group ? ConditionType.GROUP : ConditionType.REGION, comparator);
-        this.name  = name;
+        this.names = names;
         this.group = group;
     }
 
@@ -34,12 +35,12 @@ public class RegionNameCondition extends AbstractComparatorCondition {
                         .filter($ -> group)
                         .or(() -> Optional.of(rg))
                         .map(Named::getName)
-                        .filter(it -> comparator.test(it, name))
+                        .filter(it -> Arrays.stream(names).anyMatch(name -> comparator.test(it, name)))
                         .isPresent());
     }
 
     @Override
     protected String valueToString() {
-        return name;
+        return String.join(",", names);
     }
 }

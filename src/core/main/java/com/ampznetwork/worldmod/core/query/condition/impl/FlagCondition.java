@@ -11,25 +11,27 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Getter
 @FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class FlagCondition extends AbstractCondition {
-    Flag flag;
+    Flag[] flags;
 
-    public FlagCondition(Flag flag) {
+    public FlagCondition(Flag... flags) {
         super(ConditionType.FLAG);
-        this.flag = flag;
+        this.flags = flags;
     }
 
     @Override
     public boolean test(WorldMod mod, WorldQuery query, QueryInputData data, @Nullable UUID executor) {
-        return data.getAction() == null || flag.equals(data.getAction());
+        return data.getAction() == null || Arrays.stream(flags).anyMatch(flag -> flag.equals(data.getAction()));
     }
 
     @Override
     protected String valueToString() {
-        return flag.getCanonicalName();
+        return Arrays.stream(flags).map(Flag::getCanonicalName).collect(Collectors.joining(","));
     }
 }

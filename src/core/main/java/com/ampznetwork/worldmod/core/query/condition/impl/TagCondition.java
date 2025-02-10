@@ -14,16 +14,17 @@ import lombok.experimental.FieldDefaults;
 import org.comroid.api.func.util.Streams;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 @Getter
 @FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class TagCondition extends AbstractComparatorCondition {
-    String data;
+    String[] values;
 
-    public TagCondition(WorldQuery.Comparator comparator, String data) {
+    public TagCondition(WorldQuery.Comparator comparator, String... values) {
         super(ConditionType.TAG, comparator);
-        this.data = data;
+        this.values = values;
     }
 
     @Override
@@ -33,8 +34,9 @@ public class TagCondition extends AbstractComparatorCondition {
 
     private boolean checkContainsKeyOrValueRecursive(@Nullable JsonNode node) {
         if (node == null) return SKIP;
-        if (node instanceof ObjectNode obj) if (Streams.of(obj.fieldNames(), obj.size()).anyMatch(key -> comparator.test(key, data))) return true;
-        if (node instanceof ValueNode value) return comparator.test(value.asText(), data);
+        if (node instanceof ObjectNode obj)
+            if (Streams.of(obj.fieldNames(), obj.size()).anyMatch(key -> Arrays.stream(values).anyMatch(any -> comparator.test(key, any)))) return true;
+        if (node instanceof ValueNode value) return Arrays.stream(values).anyMatch(any -> comparator.test(value.asText(), any));
         for (var child : node)
             if (checkContainsKeyOrValueRecursive(child)) return true;
         return false;
@@ -42,6 +44,6 @@ public class TagCondition extends AbstractComparatorCondition {
 
     @Override
     protected String valueToString() {
-        return data;
+        return String.join(",", values);
     }
 }

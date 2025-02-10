@@ -11,27 +11,28 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 @Getter
 @FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class SourceCondition extends AbstractComparatorCondition {
-    String source;
+    String[] sources;
 
-    public SourceCondition(WorldQuery.Comparator comparator, String source) {
+    public SourceCondition(WorldQuery.Comparator comparator, String... sources) {
         super(ConditionType.SOURCE, comparator);
-        this.source = source;
+        this.sources = sources;
     }
 
     @Override
     public boolean test(WorldMod mod, WorldQuery query, QueryInputData data, @Nullable UUID executor) {
         return Stream.concat(Stream.ofNullable(data.getPlayer()).map(Player::getName), Stream.ofNullable(data.getNonPlayerSource()).map(Object::toString))
-                .anyMatch(str -> comparator.test(str, source));
+                .anyMatch(str -> Arrays.stream(sources).anyMatch(source -> comparator.test(str, source)));
     }
 
     @Override
     protected String valueToString() {
-        return source;
+        return String.join(",", sources);
     }
 }

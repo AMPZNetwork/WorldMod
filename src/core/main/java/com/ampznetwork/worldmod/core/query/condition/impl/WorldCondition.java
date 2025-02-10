@@ -10,25 +10,26 @@ import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 @Getter
 @FieldDefaults(makeFinal = true, level = AccessLevel.PROTECTED)
 public class WorldCondition extends AbstractComparatorCondition {
-    String worldName;
+    String[] worlds;
 
-    public WorldCondition(WorldQuery.Comparator comparator, String worldName) {
+    public WorldCondition(WorldQuery.Comparator comparator, String... worlds) {
         super(ConditionType.WORLD, comparator);
-        this.worldName = worldName;
+        this.worlds = worlds;
     }
 
     @Override
     public boolean test(WorldMod mod, WorldQuery query, QueryInputData data, @Nullable UUID executor) {
-        return comparator.test(data.getWorldName(), worldName);
+        return Arrays.stream(worlds).anyMatch(world -> comparator.test(data.getWorldName(), world));
     }
 
     @Override
     protected String valueToString() {
-        return worldName;
+        return String.join(",", worlds);
     }
 }

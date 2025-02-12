@@ -41,10 +41,10 @@ public class ExpressionParser extends StreamTokenizer {
             case '(' -> parensExpr();
             default -> throw new IllegalStateException("Unexpected value: " + ttype);
         };
-        final var n = nextToken();
         // if next is an operator, return the operator expression instead
         for (var op : Operator.values())
-            if (op.symbol == n) return opExpr(expr, op);
+            if (op.symbol == ttype)
+                return opExpr(expr, op);
         nextToken();
         return expr;
     }
@@ -53,9 +53,8 @@ public class ExpressionParser extends StreamTokenizer {
         var buf = new StringBuilder();
         do {
             buf.append(ttype == TT_NUMBER ? sval : String.valueOf(ttype));
-            nextToken();
-        } while (Arrays.binarySearch(varParts, ttype) != -1);
-        nextToken();
+            if (nextToken() == -1) break;
+        } while (Arrays.binarySearch(varParts, ttype) >= 0);
         return new VariableExpression(buf.toString());
     }
 
@@ -63,11 +62,10 @@ public class ExpressionParser extends StreamTokenizer {
         var buf     = new StringBuilder();
         var decimal = false;
         do {
-            buf.append(ttype == TT_NUMBER ? String.valueOf(nval) : String.valueOf(ttype));
-            nextToken();
+            buf.append(ttype == TT_NUMBER ? String.valueOf((int) nval) : String.valueOf(ttype));
+            if (nextToken() == -1) break;
             if (!decimal) decimal = ttype == '.';
-        } while (Arrays.binarySearch(numParts, ttype) != -1);
-        nextToken();
+        } while (Arrays.binarySearch(numParts, ttype) >= 0);
         return decimal ? new NumberExpression<>(Double.parseDouble(buf.toString())) : new NumberExpression<Number>(Long.parseLong(buf.toString()));
     }
 

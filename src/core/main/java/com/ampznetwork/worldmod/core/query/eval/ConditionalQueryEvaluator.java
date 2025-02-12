@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 @Value
-public class ConditionalQueryEvaluator implements VarSupplier, Predicate<Map<String, Object>> {
+public class ConditionalQueryEvaluator implements VarSupplier, Predicate<Map<String, @NotNull Long>> {
     WorldQuery query;
     Expression expr, value;
     ValueComparator comparator;

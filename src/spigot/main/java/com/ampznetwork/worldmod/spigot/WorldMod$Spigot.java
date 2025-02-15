@@ -1,5 +1,6 @@
 package com.ampznetwork.worldmod.spigot;
 
+import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.libmod.spigot.SubMod$Spigot;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.game.Flag;
@@ -21,6 +22,8 @@ import org.bukkit.generator.WorldInfo;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.java.ResourceLoader;
 import org.comroid.api.java.StackTraceUtils;
+import org.intellij.lang.annotations.Language;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -93,12 +96,21 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
 
     @Override
     public Stream<String> flagNames() {
-        return Flag.VALUES.values().stream().flatMap(this::ownAndChildFlagNames);
+        return Flag.VALUES.values().stream().flatMap(WorldMod$Spigot::ownAndChildFlagNames);
     }
 
-    private Stream<String> ownAndChildFlagNames(Flag flag) {
-        var name = flag.getName();
-        return Stream.concat(Stream.of(name), flag.getChildren().stream().flatMap(this::ownAndChildFlagNames).map(str -> name + str));
+    @Override
+    public Map<String, Long> flagInvokeCount(@Nullable Player player) {
+        @Language("SQL") String fq, q = "select e.* from dev.worldmod_world_log e where e.action = :canonical";
+        if (player != null) q += " and e.player_id = :player_id";
+        fq = q;
+        return Flag.VALUES.values()
+                .stream()
+                .map(Flag::getCanonicalName)
+                .collect(Collectors.toUnmodifiableMap(Function.identity(),
+                        canonical -> getEntityService().getAccessor(LogEntry.TYPE)
+                                .querySelect(fq, Map.of("canonical", canonical, "player_id", player == null ? "" : player.getId()))
+                                .count()));
     }
 
     @Override
@@ -139,5 +151,10 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
                 .map(mod -> new QueryManager(this, mod))
                 .collect(Collectors.toMap(QueryManager::getWorldName, Function.identity()));
         getLogger().log(Level.INFO, "Loaded %d query managers".formatted(queryManagers.size()));
+    }
+
+    private static Stream<String> ownAndChildFlagNames(Flag flag) {
+        var name = flag.getName();
+        return Stream.concat(Stream.of(name), flag.getChildren().stream().flatMap(WorldMod$Spigot::ownAndChildFlagNames).map(str -> name + '.' + str));
     }
 }

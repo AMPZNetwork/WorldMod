@@ -52,7 +52,7 @@ public class ExpressionParser extends StreamTokenizer {
     public VariableExpression varExpr() throws IOException {
         var buf = new StringBuilder();
         do {
-            buf.append(ttype == TT_NUMBER ? sval : String.valueOf(ttype));
+            buf.append(ttype == TT_WORD ? sval : String.valueOf((char) ttype));
             if (nextToken() == -1) break;
         } while (Arrays.binarySearch(varParts, ttype) >= 0);
         return new VariableExpression(buf.toString());

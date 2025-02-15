@@ -70,8 +70,8 @@ public class WorldQuery implements IWorldQuery {
                 var comp   = str.replaceFirst(kvPairPattern, "$&");
                 var add = switch (key) {
                     case "region", "group" -> new RegionNameCondition(comparator(comp), "group".equals(key), values);
-                    case "source", "expr", "expression" -> new SourceCondition(comparator(comp), values);
-                    case "target", "value" -> new TargetCondition(comparator(comp), values);
+                    case "from", "source", "expr", "expression" -> new SourceCondition(comparator(comp), values);
+                    case "towards", "target", "value" -> new TargetCondition(comparator(comp), values);
                     case "radius" -> new RadiusCondition(wrapParseArg("radius", () -> Integer.parseInt(values[0])));
                     case "world" -> new WorldCondition(comparator(comp), values);
                     case "since" -> new TimeCondition(wrapParseArg("duration", () -> Instant.now().minus(Polyfill.parseDuration(values[0]))));

@@ -65,14 +65,14 @@ public class Region extends DbObject implements PropagationController, ShapeColl
             null,
             Region.class,
             Region.Builder.class));
-    public static final  Comparator<Region>                     BY_PRIORITY      = Comparator.comparingLong(Region::getPriority).reversed();
-    public static        String                                 GlobalRegionName = "#global";
+    public static final Comparator<Region> BY_PRIORITY        = Comparator.comparingLong(Region::getPriority).reversed();
+    public static       String             GLOBAL_REGION_NAME = "#global";
 
     public static Region global(String worldName) {
         return GlobalRegions.computeIfAbsent(worldName,
                 $ -> Region.builder()
                         .serverName("")
-                        .name(GlobalRegionName)
+                        .name(GLOBAL_REGION_NAME)
                         .worldName(worldName)
                         .priority(Long.MIN_VALUE)
                         .area(Area.builder()
@@ -103,7 +103,7 @@ public class Region extends DbObject implements PropagationController, ShapeColl
     }
 
     public boolean isGlobal() {
-        return GlobalRegionName.equals(name);
+        return GLOBAL_REGION_NAME.equals(name);
     }
 
     @Override

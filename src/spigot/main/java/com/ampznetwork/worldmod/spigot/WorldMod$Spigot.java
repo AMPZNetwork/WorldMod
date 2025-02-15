@@ -20,6 +20,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.generator.WorldInfo;
 import org.comroid.api.func.util.Command;
+import org.comroid.api.func.util.Streams;
 import org.comroid.api.java.ResourceLoader;
 import org.comroid.api.java.StackTraceUtils;
 import org.intellij.lang.annotations.Language;
@@ -148,7 +149,8 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
     public void reloadQueryManagers() {
         this.queryManagers = getWorlds().stream()
                 .map(WorldInfo::getName)
-                .map(mod -> new QueryManager(this, mod))
+                .map(world -> new QueryManager(this, world))
+                .collect(Streams.append(new QueryManager(this, Region.GLOBAL_REGION_NAME)))
                 .collect(Collectors.toMap(QueryManager::getWorldName, Function.identity()));
         getLogger().log(Level.INFO, "Loaded %d query managers".formatted(queryManagers.size()));
     }

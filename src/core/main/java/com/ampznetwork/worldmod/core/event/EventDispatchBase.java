@@ -8,7 +8,6 @@ import com.ampznetwork.worldmod.api.game.Flag;
 import com.ampznetwork.worldmod.api.model.WandType;
 import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.mini.EventState;
-import com.ampznetwork.worldmod.api.model.query.IQueryManager;
 import com.ampznetwork.worldmod.api.model.query.IWorldQuery;
 import com.ampznetwork.worldmod.api.model.query.QueryInputData;
 import com.ampznetwork.worldmod.api.model.query.QueryVerb;
@@ -23,7 +22,6 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
-import org.comroid.api.func.util.Debug;
 import org.comroid.api.func.util.Streams;
 import org.comroid.api.func.util.Tuple;
 import org.comroid.api.model.minecraft.model.DefaultPermissionValue;
@@ -32,7 +30,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -63,7 +60,7 @@ public abstract class EventDispatchBase {
         while (iter.hasNext()) {
             var region   = iter.next();
             var usage    = region.getEffectiveFlagValueForPlayer(flag, player);
-            var isGlobal = Region.GlobalRegionName.equals(region.getName());
+            var isGlobal = Region.GLOBAL_REGION_NAME.equals(region.getName());
             if (isGlobal && usage.getFlag().equals(Build) && usage.getState() != TriState.FALSE) continue; // exception for build flag on global region
             var state = usage.getState();
             if (state == TriState.NOT_SET) {
@@ -163,13 +160,12 @@ public abstract class EventDispatchBase {
     }
 
     public void dispatchEvent(Cancellable cancellable, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {
-        Debug.log("EventDispatchBase.dispatchEvent(cancellable = %s, source = %s, target = %s, location = %s, worldName = %s, flag = %s)".formatted(
-                cancellable,
+        log.fine("Dispatching %s: [%s] %s [%s] @ %s in %s".formatted(cancellable.getClass().getSimpleName(),
                 source,
+                flag.getCanonicalName(),
                 target,
                 location,
-                worldName,
-                flag));
+                worldName));
 
         //if (cancellable.isCancelled()) return;
         if (passthrough(location, worldName)) return;
@@ -178,9 +174,9 @@ public abstract class EventDispatchBase {
         final var queryVars = mod.flagInvokeCount(player);
         queryVars.compute(flag.getCanonicalName(), (k, v) -> (v == null ? 0L : v) + 1);
 
-        var queries = Optional.ofNullable(mod.getQueryManagers().getOrDefault(worldName, null))
-                .map(IQueryManager::getQueries)
-                .orElseGet(List::of);
+        var managers = mod.getQueryManagers();
+        var queries = Stream.concat(Stream.ofNullable(managers.getOrDefault(worldName, null)).flatMap(mgr -> mgr.getQueries().stream()),
+                managers.get(Region.GLOBAL_REGION_NAME).getQueries().stream()).toList();
         final var data = qidBuilder(player, source, target, location, worldName, flag).timestamp(Instant.now()).build();
         final EventState[] result = new EventState[]{ EventState.Unaffected };
 
@@ -215,16 +211,17 @@ public abstract class EventDispatchBase {
                         .filter(query -> query.test(mod, data))
                         .flatMap(Streams.cast(WorldQuery.class))
                         .flatMap(query -> Stream.ofNullable(query.getEvaluator()))
-                        .anyMatch(eval -> !eval.test(queryVars)))
-                    result[0] = EventState.Cancelled;
+                        .anyMatch(eval -> !eval.test(queryVars))) result[0] = EventState.Cancelled;
             }
         }
 
         if (result[0] == EventState.Cancelled && player != null) mod.getLib()
                 .getPlayerAdapter()
                 .send(player.getId(), text("You don't have permission to do that here").color(NamedTextColor.RED));
-        mod.getLib().getScheduler().execute(() -> triggerLog(source, target, location, worldName, flag, result[0]));
-        log.finer(() -> "%s by %s at %s towards %s resulted in %s".formatted(cancellable, source, location, target, result[0]));
+        mod.getLib().getScheduler().execute(() -> {
+            log.finer(() -> "%s by %s at %s towards %s resulted in %s".formatted(cancellable, source, location, target, result[0]));
+            triggerLog(source, target, location, worldName, flag, result[0]);
+        });
     }
 
     private QueryInputData.Builder qidBuilder(@Nullable Player player, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {

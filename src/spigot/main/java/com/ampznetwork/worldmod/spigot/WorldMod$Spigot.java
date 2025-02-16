@@ -29,7 +29,6 @@ import javax.persistence.Tuple;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigInteger;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -112,7 +111,7 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
         var map = Polyfill.<Stream<Tuple>>uncheckedCast(query.getResultStream())
                 .collect(Collectors.toMap(it -> it.get("action", String.class), it -> it.get("count", BigInteger.class).longValue()));
         Flag.VALUES.values().stream().map(Flag::getCanonicalName).filter(Predicate.not(map::containsKey)).forEach(key -> map.put(key, 0L));
-        return Collections.unmodifiableMap(map);
+        return map;
     }
 
     @Override

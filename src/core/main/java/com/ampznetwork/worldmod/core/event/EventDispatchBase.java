@@ -174,6 +174,7 @@ public abstract class EventDispatchBase {
             if (passthrough(location, worldName)) return;
 
             final var queryVars = mod.flagLog(player, target instanceof Key key ? key.asString() : null);
+            queryVars.compute(flag.getCanonicalName(), (k, v) -> (v == null ? 0L : v) + 1);
 
             var managers = mod.getQueryManagers();
             var queries = Stream.concat(Stream.ofNullable(managers.getOrDefault(worldName, null)).flatMap(mgr -> mgr.getQueries().stream()),

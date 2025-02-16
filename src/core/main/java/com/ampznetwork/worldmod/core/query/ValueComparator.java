@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
@@ -121,7 +122,10 @@ public enum ValueComparator implements BiPredicate<Object, Object> {
     };
 
     public static ValueComparator find(String string) {
-        return Arrays.stream(values()).filter(comp -> comp.string.equals(string)).findAny().orElseThrow();
+        return Arrays.stream(values())
+                .filter(comp -> comp.string.equals(string))
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("Cannot parse ValueComparator from string: " + string));
     }
 
     String string;

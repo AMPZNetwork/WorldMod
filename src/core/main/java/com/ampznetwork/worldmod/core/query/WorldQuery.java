@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -63,11 +64,13 @@ public class WorldQuery implements IWorldQuery {
             builder.verb(QueryVerb.valueOf(split[0].toUpperCase()));
 
             for (int i = 1; i < split.length; i++) {
-                var str    = split[i];
-                var pair   = str.split(kvPairPattern);
-                var key    = pair[0];
-                var values = pair[1].split(",");
-                var comp   = str.replaceFirst(kvPairPattern, "$&");
+                var str     = split[i];
+                var pair    = str.split(kvPairPattern);
+                var key     = pair[0];
+                var values  = pair[1].split(",");
+                var matcher = Pattern.compile("(" + kvPairPattern + ")").matcher(str);
+                if (!matcher.find()) throw new IllegalStateException("Invalid Comparator in pair: " + str);
+                var comp = matcher.group(1);
                 var add = switch (key) {
                     case "region", "group" -> new RegionNameCondition(comparator(comp), "group".equals(key), values);
                     case "from", "source", "expr", "expression" -> new SourceCondition(comparator(comp), values);

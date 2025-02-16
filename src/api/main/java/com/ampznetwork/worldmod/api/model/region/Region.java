@@ -11,6 +11,7 @@ import com.ampznetwork.worldmod.api.model.mini.PointCollider;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.mini.PropagationController;
 import com.ampznetwork.worldmod.api.model.mini.ShapeCollider;
+import com.ampznetwork.worldmod.api.model.query.IWorldQuery;
 import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.ampznetwork.worldmod.api.model.sel.Chunk;
 import lombok.AllArgsConstructor;
@@ -60,13 +61,13 @@ import static java.util.stream.Stream.*;
 @NoArgsConstructor(force = true)
 @Table(name = "worldmod_regions", uniqueConstraints = @UniqueConstraint(columnNames = { "name", "worldName" }))
 public class Region extends DbObject implements PropagationController, ShapeCollider, Prioritized, Named, PointCollider {
-    private static final Map<String, Region>                    GlobalRegions    = new ConcurrentHashMap<>();
-    public static final  EntityType<Region, Builder<Region, ?>> TYPE             = Polyfill.uncheckedCast(new EntityType<>(Region::builder,
+    private static final Map<String, Region>                    GlobalRegions      = new ConcurrentHashMap<>();
+    public static final  EntityType<Region, Builder<Region, ?>> TYPE               = Polyfill.uncheckedCast(new EntityType<>(Region::builder,
             null,
             Region.class,
             Region.Builder.class));
-    public static final Comparator<Region> BY_PRIORITY        = Comparator.comparingLong(Region::getPriority).reversed();
-    public static       String             GLOBAL_REGION_NAME = "#global";
+    public static final  Comparator<Region>                     BY_PRIORITY        = Comparator.comparingLong(Region::getPriority).reversed();
+    public static        String                                 GLOBAL_REGION_NAME = "#global";
 
     public static Region global(String worldName) {
         return GlobalRegions.computeIfAbsent(worldName,
@@ -75,22 +76,17 @@ public class Region extends DbObject implements PropagationController, ShapeColl
                         .name(GLOBAL_REGION_NAME)
                         .worldName(worldName)
                         .priority(Long.MIN_VALUE)
-                        .area(Area.builder()
-                                .x1(MIN_VALUE)
-                                .y1(MIN_VALUE)
-                                .z1(MIN_VALUE)
-                                .x2(MAX_VALUE)
-                                .y2(MAX_VALUE)
-                                .z2(MAX_VALUE)
-                                .build())
+                        .area(Area.builder().x1(MIN_VALUE).y1(MIN_VALUE).z1(MIN_VALUE).x2(MAX_VALUE).y2(MAX_VALUE).z2(MAX_VALUE).build())
                         .build());
     }
 
-    @NotNull                                                                       String    serverName;
-    @Default                                                                                 String          name       = NameGenerator.POI.get();
-    @Default                                                                                 String          worldName  = "world";
-    @Singular("owner") @ManyToMany @CollectionTable(name = "worldmod_region_owners")         Set<Player>     owners;
-    @Singular("member") @ManyToMany @CollectionTable(name = "worldmod_region_members")       Set<Player>     members;
+    @NotNull                                                                           String      serverName;
+    @Default                                                                           String      name      = NameGenerator.POI.get();
+    @Default                                                                           String      worldName = "world";
+    @Singular("owner") @ManyToMany @CollectionTable(name = "worldmod_region_owners")   Set<Player> owners;
+    @Singular("member") @ManyToMany @CollectionTable(name = "worldmod_region_members") Set<Player> members;
+    @Singular("query") @ElementCollection @CollectionTable(name = "worldmod_region_queries") @Convert(converter = IWorldQuery.Converter.class)
+    Set<IWorldQuery> queries;
     @Singular("area") @ManyToMany @CollectionTable(name = "worldmod_region_areas") Set<Area> areas;
     @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class) @Column(name = "flag")
     @CollectionTable(name = "worldmod_region_flags", joinColumns = @JoinColumn(name = "id")) Set<Flag.Usage> declaredFags;
@@ -119,15 +115,14 @@ public class Region extends DbObject implements PropagationController, ShapeColl
     @Override
     public Stream<Flag.Usage> streamDeclaredFlags() {
         var group = getGroup();
-        return (group == null
-                ? declaredFags.stream()
-                : concat(declaredFags.stream(), group.streamDeclaredFlags())).sorted(Comparator.<Flag.Usage>comparingLong(value -> -value.getFlag()
-                .getPriority()).thenComparingLong(value -> -value.getPriority()));
+        return (group == null ? declaredFags.stream() : concat(declaredFags.stream(), group.streamDeclaredFlags())).sorted(Comparator.<Flag.Usage>comparingLong(
+                value -> -value.getFlag().getPriority()).thenComparingLong(value -> -value.getPriority()));
     }
 
     public Stream<Region> findOverlaps(API api) {
         var chunks = streamChunks().collect(Collectors.toUnmodifiableSet());
-        var points = getAreas().stream().map(area -> {
+        var points = getAreas().stream()
+                .map(area -> {
                     assert area.getShape() == Shape.Cuboid;
 
                     var vecs = area.toVectors();
@@ -139,13 +134,19 @@ public class Region extends DbObject implements PropagationController, ShapeColl
                     var max = new Vector.N3(Math.max(a.getX(), b.getX()), Math.max(a.getY(), b.getY()), Math.max(a.getZ(), b.getZ()));
                     return new Tuple.N2<>(min, max);
                 })
-                .flatMap(lim -> IntStream.rangeClosed((int) lim.a.getX(), (int) lim.b.getX()).boxed().parallel().flatMap(x ->
-                        IntStream.rangeClosed((int) lim.a.getY(), (int) lim.b.getY()).boxed().parallel().flatMap(y ->
-                                IntStream.rangeClosed((int) lim.a.getZ(), (int) lim.b.getZ()).parallel().mapToObj(z -> new Vector.N3(x, y, z)))))
+                .flatMap(lim -> IntStream.rangeClosed((int) lim.a.getX(), (int) lim.b.getX())
+                        .boxed()
+                        .parallel()
+                        .flatMap(x -> IntStream.rangeClosed((int) lim.a.getY(), (int) lim.b.getY())
+                                .boxed()
+                                .parallel()
+                                .flatMap(y -> IntStream.rangeClosed((int) lim.a.getZ(), (int) lim.b.getZ()).parallel().mapToObj(z -> new Vector.N3(x, y, z)))))
                 .peek(System.out::println)
                 .collect(Collectors.toUnmodifiableSet());
-        return api.getEntityService().getAccessor(Region.TYPE)
-                .all().parallel()
+        return api.getEntityService()
+                .getAccessor(Region.TYPE)
+                .all()
+                .parallel()
                 .filter(Predicate.not(Region::isGlobal))
                 .filter(region -> region.streamChunks().anyMatch(chunks::contains))
                 .filter(region -> points.stream().anyMatch(region::isPointInside));

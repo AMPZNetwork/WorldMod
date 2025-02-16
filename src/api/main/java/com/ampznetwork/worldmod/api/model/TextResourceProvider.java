@@ -8,7 +8,6 @@ import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Value;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.Polyfill;
 import org.comroid.api.data.Vector;
@@ -24,6 +23,7 @@ import static java.util.Optional.*;
 import static net.kyori.adventure.text.Component.*;
 import static net.kyori.adventure.text.event.HoverEvent.*;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
+import static net.kyori.adventure.text.format.TextDecoration.*;
 import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.*;
 
 @Value
@@ -55,7 +55,7 @@ public class TextResourceProvider {
                 .append(text("/").color(GRAY))
                 .append(text(totalPages).color(AQUA))
                 .append(text(")").color(GRAY))
-                .decorate(TextDecoration.ITALIC)
+                .decorate(ITALIC)
                 .build();
     }
 
@@ -92,31 +92,30 @@ public class TextResourceProvider {
     }
 
     public Component getRegionHeader(Region rg) {
-        return text("=[ ", YELLOW).append(text(rg.getClaimOwner() == null ? "Region" : "Claim", YELLOW, TextDecoration.UNDERLINED))
-                .append(text(" \"", GRAY, TextDecoration.UNDERLINED))
-                .append(legacyAmpersand().deserialize(rg.getName()).decorate(TextDecoration.UNDERLINED))
-                .append(text("\"", GRAY, TextDecoration.UNDERLINED))
-                .append(text(" by ", YELLOW, TextDecoration.UNDERLINED))
+        return text("=[ ", YELLOW).append(text(rg.getClaimOwner() == null ? "Region" : "Claim", YELLOW))
+                .append(text(" \"", GRAY))
+                .append(legacyAmpersand().deserialize(rg.getName()))
+                .append(text("\"", GRAY))
+                .append(text(" by ", YELLOW))
                 .append(text(rg.getClaimOwner() == null ? "Server" : rg.getClaimOwner().getName(),
-                        rg.getClaimOwner() == null ? GREEN : BLUE,
-                        TextDecoration.UNDERLINED))
-                .append(text(" ]=", YELLOW, TextDecoration.UNDERLINED));
+                        rg.getClaimOwner() == null ? GREEN : BLUE))
+                .append(text(" ]=", YELLOW));
     }
 
     public Component getRegionDetails(Region rg) {
-        return text(rg.getOwners().size(), AQUA).append(text(" Admins", RED, TextDecoration.UNDERLINED).hoverEvent(showText(text("Open Admin menu...")))
+        return text(rg.getOwners().size(), AQUA).append(text(" Admins", RED, BOLD).hoverEvent(showText(text("Open Admin menu...")))
                         .clickEvent(ClickEvent.runCommand("/chatmod:region menu admins")))
                 .append(text(", ", GRAY))
                 .append(text(rg.getMembers().size(), AQUA))
-                .append(text(" Members", GREEN, TextDecoration.UNDERLINED).hoverEvent(showText(text("Open Member menu...")))
+                .append(text(" Members", GREEN, BOLD).hoverEvent(showText(text("Open Member menu...")))
                         .clickEvent(ClickEvent.runCommand("/chatmod:region menu members")))
                 .append(text(", ", GRAY))
                 .append(text(Flag.VALUES.values().stream().filter(flag -> rg.getFlagState(flag) != TriState.NOT_SET).count(), AQUA))
-                .append(text(" Flags", YELLOW, TextDecoration.UNDERLINED).hoverEvent(showText(text("Open Flags menu...")))
+                .append(text(" Flags", YELLOW, BOLD).hoverEvent(showText(text("Open Flags menu...")))
                         .clickEvent(ClickEvent.runCommand("/chatmod:region menu flags")))
                 .append(text(", ", GRAY))
                 .append(text(rg.getQueries().size(), AQUA))
-                .append(text(" Queries", LIGHT_PURPLE, TextDecoration.UNDERLINED).hoverEvent(showText(text("Open Query menu...")))
+                .append(text(" Queries", LIGHT_PURPLE, BOLD).hoverEvent(showText(text("Open Query menu...")))
                         .clickEvent(ClickEvent.runCommand("/chatmod:region menu queries")));
     }
 

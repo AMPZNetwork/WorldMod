@@ -1,3 +1,6 @@
+# whether to deny everything if an error occurs within event handling
+safe-mode: true
+
 # configure wand items
 wand:
   selection: minecraft:stick

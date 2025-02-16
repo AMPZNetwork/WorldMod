@@ -110,8 +110,14 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
                 .map(Flag::getCanonicalName)
                 .collect(Collectors.toUnmodifiableMap(Function.identity(),
                         canonical -> getEntityService().getAccessor(LogEntry.TYPE)
-                                .querySelect(fq, player == null ? Map.of("canonical", canonical) : Map.of("canonical", canonical, "player_id", player.getId()))
+                                .querySelect(fq, player == null ? Map.of("canonical", canonical) : Map.of("canonical", canonical, "player_id",
+                                        player.getId().toString()))
                                 .count()));
+    }
+
+    @Override
+    public boolean isSafeMode() {
+        return getConfig().getBoolean("safe-mode", true);
     }
 
     @Override

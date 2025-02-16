@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import static com.ampznetwork.worldmod.api.game.Flag.*;
@@ -49,11 +50,11 @@ public abstract class EventDispatchBase {
     Map<Player, Tuple.N2<Vector.N3, @NotNull Integer>> lookupRepeatCounter = new ConcurrentHashMap<>();
     WorldMod                                           mod;
 
-    public EventState dependsOnFlag(Cancellable cancellable, Player player, Vector.N3 location, String worldName, Flag flagChain) {
-        return dependsOnFlag(cancellable, player, location, worldName, OP.LogicalOr, OP.LogicalOr, flagChain);
+    public EventState dependsOnFlag(Player player, Vector.N3 location, String worldName, Flag flagChain) {
+        return dependsOnFlag(player, location, worldName, OP.LogicalOr, OP.LogicalOr, flagChain);
     }
 
-    public EventState dependsOnFlag(Cancellable adp, Object source, Vector.N3 location, String worldName, OP chainOp_cancel, OP chainOp_force, Flag flag) {
+    public EventState dependsOnFlag(Object source, Vector.N3 location, String worldName, OP chainOp_cancel, OP chainOp_force, Flag flag) {
         var     player = source instanceof Player p0 ? p0 : null;
         var     iter   = mod.findRegions(location, worldName).iterator();
         boolean cancel = false, force = false;
@@ -75,13 +76,9 @@ public abstract class EventDispatchBase {
             if (state == TriState.FALSE) cancel = chainOp_cancel.test(cancel, true);
             else if (state == TriState.TRUE && usage.isForce()) force = chainOp_force.test(force, true);
         }
-        if (force) {
-            adp.force();
-            return EventState.Forced;
-        } else if (cancel) {
-            adp.cancel();
-            return EventState.Cancelled;
-        } else return EventState.Unaffected;
+        if (force) return EventState.Forced;
+        else if (cancel) return EventState.Cancelled;
+        return EventState.Unaffected;
     }
 
     public boolean passthrough(Vector.N3 location, String worldName) {
@@ -166,62 +163,71 @@ public abstract class EventDispatchBase {
                 target,
                 location,
                 worldName));
-
-        //if (cancellable.isCancelled()) return;
-        if (passthrough(location, worldName)) return;
-
-        var       player    = source instanceof Player p0 ? p0 : null;
-        final var queryVars = mod.flagInvokeCount(player);
-        queryVars.compute(flag.getCanonicalName(), (k, v) -> (v == null ? 0L : v) + 1);
-
-        var managers = mod.getQueryManagers();
-        var queries = Stream.concat(Stream.ofNullable(managers.getOrDefault(worldName, null)).flatMap(mgr -> mgr.getQueries().stream()),
-                managers.get(Region.GLOBAL_REGION_NAME).getQueries().stream()).toList();
-        final var data = qidBuilder(player, source, target, location, worldName, flag).timestamp(Instant.now()).build();
         final EventState[] result = new EventState[]{ EventState.Unaffected };
+        var                player = source instanceof Player p0 ? p0 : null;
 
-        end:
-        {
-            // check for passthrough queries
-            if (queries.stream().filter(proxy(IWorldQuery::getVerb, QueryVerb.PASSTHROUGH::equals)).anyMatch(query -> query.test(mod, data)))
-                // do not handle event as it is set to pass through
-                break end;
+        try {
+            //if (cancellable.isCancelled()) return;
+            if (passthrough(location, worldName)) return;
 
-            // run flag checks
-            result[0] = dependsOnFlag(cancellable, player, location, worldName, flag);
+            final var queryVars = mod.flagInvokeCount(player);
 
-            // check for force queries
-            if (queries.stream().filter(proxy(IWorldQuery::getVerb, QueryVerb.FORCE::equals)).anyMatch(query -> query.test(mod, data))) {
-                result[0] = EventState.Forced;
-                break end;
+            var managers = mod.getQueryManagers();
+            var queries = Stream.concat(Stream.ofNullable(managers.getOrDefault(worldName, null)).flatMap(mgr -> mgr.getQueries().stream()),
+                    managers.get(Region.GLOBAL_REGION_NAME).getQueries().stream()).toList();
+            final var data = qidBuilder(player, source, target, location, worldName, flag).timestamp(Instant.now()).build();
+
+            end:
+            {
+                // check for passthrough queries
+                if (queries.stream().filter(proxy(IWorldQuery::getVerb, QueryVerb.PASSTHROUGH::equals)).anyMatch(query -> query.test(mod, data)))
+                    // do not handle event as it is set to pass through
+                    break end;
+
+                // run flag checks
+                result[0] = dependsOnFlag(player, location, worldName, flag);
+
+                // check for force queries
+                if (queries.stream().filter(proxy(IWorldQuery::getVerb, QueryVerb.FORCE::equals)).anyMatch(query -> query.test(mod, data))) {
+                    result[0] = EventState.Forced;
+                    break end;
+                }
+
+                // evaluate allow/deny and conditional queries when unaffected
+                if (result[0] == EventState.Unaffected) {
+                    queries.stream()
+                            .filter(proxy(IWorldQuery::getVerb, Set.of(QueryVerb.ALLOW, QueryVerb.DENY)::contains))
+                            .filter(query -> query.test(mod, data))
+                            .forEach(query -> {
+                                if (query.getMessageKey() != null && player != null) query.getMessage(mod)
+                                        .ifPresent(msg -> mod.getPlayerAdapter().send(player.getId(), msg));
+                                result[0] = query.getVerb().apply(result[0]);
+                            });
+                    if (queries.stream()
+                            .filter(proxy(IWorldQuery::getVerb, QueryVerb.CONDITIONAL::equals))
+                            .filter(query -> query.test(mod, data))
+                            .flatMap(Streams.cast(WorldQuery.class))
+                            .flatMap(query -> Stream.ofNullable(query.getEvaluator()))
+                            .anyMatch(eval -> !eval.test(queryVars))) result[0] = EventState.Cancelled;
+                }
             }
+        } catch (Throwable t) {
+            if (result[0] == EventState.Unaffected && mod.isSafeMode() && (player == null || !mod.getPlayerAdapter()
+                    .checkOpLevel(player.getId(), 1))) result[0] = EventState.Cancelled;
 
-            // evaluate allow/deny and conditional queries when unaffected
-            if (result[0] == EventState.Unaffected) {
-                queries.stream()
-                        .filter(proxy(IWorldQuery::getVerb, Set.of(QueryVerb.ALLOW, QueryVerb.DENY)::contains))
-                        .filter(query -> query.test(mod, data))
-                        .forEach(query -> {
-                            if (query.getMessageKey() != null && player != null) query.getMessage(mod)
-                                    .ifPresent(msg -> mod.getPlayerAdapter().send(player.getId(), msg));
-                            result[0] = query.getVerb().apply(result[0]);
-                        });
-                if (queries.stream()
-                        .filter(proxy(IWorldQuery::getVerb, QueryVerb.CONDITIONAL::equals))
-                        .filter(query -> query.test(mod, data))
-                        .flatMap(Streams.cast(WorldQuery.class))
-                        .flatMap(query -> Stream.ofNullable(query.getEvaluator()))
-                        .anyMatch(eval -> !eval.test(queryVars))) result[0] = EventState.Cancelled;
-            }
-        }
+            log.log(Level.SEVERE, "Could not handle " + cancellable + "; falling back to " + result[0].name(), t);
+        } finally {
+            if (result[0] == EventState.Cancelled && player != null) mod.getLib()
+                    .getPlayerAdapter()
+                    .send(player.getId(), text("You don't have permission to do that here").color(NamedTextColor.RED));
 
-        if (result[0] == EventState.Cancelled && player != null) mod.getLib()
-                .getPlayerAdapter()
-                .send(player.getId(), text("You don't have permission to do that here").color(NamedTextColor.RED));
-        mod.getLib().getScheduler().execute(() -> {
+            // apply state
+            if (result[0] == EventState.Cancelled && !cancellable.isCancelled()) cancellable.cancel();
+            else if (result[0] == EventState.Forced && !cancellable.isForced()) cancellable.force();
+
             log.finer(() -> "%s by %s at %s towards %s resulted in %s".formatted(cancellable, source, location, target, result[0]));
             triggerLog(source, target, location, worldName, flag, result[0]);
-        });
+        }
     }
 
     private QueryInputData.Builder qidBuilder(@Nullable Player player, Object source, Object target, Vector.N3 location, String worldName, Flag flag) {

@@ -170,7 +170,7 @@ public abstract class EventDispatchBase {
             //if (cancellable.isCancelled()) return;
             if (passthrough(location, worldName)) return;
 
-            final var queryVars = mod.flagLog(player);
+            final var queryVars = mod.flagLog(player, target instanceof Key key ? key.asString() : null);
 
             var managers = mod.getQueryManagers();
             var queries = Stream.concat(Stream.ofNullable(managers.getOrDefault(worldName, null)).flatMap(mgr -> mgr.getQueries().stream()),
@@ -261,15 +261,8 @@ public abstract class EventDispatchBase {
                 .y((int) location.getY())
                 .z((int) location.getZ())
                 .result(result);
-        Map<String, Long> flagLog;
-        if (source instanceof Player player) {
-            builder.player(player);
-            flagLog = mod.flagLog(player);
-        } else {
-            builder.nonPlayerSource(source == null ? null : String.valueOf(source));
-            flagLog = mod.flagLog(null);
-        }
-        flagLog.compute(canonicalName, (k, v) -> (v == null ? 0L : v) + 1);
+        if (source instanceof Player player) builder.player(player);
+        else builder.nonPlayerSource(source == null ? null : String.valueOf(source));
         if (target instanceof Player playerTarget) builder.target(playerTarget);
         else builder.nonPlayerTarget(target == null ? null : String.valueOf(target));
         mod.getEntityService().save(builder.build());

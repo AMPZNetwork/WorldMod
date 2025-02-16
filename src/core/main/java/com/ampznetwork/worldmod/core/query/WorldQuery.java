@@ -19,8 +19,6 @@ import com.ampznetwork.worldmod.core.query.condition.impl.TargetCondition;
 import com.ampznetwork.worldmod.core.query.condition.impl.TimeCondition;
 import com.ampznetwork.worldmod.core.query.condition.impl.WorldCondition;
 import com.ampznetwork.worldmod.core.query.eval.ConditionalQueryEvaluator;
-import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.Singular;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +51,6 @@ import java.util.stream.Stream;
 
 @Value
 @Slf4j
-@Builder
 public class WorldQuery implements IWorldQuery {
     private static final String kvPairPattern = "[~!]=|[<>]?=|[<>]";
 
@@ -123,10 +120,18 @@ public class WorldQuery implements IWorldQuery {
         }
     }
 
-    @NotNull           QueryVerb                 verb;
-    @Nullable @Default String                    messageKey = null;
-    @Nullable @Default ConditionalQueryEvaluator evaluator  = null;
-    @Singular          List<QueryCondition>      conditions;
+    @NotNull  QueryVerb                 verb;
+    @Nullable String                    messageKey;
+    @Nullable ConditionalQueryEvaluator evaluator;
+    List<QueryCondition> conditions;
+
+    @lombok.Builder
+    private WorldQuery(@NotNull QueryVerb verb, @Nullable String messageKey, @Singular List<QueryCondition> conditions) {
+        this.verb       = verb;
+        this.messageKey = messageKey;
+        this.conditions = conditions;
+        this.evaluator  = verb == QueryVerb.CONDITIONAL ? new ConditionalQueryEvaluator(this) : null;
+    }
 
     @Override
     public Optional<TextComponent> getMessage(WorldMod mod) {
@@ -177,9 +182,7 @@ public class WorldQuery implements IWorldQuery {
     public String toString() {
         return verb.name().toLowerCase() + ' ' + (evaluator == null ? "" : evaluator.toString() + ' ') + conditions.stream()
                 .map(Object::toString)
-                .collect(Collectors.joining(" ")) + (messageKey == null
-                                                     ? ""
-                                                     : " message=" + messageKey);
+                .collect(Collectors.joining(" ")) + (messageKey == null ? "" : " message=" + messageKey);
     }
 
     @Override

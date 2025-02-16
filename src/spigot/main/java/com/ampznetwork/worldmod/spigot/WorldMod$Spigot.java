@@ -19,21 +19,23 @@ import lombok.SneakyThrows;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.generator.WorldInfo;
+import org.comroid.api.Polyfill;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
 import org.comroid.api.java.ResourceLoader;
-import org.intellij.lang.annotations.Language;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.persistence.Tuple;
 import java.io.File;
 import java.io.FileInputStream;
+import java.math.BigInteger;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,8 +44,6 @@ import static org.bukkit.Bukkit.*;
 
 @Getter
 public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
-    private static final Map<UUID, Map<String, @NotNull Long>> flagLog = new ConcurrentHashMap<>();
-
     private final SpigotEventDispatch        eventDispatch = new SpigotEventDispatch(this);
     private       FileConfiguration          config;
     private       Map<String, IQueryManager> queryManagers;
@@ -100,21 +100,25 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
     }
 
     @Override
-    public Map<String, Long> flagLog(@Nullable Player player) {
-        return flagLog.computeIfAbsent(player == null ? new UUID(0, 0) : player.getId(), $ -> {
-            @Language("SQL") String fq, q = "select e.* from dev.worldmod_world_log e where e.action = :canonical";
-            if (player != null) q += " and e.player_id = :player_id";
-            fq = q;
-            return Flag.VALUES.values()
-                    .stream()
-                    .parallel()
-                    .map(Flag::getCanonicalName)
-                    .collect(Collectors.toConcurrentMap(Function.identity(),
-                            canonical -> getEntityService().getAccessor(LogEntry.TYPE)
-                                    .querySelect(fq, player == null ? Map.of("canonical", canonical) : Map.of("canonical", canonical, "player_id",
-                                            player.getId().toString()))
-                                    .count(), Long::sum, ConcurrentHashMap::new));
+    public Map<String, Long> flagLog(@Nullable Player player, @Nullable String target) {
+        var query = getEntityService().createQuery(mgr -> {
+            var q = "select action, COUNT(*) as count from worldmod_world_log e where (result = 0 or result = 2)";
+            if (player != null) q += " and player_id = :playerId";
+            if (target != null) q += " and nonPlayerTarget = :target";
+            return mgr.createNativeQuery(q + " group by action;", Tuple.class);
         });
+        if (player != null) query.setParameter("playerId", player.getId().toString());
+        if (target != null) query.setParameter("target", target);
+        var map = Polyfill.<Stream<Tuple>>uncheckedCast(query.getResultStream())
+                .collect(Collectors.toMap(it -> it.get("action", String.class), it -> it.get("count", BigInteger.class).longValue()));
+        Flag.VALUES.values().stream().map(Flag::getCanonicalName).filter(Predicate.not(map::containsKey)).forEach(key -> map.put(key, 0L));
+        if (player != null && target != null) System.out.printf("%s place,break,interact %s -> %d / %d / %d%n",
+                player.getName(),
+                target,
+                map.get("build.place"),
+                map.get("build.break"),
+                map.get("interact"));
+        return Collections.unmodifiableMap(map);
     }
 
     @Override

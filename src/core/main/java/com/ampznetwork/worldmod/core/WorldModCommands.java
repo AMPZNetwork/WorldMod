@@ -274,7 +274,7 @@ public class WorldModCommands {
                                                 .hoverEvent(HoverEvent.showText(text("Remove Query")))
                                                 .clickEvent(ClickEvent.suggestCommand(("/worldmod:query remove %d").formatted(i[0]))))
                                         .append(text("] "))
-                                        .append(text(shortened, GRAY));
+                                        .append(text(shortened, GRAY).hoverEvent(HoverEvent.showText(text(content))));
                             })
                             .collect(Streams.atLeastOneOrElseGet(() -> mod.text().getEmptyListEntry()))
                             .collect(Util.Kyori.collector(dash)));

@@ -2,6 +2,7 @@ package com.ampznetwork.worldmod.core.query.eval;
 
 import com.ampznetwork.worldmod.core.query.ValueComparator;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
+import com.ampznetwork.worldmod.core.query.condition.AbstractComparatorCondition;
 import com.ampznetwork.worldmod.core.query.condition.impl.SourceCondition;
 import com.ampznetwork.worldmod.core.query.condition.impl.TargetCondition;
 import com.ampznetwork.worldmod.core.query.eval.decl.Expression;
@@ -31,9 +32,9 @@ public class ConditionalQueryEvaluator implements VarSupplier, Predicate<Map<Str
                 .findAny()
                 .map(Expression::parse)
                 .orElseThrow();
-        var target = query.getConditions().stream().flatMap(Streams.cast(TargetCondition.class)).flatMap(tgt -> Arrays.stream(tgt.getTargets())).findAny();
-        this.value      = target.map(Expression::parse).orElseThrow();
-        this.comparator = target.map(ValueComparator::find).orElseThrow();
+        var target = query.getConditions().stream().flatMap(Streams.cast(TargetCondition.class)).findAny();
+        this.value      = target.stream().flatMap(tgt -> Arrays.stream(tgt.getTargets())).findAny().map(Expression::parse).orElseThrow();
+        this.comparator = target.map(AbstractComparatorCondition::getComparator).orElseThrow();
     }
 
     @Override

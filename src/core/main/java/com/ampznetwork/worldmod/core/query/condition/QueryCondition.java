@@ -11,6 +11,10 @@ import java.util.UUID;
 public interface QueryCondition {
     boolean SKIP = true;
 
+    default @Nullable ValueComparator getComparator() {
+        return null;
+    }
+
     /**
      * @param mod      WorldMod instance
      * @param query    The whole query being executed
@@ -20,9 +24,4 @@ public interface QueryCondition {
      * @return whether the data passes the condition
      */
     boolean test(WorldMod mod, WorldQuery query, QueryInputData data, @Nullable UUID executor);
-
-    @Nullable
-    default ValueComparator comparator() {
-        return null;
-    }
 }

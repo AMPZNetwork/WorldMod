@@ -239,7 +239,7 @@ public abstract class EventDispatchBase {
                 .action(flag)
                 .position(location)
                 .nonPlayerSource(String.valueOf(source))
-                .targetResourceKey(Key.key(String.valueOf(target)));
+                .targetResourceKey(Key.key(String.valueOf(target).toLowerCase().replaceAll("[-.]", "_")));
     }
 
     private void triggerLog(Object source, Object target, Vector.N3 location, String worldName, Flag flag, EventState result) {

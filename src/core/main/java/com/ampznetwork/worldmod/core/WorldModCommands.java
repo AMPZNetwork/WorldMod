@@ -35,7 +35,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collector;
@@ -129,7 +128,7 @@ public class WorldModCommands {
     @Alias("region")
     public static class claim {
         @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
-        public static String $(WorldMod worldMod, UUID playerId, @Nullable @Command.Arg String name) {
+        public static String $(WorldMod worldMod, UUID playerId, @Nullable @Command.Arg(required = false) String name) {
             var player = worldMod.getLib().getPlayerAdapter().getPlayer(playerId).orElseThrow();
             if (!selections.containsKey(playerId)) throw new Command.Error("No area selected!");
             var sel = sel(playerId).build();
@@ -142,13 +141,8 @@ public class WorldModCommands {
         }
 
         @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
-        public static String info(@Nullable Region region) {
-            isClaimed(region);
-            return Optional.ofNullable(region)
-                    .map(rg -> rg.getClaimOwner() != null
-                               ? "Claimed by " + rg.getClaimOwner().getName()
-                               : "This area belongs to " + rg.getOwners().stream().map(Player::getName).collect(joining(", ")))
-                    .orElse("This area is not claimed");
+        public static Component info(WorldMod mod, @Nullable Region region) {
+            return mod.text().ofRegion(region);
         }
 
         @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)

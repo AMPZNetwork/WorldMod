@@ -8,6 +8,7 @@ import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Value;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.Polyfill;
 import org.comroid.api.data.Vector;
@@ -28,11 +29,10 @@ import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializ
 
 @Value
 public class TextResourceProvider {
-    WorldMod mod;
-
-    Component EmptyListEntry = text().append(text(" - ").color(WHITE)).append(text("(no entries)").color(GRAY)).build();
-
-    Component NoClaimMessage = text("This area is wilderness", GREEN);
+    WorldMod  mod;
+    Component EmptyListEntry      = text().append(text(" - ").color(WHITE)).append(text("(no entries)").color(GRAY)).build();
+    Component NoClaimMessage      = text("This area is wilderness", GREEN);
+    Component NoPermissionMessage = text("You don't have permission to do that here", NamedTextColor.RED);
 
     public Component getLookupHeader(Vector.N3 location) {
         return text().append(text("Recorded events at position ").color(BLUE))
@@ -97,8 +97,7 @@ public class TextResourceProvider {
                 .append(legacyAmpersand().deserialize(rg.getName()))
                 .append(text("\"", GRAY))
                 .append(text(" by ", YELLOW))
-                .append(text(rg.getClaimOwner() == null ? "Server" : rg.getClaimOwner().getName(),
-                        rg.getClaimOwner() == null ? GREEN : BLUE))
+                .append(text(rg.getClaimOwner() == null ? "Server" : rg.getClaimOwner().getName(), rg.getClaimOwner() == null ? GREEN : BLUE))
                 .append(text(" ]=", YELLOW));
     }
 

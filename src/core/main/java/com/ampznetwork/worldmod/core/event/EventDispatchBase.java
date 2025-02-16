@@ -19,7 +19,9 @@ import lombok.Value;
 import lombok.experimental.NonFinal;
 import lombok.extern.java.Log;
 import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Streams;
@@ -163,8 +165,9 @@ public abstract class EventDispatchBase {
                 target,
                 location,
                 worldName));
-        final EventState[] result = new EventState[]{ EventState.Unaffected };
-        var                player = source instanceof Player p0 ? p0 : null;
+        final EventState[] result     = new EventState[]{ EventState.Unaffected };
+        final String[]     messageKey = new String[1];
+        var                player     = source instanceof Player p0 ? p0 : null;
 
         try {
             //if (cancellable.isCancelled()) return;
@@ -199,16 +202,18 @@ public abstract class EventDispatchBase {
                             .filter(proxy(IWorldQuery::getVerb, Set.of(QueryVerb.ALLOW, QueryVerb.DENY)::contains))
                             .filter(query -> query.test(mod, data))
                             .forEach(query -> {
-                                if (query.getMessageKey() != null && player != null) query.getMessage(mod)
-                                        .ifPresent(msg -> mod.getPlayerAdapter().send(player.getId(), msg));
-                                result[0] = query.getVerb().apply(result[0]);
+                                messageKey[0] = query.getMessageKey();
+                                result[0]     = query.getVerb().apply(result[0]);
                             });
-                    if (queries.stream()
+                    queries.stream()
                             .filter(proxy(IWorldQuery::getVerb, QueryVerb.CONDITIONAL::equals))
                             .filter(query -> query.test(mod, data))
                             .flatMap(Streams.cast(WorldQuery.class))
-                            .flatMap(query -> Stream.ofNullable(query.getEvaluator()))
-                            .anyMatch(eval -> !eval.test(queryVars))) result[0] = EventState.Cancelled;
+                            .filter(query -> Optional.ofNullable(query.getEvaluator()).filter(eval -> eval.test(queryVars)).isEmpty())
+                            .forEach(query -> {
+                                messageKey[0] = query.getMessageKey();
+                                result[0]     = EventState.Cancelled;
+                            });
                 }
             }
         } catch (Throwable t) {
@@ -219,7 +224,12 @@ public abstract class EventDispatchBase {
         } finally {
             if (result[0] == EventState.Cancelled && player != null) mod.getLib()
                     .getPlayerAdapter()
-                    .send(player.getId(), text("You don't have permission to do that here").color(NamedTextColor.RED));
+                    .send(player.getId(),
+                            Optional.ofNullable(messageKey[0])
+                                    .map(mod.getMessages()::getProperty)
+                                    .<Component>map(LegacyComponentSerializer.legacyAmpersand()::deserialize)
+                                    .orElseGet(mod.text()::getNoPermissionMessage)
+                                    .color(NamedTextColor.RED));
 
             // apply state
             if (result[0] == EventState.Cancelled && !cancellable.isCancelled()) cancellable.cancel();

@@ -22,8 +22,6 @@ import com.ampznetwork.worldmod.core.query.eval.ConditionalQueryEvaluator;
 import lombok.Singular;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.comroid.annotations.Instance;
 import org.comroid.api.Polyfill;
 import org.comroid.api.data.Vector;
@@ -131,11 +129,6 @@ public class WorldQuery implements IWorldQuery {
         this.messageKey = messageKey;
         this.conditions = conditions;
         this.evaluator  = verb == QueryVerb.CONDITIONAL ? new ConditionalQueryEvaluator(this) : null;
-    }
-
-    @Override
-    public Optional<TextComponent> getMessage(WorldMod mod) {
-        return Optional.ofNullable(messageKey).map(mod.getMessages()::getProperty).map(LegacyComponentSerializer.legacyAmpersand()::deserialize);
     }
 
     @Override

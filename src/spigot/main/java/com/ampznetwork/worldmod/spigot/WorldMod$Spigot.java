@@ -112,12 +112,6 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
         var map = Polyfill.<Stream<Tuple>>uncheckedCast(query.getResultStream())
                 .collect(Collectors.toMap(it -> it.get("action", String.class), it -> it.get("count", BigInteger.class).longValue()));
         Flag.VALUES.values().stream().map(Flag::getCanonicalName).filter(Predicate.not(map::containsKey)).forEach(key -> map.put(key, 0L));
-        if (player != null && target != null) System.out.printf("%s place,break,interact %s -> %d / %d / %d%n",
-                player.getName(),
-                target,
-                map.get("build.place"),
-                map.get("build.break"),
-                map.get("interact"));
         return Collections.unmodifiableMap(map);
     }
 

@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -79,7 +80,8 @@ public class WorldQuery implements IWorldQuery {
                     case "world" -> new WorldCondition(comparator(comp), values);
                     case "since" -> new TimeCondition(wrapParseArg("duration", () -> Instant.now().minus(Polyfill.parseDuration(values[0]))));
                     case "type" -> new BlockTypeCondition(comparator(comp), values);
-                    case "flag" -> new FlagCondition(wrapParseArg("flag", () -> Arrays.stream(values).map(Flag::getForName).toArray(Flag[]::new)));
+                    case "flag" -> new FlagCondition(wrapParseArg("flag",
+                            () -> Arrays.stream(values).map(Flag::getForName).filter(Objects::nonNull).toArray(Flag[]::new)));
                     case "tag" -> new TagCondition(comparator(comp), values);
                     case "x", "y", "z" -> wrapParseArg("coordinate", () -> {
                         var value = values[0];

@@ -22,8 +22,8 @@ import org.bukkit.generator.WorldInfo;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
 import org.comroid.api.java.ResourceLoader;
-import org.comroid.api.java.StackTraceUtils;
 import org.intellij.lang.annotations.Language;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -31,6 +31,7 @@ import java.io.FileInputStream;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -41,9 +42,7 @@ import static org.bukkit.Bukkit.*;
 
 @Getter
 public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
-    static {
-        StackTraceUtils.EXTRA_FILTER_NAMES.add("com.ampznetwork");
-    }
+    private static final Map<UUID, Map<String, @NotNull Long>> flagLog = new ConcurrentHashMap<>();
 
     private final SpigotEventDispatch        eventDispatch = new SpigotEventDispatch(this);
     private       FileConfiguration          config;
@@ -101,18 +100,21 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
     }
 
     @Override
-    public Map<String, Long> flagInvokeCount(@Nullable Player player) {
-        @Language("SQL") String fq, q = "select e.* from dev.worldmod_world_log e where e.action = :canonical";
-        if (player != null) q += " and e.player_id = :player_id";
-        fq = q;
-        return Flag.VALUES.values()
-                .stream()
-                .map(Flag::getCanonicalName)
-                .collect(Collectors.toUnmodifiableMap(Function.identity(),
-                        canonical -> getEntityService().getAccessor(LogEntry.TYPE)
-                                .querySelect(fq, player == null ? Map.of("canonical", canonical) : Map.of("canonical", canonical, "player_id",
-                                        player.getId().toString()))
-                                .count()));
+    public Map<String, Long> flagLog(@Nullable Player player) {
+        return flagLog.computeIfAbsent(player == null ? new UUID(0, 0) : player.getId(), $ -> {
+            @Language("SQL") String fq, q = "select e.* from dev.worldmod_world_log e where e.action = :canonical";
+            if (player != null) q += " and e.player_id = :player_id";
+            fq = q;
+            return Flag.VALUES.values()
+                    .stream()
+                    .parallel()
+                    .map(Flag::getCanonicalName)
+                    .collect(Collectors.toConcurrentMap(Function.identity(),
+                            canonical -> getEntityService().getAccessor(LogEntry.TYPE)
+                                    .querySelect(fq, player == null ? Map.of("canonical", canonical) : Map.of("canonical", canonical, "player_id",
+                                            player.getId().toString()))
+                                    .count(), Long::sum, ConcurrentHashMap::new));
+        });
     }
 
     @Override

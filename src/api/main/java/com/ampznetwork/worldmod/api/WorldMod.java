@@ -108,7 +108,7 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
 
     Stream<String> flagNames();
 
-    Map<String, Long> flagInvokeCount(@Nullable Player player);
+    Map<String, Long> flagLog(@Nullable Player player);
 
     boolean isSafeMode();
 }

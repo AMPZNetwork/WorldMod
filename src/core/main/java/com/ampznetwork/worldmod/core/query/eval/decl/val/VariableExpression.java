@@ -19,4 +19,9 @@ public class VariableExpression implements ValueExpression {
     public @NotNull Object eval(Map<String, @NotNull Long> vars) {
         return vars.get(key);
     }
+
+    @Override
+    public String toString() {
+        return key;
+    }
 }

@@ -15,4 +15,9 @@ public class NumberExpression<T extends Number> implements ValueExpression {
     public @NotNull Object eval(Map<String, @NotNull Long> vars) {
         return value;
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(value);
+    }
 }

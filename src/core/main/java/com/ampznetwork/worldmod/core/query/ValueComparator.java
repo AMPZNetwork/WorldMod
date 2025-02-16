@@ -129,6 +129,11 @@ public enum ValueComparator implements BiPredicate<Object, Object> {
     @Override
     public abstract boolean test(Object base, Object key);
 
+    @Override
+    public String toString() {
+        return string;
+    }
+
     protected abstract boolean test(long l, long r);
 
     protected abstract boolean test(double l, double r);

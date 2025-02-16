@@ -26,4 +26,9 @@ public class OperatorExpression implements Expression {
             return op.apply(ln, rn);
         return String.valueOf(l) + r;
     }
+
+    @Override
+    public String toString() {
+        return left.toString() + op.symbol + right;
+    }
 }

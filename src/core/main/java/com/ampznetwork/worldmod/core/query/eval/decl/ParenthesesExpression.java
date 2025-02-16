@@ -6,4 +6,9 @@ import lombok.experimental.Delegate;
 @Value
 public class ParenthesesExpression implements Expression {
     @Delegate Expression inner;
+
+    @Override
+    public String toString() {
+        return "(" + inner + ')';
+    }
 }

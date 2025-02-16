@@ -47,4 +47,9 @@ public class ConditionalQueryEvaluator implements VarSupplier, Predicate<Map<Str
         var expect = value.eval(vars);
         return comparator.test(result, expect);
     }
+
+    @Override
+    public String toString() {
+        return "expr=" + expr + " value" + comparator + value;
+    }
 }

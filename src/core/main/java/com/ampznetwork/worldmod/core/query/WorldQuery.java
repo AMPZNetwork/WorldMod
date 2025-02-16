@@ -170,9 +170,11 @@ public class WorldQuery implements IWorldQuery {
 
     @Override
     public String toString() {
-        return verb.name().toLowerCase() + ' ' + conditions.stream().map(Object::toString).collect(Collectors.joining(" ")) + (messageKey == null
-                                                                                                                               ? ""
-                                                                                                                               : " message=" + messageKey);
+        return verb.name().toLowerCase() + ' ' + (evaluator == null ? "" : evaluator.toString() + ' ') + conditions.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(" ")) + (messageKey == null
+                                                     ? ""
+                                                     : " message=" + messageKey);
     }
 
     @Override

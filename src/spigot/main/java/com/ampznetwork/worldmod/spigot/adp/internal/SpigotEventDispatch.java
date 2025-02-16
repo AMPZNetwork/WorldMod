@@ -156,12 +156,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(BlockDispenseEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event,
-                block.getType().getKey(),
-                event.getItem().getType().getKey(),
-                location,
-                block.getWorld().getName(),
-                Dispense);
+        dispatchEvent(event, block.getType().getKey(), event.getItem().getType().getKey(), location, block.getWorld().getName(), Dispense);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -181,7 +176,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
         for (var item : event.getItems())
-            dispatchEvent(event, event.getPlayer(), item.getItemStack().getType().getKey(), location, block.getWorld().getName(), Drop);
+            dispatchEvent(event, null, item.getItemStack().getType().getKey(), location, block.getWorld().getName(), Drop);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -195,12 +190,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(BlockFadeEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event,
-                block.getType().getKey(),
-                event.getNewState().getType().getKey(),
-                location,
-                block.getWorld().getName(),
-                Fade);
+        dispatchEvent(event, block.getType().getKey(), event.getNewState().getType().getKey(), location, block.getWorld().getName(), Fade);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -219,24 +209,14 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(BlockFormEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event,
-                block.getType().getKey(),
-                event.getNewState().getType().getKey(),
-                location,
-                block.getWorld().getName(),
-                Form);
+        dispatchEvent(event, block.getType().getKey(), event.getNewState().getType().getKey(), location, block.getWorld().getName(), Form);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockGrowEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event,
-                block.getType().getKey(),
-                event.getNewState().getType().getKey(),
-                location,
-                block.getWorld().getName(),
-                Grow);
+        dispatchEvent(event, block.getType().getKey(), event.getNewState().getType().getKey(), location, block.getWorld().getName(), Grow);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -259,24 +239,14 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     public void dispatch(BlockShearEntityEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event,
-                event.getTool().getType().getKey(),
-                event.getEntity().getType().getKey(),
-                location,
-                block.getWorld().getName(),
-                Shear);
+        dispatchEvent(event, event.getTool().getType().getKey(), event.getEntity().getType().getKey(), location, block.getWorld().getName(), Shear);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(BlockSpreadEvent event) {
         var block    = event.getBlock();
         var location = vec(block.getLocation());
-        dispatchEvent(event,
-                block.getType().getKey(),
-                event.getNewState().getType().getKey(),
-                location,
-                block.getWorld().getName(),
-                Spread);
+        dispatchEvent(event, block.getType().getKey(), event.getNewState().getType().getKey(), location, block.getWorld().getName(), Spread);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -325,12 +295,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerDropItemEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event,
-                event.getPlayer(),
-                event.getItemDrop().getItemStack().getType().getKey(),
-                location,
-                event.getPlayer().getWorld().getName(),
-                Drop);
+        dispatchEvent(event, null, event.getItemDrop().getItemStack().getType().getKey(), location, event.getPlayer().getWorld().getName(), Drop);
     }
 
     //@EventHandler(priority = EventPriority.LOWEST) public void dispatch(PlayerEggThrowEvent event) {var location = vec(event.getPlayer().getLocation());dispatchEvent(event, event.getPlayer().getUniqueId(), location, Use_Egg);}
@@ -419,12 +384,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(PlayerShearEntityEvent event) {
         var location = vec(event.getPlayer().getLocation());
-        dispatchEvent(event,
-                event.getPlayer(),
-                event.getEntity().getType().getKey(),
-                location,
-                event.getPlayer().getWorld().getName(),
-                Interact_Shear);
+        dispatchEvent(event, event.getPlayer(), event.getEntity().getType().getKey(), location, event.getPlayer().getWorld().getName(), Interact_Shear);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -526,12 +486,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityDamageEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event,
-                event.getCause().name(),
-                event.getEntity().getType().getKey(),
-                location,
-                event.getEntity().getWorld().getName(),
-                Damage);
+        dispatchEvent(event, event.getCause().name(), event.getEntity().getType().getKey(), location, event.getEntity().getWorld().getName(), Damage);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -571,12 +526,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityEnterBlockEvent event) {
         var location = vec(event.getBlock().getLocation());
-        dispatchEvent(event,
-                event.getEntity().getType().getKey(),
-                event.getBlock().getType().getKey(),
-                location,
-                event.getEntity().getWorld().getName(),
-                Hide);
+        dispatchEvent(event, event.getEntity().getType().getKey(), event.getBlock().getType().getKey(), location, event.getEntity().getWorld().getName(), Hide);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -648,12 +598,7 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void dispatch(EntityTameEvent event) {
         var location = vec(event.getEntity().getLocation());
-        dispatchEvent(event,
-                event.getOwner().getUniqueId(),
-                event.getEntity().getType().getKey(),
-                location,
-                event.getEntity().getWorld().getName(),
-                Tame);
+        dispatchEvent(event, event.getOwner().getUniqueId(), event.getEntity().getType().getKey(), location, event.getEntity().getWorld().getName(), Tame);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

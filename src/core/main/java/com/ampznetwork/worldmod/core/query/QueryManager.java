@@ -3,6 +3,8 @@ package com.ampznetwork.worldmod.core.query;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.model.query.IQueryManager;
 import com.ampznetwork.worldmod.api.model.query.IWorldQuery;
+import com.ampznetwork.worldmod.api.model.region.Region;
+import com.ampznetwork.worldmod.core.query.condition.impl.WorldCondition;
 import lombok.SneakyThrows;
 import lombok.Value;
 import org.comroid.api.func.exc.ThrowingFunction;
@@ -26,13 +28,13 @@ public class QueryManager implements IQueryManager {
     public static final String INFO_COMMENT = "# Documentation: https://github.com/AMPZNetwork/WorldMod";
 
     WorldMod          mod;
-    String            worldName;
+    WorldCondition worldCondition;
     List<IWorldQuery> queries;
 
     @SneakyThrows
     public QueryManager(WorldMod mod, String worldName) {
-        this.mod       = mod;
-        this.worldName = worldName;
+        this.mod            = mod;
+        this.worldCondition = new WorldCondition(ValueComparator.EQUALS, worldName);
 
         var cfg = new FileHandle(mod.getConfigDir()).createSubDir("worlds");
         if (!cfg.mkdirs() && !cfg.exists()) throw new RuntimeException("Failed to create queries base directory: " + cfg.getAbsolutePath());
@@ -48,7 +50,10 @@ public class QueryManager implements IQueryManager {
                     .filter(Predicate.not(String::isBlank))
                     .map(ThrowingFunction.logging(Log.get(), WorldQuery::parse))
                     .filter(Objects::nonNull)
-                    .map(IWorldQuery.class::cast)
+                    .peek(query -> {
+                        var conditions = query.getConditions();
+                        if (!Region.GLOBAL_REGION_NAME.equals(worldName) && !conditions.contains(worldCondition)) conditions.add(worldCondition);
+                    })
                     .collect(Collectors.toList());
         }
     }
@@ -60,7 +65,7 @@ public class QueryManager implements IQueryManager {
 
         var cfg = new FileHandle(mod.getConfigDir()).createSubDir("worlds");
         if (!cfg.mkdirs() && !cfg.exists()) throw new RuntimeException("Failed to create queries base directory: " + cfg.getAbsolutePath());
-        cfg = cfg.createSubFile(worldName + ".wmq");
+        cfg = cfg.createSubFile(worldCondition.getWorlds()[0] + ".wmq");
 
         try (var fos = new FileOutputStream(cfg)) {
             fos.write(str.getBytes(StandardCharsets.US_ASCII));

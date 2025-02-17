@@ -101,11 +101,11 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
     @Override
     public Map<String, Long> flagLog(@Nullable Player player, @Nullable String target) {
         var query = getEntityService().createQuery(mgr -> {
-            var q = "select action, COUNT(*) as count from worldmod_world_log e where (result = 0 or result = 2)";
+            var q = "select action, COUNT(*) as count from worldmod_world_log e where serverName = :serverName and (result = 0 or result = 2)";
             if (player != null) q += " and player_id = :playerId";
             if (target != null) q += " and nonPlayerTarget = :target";
             return mgr.createNativeQuery(q + " group by action;", Tuple.class);
-        });
+        }).setParameter("serverName", lib.getServerName());
         if (player != null) query.setParameter("playerId", player.getId().toString());
         if (target != null) query.setParameter("target", target);
         var map = Polyfill.<Stream<Tuple>>uncheckedCast(query.getResultStream())
@@ -156,7 +156,7 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod {
                 .map(WorldInfo::getName)
                 .map(world -> new QueryManager(this, world))
                 .collect(Streams.append(new QueryManager(this, Region.GLOBAL_REGION_NAME)))
-                .collect(Collectors.toMap(QueryManager::getWorldName, Function.identity()));
+                .collect(Collectors.toMap(mgr -> mgr.getWorldCondition().getWorlds()[0], Function.identity()));
         getLogger().log(Level.INFO, "Loaded %d query managers".formatted(queryManagers.size()));
     }
 

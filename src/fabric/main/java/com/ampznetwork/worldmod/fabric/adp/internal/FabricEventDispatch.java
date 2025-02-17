@@ -1,7 +1,7 @@
 package com.ampznetwork.worldmod.fabric.adp.internal;
 
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import com.ampznetwork.worldmod.fabric.WorldModFabric;

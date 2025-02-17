@@ -1,6 +1,6 @@
 package com.ampznetwork.worldmod.api.model.region;
 
-import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.flag.Flag;
 import net.kyori.adventure.util.TriState;
 
 import java.util.stream.Stream;

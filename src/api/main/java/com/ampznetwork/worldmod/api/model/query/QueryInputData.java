@@ -1,7 +1,7 @@
 package com.ampznetwork.worldmod.api.model.query;
 
 import com.ampznetwork.libmod.api.entity.Player;
-import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Builder;

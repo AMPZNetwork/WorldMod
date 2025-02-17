@@ -1,7 +1,7 @@
 package com.ampznetwork.worldmod.core.query.condition.impl;
 
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.model.query.ConditionType;
 import com.ampznetwork.worldmod.api.model.query.QueryInputData;
 import com.ampznetwork.worldmod.core.query.WorldQuery;

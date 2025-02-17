@@ -3,7 +3,7 @@ package com.ampznetwork.worldmod.core.ui;
 import com.ampznetwork.libmod.api.LibMod;
 import com.ampznetwork.libmod.api.adapter.BookAdapter;
 import com.ampznetwork.libmod.api.entity.Player;
-import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.model.mini.PlayerRelation;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import lombok.Value;
@@ -17,7 +17,6 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -85,7 +84,7 @@ public class ClaimMenuBook implements BookAdapter {
         var claimOwner = region.getClaimOwner();
         var bestName  = region.getBestName();
         var group     = region.getGroup();
-        var canManage = region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId).getState() == TriState.TRUE;
+        var canManage = region.getEffectiveFlagValueForPlayer(Flag.Manage, playerId) == TriState.TRUE;
 
         var compName = text("Name: %s".formatted(bestName.matches(RegExpUtil.UUID4_PATTERN)
                                                  ? "<not set>" : bestName));

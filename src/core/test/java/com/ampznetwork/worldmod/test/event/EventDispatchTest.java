@@ -3,7 +3,7 @@ package com.ampznetwork.worldmod.test.event;
 import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.libmod.api.model.delegate.Cancellable;
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import lombok.Data;
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.ampznetwork.worldmod.api.game.Flag.*;
+import static com.ampznetwork.worldmod.api.flag.Flag.*;
 
 public class EventDispatchTest {
     final UUID   PlayerOwner  = UUID.randomUUID();

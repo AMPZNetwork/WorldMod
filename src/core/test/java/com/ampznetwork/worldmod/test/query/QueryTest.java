@@ -1,6 +1,6 @@
 package com.ampznetwork.worldmod.test.query;
 
-import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.model.query.QueryVerb;
 import com.ampznetwork.worldmod.core.query.ValueComparator;
 import com.ampznetwork.worldmod.core.query.WorldQuery;

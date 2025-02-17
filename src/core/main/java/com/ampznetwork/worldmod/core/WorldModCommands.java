@@ -5,7 +5,7 @@ import com.ampznetwork.libmod.api.model.AutoFillProvider;
 import com.ampznetwork.libmod.api.util.NameGenerator;
 import com.ampznetwork.libmod.api.util.Util;
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.mini.PlayerRelation;
@@ -158,7 +158,7 @@ public class WorldModCommands {
                 @Nullable @Command.Arg(stringMode = StringMode.GREEDY, required = false) String arg
         ) {
             isClaimed(region);
-            if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player).getState() != TriState.TRUE) notPermitted();
+            if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player) != TriState.TRUE) notPermitted();
             if (arg == null) arg = NameGenerator.POI.get();
             region.setName(arg);
             worldMod.getEntityService().save(region);
@@ -173,7 +173,7 @@ public class WorldModCommands {
         @Command
         public static String owner(WorldMod worldMod, Player player, @Nullable Region region, @Nullable @Command.Arg String arg) {
             isClaimed(region);
-            if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player).getState() != TriState.TRUE) notPermitted();
+            if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player) != TriState.TRUE) notPermitted();
             if (arg == null) {
                 region.setClaimOwner(null);
                 return "Owner removed";
@@ -208,7 +208,7 @@ public class WorldModCommands {
             ) {
                 if (type == null) type = PlayerRelation.MEMBER;
                 isClaimed(region);
-                if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player).getState() != TriState.TRUE) notPermitted();
+                if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player) != TriState.TRUE) notPermitted();
                 var targetId = worldMod.getLib().getPlayerAdapter().getIdOrThrow(targetName);
                 var target = worldMod.getLib().getPlayerAdapter().getPlayer(targetId).orElseThrow();
                 (switch (type) {
@@ -222,7 +222,7 @@ public class WorldModCommands {
             @Command
             public static String remove(WorldMod worldMod, Player player, @Nullable Region region, @Command.Arg String targetName) {
                 isClaimed(region);
-                if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player).getState() != TriState.TRUE) notPermitted();
+                if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player) != TriState.TRUE) notPermitted();
                 var targetId = worldMod.getLib().getPlayerAdapter().getIdOrThrow(targetName);
                 var wasOwner  = region.getOwners().remove(targetId);
                 var wasMember = region.getMembers().remove(targetId);

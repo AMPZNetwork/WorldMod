@@ -1,7 +1,7 @@
 package com.ampznetwork.worldmod.spigot.adp.internal;
 
 import com.ampznetwork.libmod.spigot.adapter.SpigotPropagationAdapter;
-import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import com.ampznetwork.worldmod.spigot.WorldMod$Spigot;
 import lombok.Value;
@@ -104,7 +104,7 @@ import org.comroid.api.data.Vector;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.ampznetwork.worldmod.api.game.Flag.*;
+import static com.ampznetwork.worldmod.api.flag.Flag.*;
 
 @Value
 public class SpigotEventDispatch extends EventDispatchBase implements Listener {

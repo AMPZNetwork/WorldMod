@@ -4,7 +4,7 @@ import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.libmod.api.model.delegate.Cancellable;
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.model.WandType;
 import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.mini.EventState;
@@ -40,7 +40,7 @@ import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
-import static com.ampznetwork.worldmod.api.game.Flag.*;
+import static com.ampznetwork.worldmod.api.flag.Flag.*;
 import static net.kyori.adventure.text.Component.*;
 import static org.comroid.api.func.util.Streams.*;
 

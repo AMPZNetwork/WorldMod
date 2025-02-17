@@ -5,7 +5,7 @@ import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.libmod.api.model.API;
 import com.ampznetwork.libmod.api.model.EntityType;
 import com.ampznetwork.libmod.api.util.NameGenerator;
-import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.PointCollider;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;

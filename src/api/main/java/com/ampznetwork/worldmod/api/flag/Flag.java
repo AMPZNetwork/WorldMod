@@ -1,4 +1,4 @@
-package com.ampznetwork.worldmod.api.game;
+package com.ampznetwork.worldmod.api.flag;
 
 import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.worldmod.api.model.mini.OwnedByParty;
@@ -18,7 +18,7 @@ import org.comroid.api.attr.Named;
 import org.comroid.api.data.seri.type.ValueType;
 import org.comroid.api.func.util.Bitmask;
 import org.comroid.api.info.Constraint;
-import org.comroid.api.text.minecraft.Tellraw;
+import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -201,30 +200,30 @@ public class Flag implements Named, Described, Prioritized {
         return flag;
     }
 
-    @Nullable Flag   parent;
-    @NotNull  String name;
-    long priority;
+    @Nullable Flag       parent;
+    @NotNull  String     name;
     @NotNull  ValueType<?> type;
     @Nullable String       displayName;
     @Nullable String       description;
-    @Nullable Object       defaultValue;
-    @NotNull List<Flag> children = new ArrayList<>();
+    @NotNull  List<Flag> children = new ArrayList<>();
+    long    priority;
+    boolean allowByDefault;
 
-    public Flag(String name, long priority, ValueType<?> type, @Nullable String displayName, @Nullable String description, @NotNull Object defaultValue) {
-        this(null, name, priority, type, displayName, description, defaultValue);
+    public Flag(String name, long priority, ValueType<?> type, @Nullable String displayName, @Nullable String description, boolean allowByDefault) {
+        this(null, name, priority, type, displayName, description, allowByDefault);
     }
 
     public Flag(
             @Nullable Flag parent, @NotNull String name, long priority, @NotNull ValueType<?> type, @Nullable String displayName, @Nullable String description,
-            @Nullable Object defaultValue
+            boolean allowByDefault
     ) {
-        this.parent      = parent;
-        this.name        = name;
-        this.priority    = priority;
-        this.type        = type;
-        this.displayName = displayName;
-        this.description = description;
-        this.defaultValue = defaultValue;
+        this.parent         = parent;
+        this.name           = name;
+        this.priority       = priority;
+        this.type           = type;
+        this.displayName    = displayName;
+        this.description    = description;
+        this.allowByDefault = allowByDefault;
 
         if (parent != null) parent.children.add(this);
 
@@ -275,22 +274,16 @@ public class Flag implements Named, Described, Prioritized {
     @AllArgsConstructor
     @RequiredArgsConstructor
     public static class Usage implements Prioritized {
-        @NotNull                            Flag                  flag;
-        @lombok.Builder.Default @NotNull    TriState              state     = TriState.NOT_SET;
-        @lombok.Builder.Default @Nullable   String                value     = null;
-        @lombok.Builder.Default @Deprecated long                  target    = Bitmask.combine(Usage.Target.Guests, Usage.Target.Members);
-        @lombok.Builder.Default             Set<Tellraw.Selector> selectors = Set.of(Tellraw.Selector.builder()
-                .base(Tellraw.Selector.Base.NEAREST_PLAYER)
-                .type("guest")
-                .build());
-        @lombok.Builder.Default             boolean               force     = false;
-        @lombok.Builder.Default             long                  priority  = 0;
+        @NotNull                                                               Flag     flag;
+        @lombok.Builder.Default @NotNull                                       TriState state    = TriState.NOT_SET;
+        @lombok.Builder.Default @MagicConstant(valuesFromClass = Target.class) long     target   = Bitmask.combine(Usage.Target.Guests, Usage.Target.Members);
+        @lombok.Builder.Default                                                long     priority = 0;
+        @lombok.Builder.Default                                                boolean  force    = false;
 
         public long getPriority() {
             return force ? Long.MAX_VALUE : priority;
         }
 
-        @Deprecated
         public boolean appliesToUser(OwnedByParty target, UUID playerId) {
             var owner  = target.getOwners().stream().map(DbObject::getId).anyMatch(playerId::equals);
             var member = target.getMembers().stream().map(DbObject::getId).anyMatch(playerId::equals);
@@ -298,7 +291,6 @@ public class Flag implements Named, Described, Prioritized {
             return owner ? Usage.Target.Owners.isFlagSet(mask) : member ? Usage.Target.Members.isFlagSet(mask) : Usage.Target.Guests.isFlagSet(mask);
         }
 
-        @Deprecated
         public enum Target implements Named, Bitmask.Attribute<Usage.Target> {
             Guests, Members, Owners
         }

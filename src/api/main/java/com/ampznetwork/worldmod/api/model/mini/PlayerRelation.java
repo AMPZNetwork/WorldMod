@@ -13,11 +13,10 @@ import org.jetbrains.annotations.Nullable;
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true,level = AccessLevel.PRIVATE)
 public enum PlayerRelation implements Named, Bitmask.Attribute<PlayerRelation> {
-    ENTITY(Tellraw.Selector.Base.ALL_ENTITIES),
-    GUEST(Tellraw.Selector.Base.ALL_PLAYERS),
-    MEMBER(Tellraw.Selector.Base.NEAREST_PLAYER),
-    ADMIN(Tellraw.Selector.Base.EXECUTOR);
-    Tellraw.Selector.Base selector;
+    ENTITY(),
+    GUEST(),
+    MEMBER(),
+    ADMIN();
 
     public static PlayerRelation find(Tellraw.Selector.Base base, @Nullable String type) {
         return switch (base) {

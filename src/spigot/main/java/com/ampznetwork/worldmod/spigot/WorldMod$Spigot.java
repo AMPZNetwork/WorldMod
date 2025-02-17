@@ -3,7 +3,7 @@ package com.ampznetwork.worldmod.spigot;
 import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.libmod.spigot.SubMod$Spigot;
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.api.game.Flag;
+import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.model.TextResourceProvider;
 import com.ampznetwork.worldmod.api.model.WandType;
 import com.ampznetwork.worldmod.api.model.log.LogEntry;

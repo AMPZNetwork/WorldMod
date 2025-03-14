@@ -62,21 +62,19 @@ public abstract class EventDispatchBase {
         boolean cancel = false, force = false;
         while (iter.hasNext()) {
             var region   = iter.next();
-            var usage    = region.getEffectiveFlagValueForPlayer(flag, player);
+            var state = region.getEffectiveFlagValueForPlayer(flag, player);
             var isGlobal = Region.GLOBAL_REGION_NAME.equals(region.getName());
-            if (isGlobal && usage.getFlag().equals(Build) && usage.getState() != TriState.FALSE) continue; // exception for build flag on global region
-            var state = usage.getState();
+            if (isGlobal && Build.equals(flag) && state != TriState.FALSE) continue; // exception for build flag on global region
             if (state == TriState.NOT_SET) {
                 if (player != null && Optional.ofNullable(region.getClaimOwner())
                         .map(DbObject::getId)
                         .filter(Predicate.not(player.getId()::equals))
                         .isPresent())
-                    //noinspection DataFlowIssue
-                    cancel = chainOp_cancel.test(cancel, !(boolean) usage.getFlag().getDefaultValue());
+                    cancel = chainOp_cancel.test(cancel, !flag.isAllowByDefault());
                 else continue;
             }
             if (state == TriState.FALSE) cancel = chainOp_cancel.test(cancel, true);
-            else if (state == TriState.TRUE && usage.isForce()) force = chainOp_force.test(force, true);
+            //else if (state == TriState.TRUE && state.isForce()) force = chainOp_force.test(force, true);
         }
         if (force) return EventState.Forced;
         else if (cancel) return EventState.Cancelled;

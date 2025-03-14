@@ -16,14 +16,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.util.stream.Stream.of;
 import static java.util.stream.Stream.*;
+import static java.util.stream.Stream.of;
 import static net.kyori.adventure.key.Key.*;
 import static net.kyori.adventure.text.Component.*;
 import static net.kyori.adventure.text.event.ClickEvent.*;
@@ -238,29 +237,31 @@ public class ClaimMenuBook implements BookAdapter {
                 .sorted(Flag.COMPARATOR)
                 .flatMap(flag -> FlagEntry.expand(flag, 0))
                 //.filter(entry -> entry.flag.getType().equals(StandardValueType.BOOLEAN)) // todo: autotype
-                .map(entry -> concat(
+                .map(entry -> //concat(
                         of(
                                 text("Flag Menu - %s\n\n".formatted(entry.flag.getCanonicalName()))
                                         .decorate(UNDERLINED),
                                 text("Name: %s\n".formatted(entry.flag.getBestName()))
-                        ),
-                        region.getFlagValues(entry.flag)
-                                .flatMap(usage -> usage.getSelectors().stream()
-                                        .map(selector -> {
-                                            var state = usage.getState();
-                                            return text("- ")
-                                                    .append(text(lower_case.convert(state.name()))
-                                                            .color(switch (state) {
-                                                                case NOT_SET -> AQUA;
-                                                                case FALSE -> RED;
-                                                                case TRUE -> GREEN;
-                                                            }))
-                                                    .append(text(" for "))
-                                                    .append(text(Title_Case.convert(PlayerRelation.valueOf(
-                                                            Objects.requireNonNull(selector.getType(),
-                                                                    "selector type").toUpperCase()).name())))
-                                                    .append(text("\n"));
-                                        })))
+                        )
+                                /*
+                                region.getFlagValues(entry.flag)
+                                        .flatMap(usage -> usage.getSelectors().stream()
+                                                .map(selector -> {
+                                                    var state = usage.getState();
+                                                    return text("- ")
+                                                            .append(text(lower_case.convert(state.name()))
+                                                                    .color(switch (state) {
+                                                                        case NOT_SET -> AQUA;
+                                                                        case FALSE -> RED;
+                                                                        case TRUE -> GREEN;
+                                                                    }))
+                                                            .append(text(" for "))
+                                                            .append(text(Title_Case.convert(PlayerRelation.valueOf(
+                                                                    Objects.requireNonNull(selector.getType(),
+                                                                            "selector type").toUpperCase()).name())))
+                                                            .append(text("\n"));
+                                                })))
+                                 */
                         .toArray(Component[]::new)
                 );
     }

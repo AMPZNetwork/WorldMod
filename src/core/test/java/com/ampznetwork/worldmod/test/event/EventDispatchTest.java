@@ -9,11 +9,9 @@ import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import lombok.Data;
 import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
-import org.comroid.api.text.minecraft.Tellraw;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
-import java.util.Set;
 import java.util.UUID;
 
 import static com.ampznetwork.worldmod.api.flag.Flag.*;
@@ -40,22 +38,16 @@ public class EventDispatchTest {
                 .owner(Player.builder().id(PlayerOwner).name("Steve").build())
                 .member(Player.builder().id(PlayerMember).name("Dinnerbone").build())
                 .flag(Flag.Usage.builder()
-                                .flag(Build)
-                                .state(TriState.TRUE)
-                                .force(true)
-                                .selectors(Set.of(Tellraw.Selector.builder()
-                                        .base(Tellraw.Selector.Base.NEAREST_PLAYER)
-                                        .type("owner")
-                                        .build()))
-                                .build())
+                        .flag(Build)
+                        .state(TriState.TRUE)
+                        .force(true)
+                        .target(Usage.Target.Owners.getAsLong())
+                        .build())
                 .flag(Flag.Usage.builder()
-                                .flag(Build)
-                                .state(TriState.TRUE)
-                                .selectors(Set.of(Tellraw.Selector.builder()
-                                        .base(Tellraw.Selector.Base.NEAREST_PLAYER)
-                                        .type("member")
-                                        .build()))
-                                .build())
+                        .flag(Build)
+                        .state(TriState.TRUE)
+                        .target(Usage.Target.Members.getAsLong())
+                        .build())
                 .build();
     }
 

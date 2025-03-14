@@ -110,7 +110,7 @@ public class QueryTest {
         var actualValue = actual.apply(condition);
 
         assertEquals(actualValue, expected);
-        if (comparator != null && condition.comparator() != null)
-            assertEquals(comparator, condition.comparator());
+        if (comparator != null && condition.getComparator() != null)
+            assertEquals(comparator, condition.getComparator());
     }
 }

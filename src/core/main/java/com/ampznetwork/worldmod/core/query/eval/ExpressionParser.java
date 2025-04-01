@@ -5,8 +5,10 @@ import com.ampznetwork.worldmod.core.query.eval.decl.Operator;
 import com.ampznetwork.worldmod.core.query.eval.decl.OperatorExpression;
 import com.ampznetwork.worldmod.core.query.eval.decl.ParenthesesExpression;
 import com.ampznetwork.worldmod.core.query.eval.decl.val.NumberExpression;
+import com.ampznetwork.worldmod.core.query.eval.decl.val.RangeExpression;
 import com.ampznetwork.worldmod.core.query.eval.decl.val.VariableExpression;
 import lombok.Value;
+import org.comroid.api.Polyfill;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -41,11 +43,19 @@ public class ExpressionParser extends StreamTokenizer {
             case '(' -> parensExpr();
             default -> throw new IllegalStateException("Unexpected value: " + ttype);
         };
+
         // if next is an operator, return the operator expression instead
         for (var op : Operator.values())
             if (op.symbol == ttype)
                 return opExpr(expr, op);
+
+        var ptype = ttype;
         nextToken();
+
+        // check for range expression
+        if (ptype == '.' && ttype == '.')
+            return rangeExpr(expr);
+
         return expr;
     }
 
@@ -67,6 +77,12 @@ public class ExpressionParser extends StreamTokenizer {
             if (!decimal) decimal = ttype == '.';
         } while (Arrays.binarySearch(numParts, ttype) >= 0);
         return decimal ? new NumberExpression<>(Double.parseDouble(buf.toString())) : new NumberExpression<Number>(Long.parseLong(buf.toString()));
+    }
+
+    public RangeExpression<?> rangeExpr(Expression low) throws IOException {
+        // step to beginning of next expression
+        nextToken();
+        return new RangeExpression<>(Polyfill.uncheckedCast(low), numExpr());
     }
 
     public ParenthesesExpression parensExpr() throws IOException {

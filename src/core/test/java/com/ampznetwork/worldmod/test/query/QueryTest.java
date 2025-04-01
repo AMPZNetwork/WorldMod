@@ -28,7 +28,7 @@ public class QueryTest {
         var query = WorldQuery.parse("lookup from=fire radius=20");
         assertEquals(QueryVerb.LOOKUP, query.getVerb());
         assertEquals(2, query.getConditions().size());
-        assertCondition(query, SourceCondition.class, sourceCondition -> sourceCondition.getSources()[0], "#fire", ValueComparator.EQUALS);
+        assertCondition(query, SourceCondition.class, sourceCondition -> sourceCondition.getSources()[0], "fire", ValueComparator.EQUALS);
         assertCondition(query, RadiusCondition.class, RadiusCondition::getRadius, 20, ValueComparator.EQUALS);
     }
 

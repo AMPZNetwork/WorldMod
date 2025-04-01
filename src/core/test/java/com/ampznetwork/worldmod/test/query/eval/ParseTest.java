@@ -4,6 +4,7 @@ import com.ampznetwork.worldmod.core.query.eval.decl.Expression;
 import com.ampznetwork.worldmod.core.query.eval.decl.Operator;
 import com.ampznetwork.worldmod.core.query.eval.decl.OperatorExpression;
 import com.ampznetwork.worldmod.core.query.eval.decl.val.NumberExpression;
+import com.ampznetwork.worldmod.core.query.eval.decl.val.RangeExpression;
 import com.ampznetwork.worldmod.core.query.eval.decl.val.VariableExpression;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,22 @@ public class ParseTest {
         Assertions.assertEquals(1L, l.getValue());
 
         var r = (NumberExpression<?>) op.getRight();
+        Assertions.assertEquals(2L, r.getValue());
+    }
+
+    @Test
+    public void testRange() {
+        var expr = Expression.parse("1..2");
+        Assertions.assertInstanceOf(RangeExpression.class, expr);
+
+        var range = (RangeExpression<?>) expr;
+        Assertions.assertInstanceOf(NumberExpression.class, range.getLow());
+        Assertions.assertInstanceOf(NumberExpression.class, range.getHigh());
+
+        var l = (NumberExpression<?>) range.getLow();
+        Assertions.assertEquals(1L, l.getValue());
+
+        var r = (NumberExpression<?>) range.getHigh();
         Assertions.assertEquals(2L, r.getValue());
     }
 

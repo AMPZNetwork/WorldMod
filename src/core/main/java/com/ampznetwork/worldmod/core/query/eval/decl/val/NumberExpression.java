@@ -12,7 +12,7 @@ public class NumberExpression<T extends Number> implements ValueExpression {
     @NotNull T value;
 
     @Override
-    public @NotNull Object eval(Map<String, @NotNull Long> vars) {
+    public @NotNull T eval(Map<String, @NotNull Long> vars) {
         return value;
     }
 

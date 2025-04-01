@@ -121,13 +121,13 @@ public class WorldQuery implements IWorldQuery {
     @NotNull  QueryVerb                 verb;
     @Nullable String                    messageKey;
     @Nullable ConditionalQueryEvaluator evaluator;
-    List<QueryCondition> conditions;
+    ArrayList<QueryCondition> conditions;
 
     @lombok.Builder
     private WorldQuery(@NotNull QueryVerb verb, @Nullable String messageKey, @Singular List<QueryCondition> conditions) {
         this.verb       = verb;
         this.messageKey = messageKey;
-        this.conditions = conditions;
+        this.conditions = new ArrayList<>(conditions);
         this.evaluator  = verb == QueryVerb.CONDITIONAL ? new ConditionalQueryEvaluator(this) : null;
     }
 

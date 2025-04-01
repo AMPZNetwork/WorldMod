@@ -103,6 +103,7 @@ import org.comroid.api.data.Vector;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import static com.ampznetwork.worldmod.api.flag.Flag.*;
 
@@ -117,7 +118,11 @@ public class SpigotEventDispatch extends EventDispatchBase implements Listener {
 
     @EventHandler
     public void dispatch(ServerLoadEvent event) {
-        mod.reloadQueryManagers();
+        try {
+            mod.reloadQueryManagers();
+        } catch (Throwable t) {
+            mod.getLogger().log(Level.SEVERE, "Failed to load queries", t);
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

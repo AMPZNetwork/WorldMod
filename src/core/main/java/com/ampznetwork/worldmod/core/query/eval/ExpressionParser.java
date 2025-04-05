@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 @Value
 public class ExpressionParser extends StreamTokenizer {
-    private static final int[] numParts = new int[]{ TT_NUMBER, '.' };
+    private static final int[] numParts = new int[]{ TT_NUMBER };
     private static final int[] varParts = new int[]{ TT_WORD, '.' };
 
     {
@@ -48,16 +48,14 @@ public class ExpressionParser extends StreamTokenizer {
             default -> throw new IllegalStateException("Unexpected value: " + ttype);
         };
 
+        // check for range expression
+        if (ttype == '.') return rangeExpr(expr);
+
         // if next is an operator, return the operator expression instead
         for (var op : Operator.values())
             if (op.symbol == ttype) return opExpr(expr, op);
 
-        var ptype = ttype;
         nextToken();
-
-        // check for range expression
-        if (ptype == '.' && ttype == '.') return rangeExpr(expr);
-
         return expr;
     }
 
@@ -74,9 +72,9 @@ public class ExpressionParser extends StreamTokenizer {
         var buf     = new StringBuilder();
         var decimal = false;
         do {
-            buf.append(ttype == TT_NUMBER ? String.valueOf((int) nval) : String.valueOf(ttype));
+            buf.append(ttype == TT_NUMBER ? String.valueOf((int) nval) : String.valueOf((char) ttype));
             if (nextToken() == -1) break;
-            if (!decimal) decimal = ttype == '.';
+            if (ttype == '.') break;// return for range expression
         } while (Arrays.binarySearch(numParts, ttype) >= 0);
         return decimal ? new NumberExpression<>(Double.parseDouble(buf.toString())) : new NumberExpression<Number>(Long.parseLong(buf.toString()));
     }

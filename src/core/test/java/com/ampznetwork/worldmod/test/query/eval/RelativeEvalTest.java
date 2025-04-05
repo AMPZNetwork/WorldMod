@@ -36,15 +36,20 @@ public class RelativeEvalTest {
 
     @Test
     public void basic() {
-        assertEquals(15, (int) Expression.parse("~10").eval(context));
+        assertEquals(15, ((Number) Expression.parse("~10").eval(context)).intValue());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void range() {
-        var range = (Range<Integer>) Expression.parse("~10..-10").eval(context);
+        var eval = Expression.parse("~10..-10").eval(context);
 
-        assertEquals(15, range.getStart());
-        assertEquals(-5, range.getEnd());
+        assertInstanceOf(Range.class, eval);
+        var range = (Range<?>) eval;
+
+        assertNotNull(range.getStart());
+        assertEquals(15, range.getStart().intValue());
+
+        assertNotNull(range.getEnd());
+        assertEquals(-5, range.getEnd().intValue());
     }
 }

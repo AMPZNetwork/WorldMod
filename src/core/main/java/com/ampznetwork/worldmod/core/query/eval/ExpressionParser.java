@@ -10,7 +10,6 @@ import com.ampznetwork.worldmod.core.query.eval.decl.val.NumericExpression;
 import com.ampznetwork.worldmod.core.query.eval.decl.val.RangeExpression;
 import com.ampznetwork.worldmod.core.query.eval.decl.val.VariableExpression;
 import lombok.Value;
-import org.comroid.api.Polyfill;
 import org.comroid.api.func.util.Command;
 
 import java.io.IOException;
@@ -79,10 +78,10 @@ public class ExpressionParser extends StreamTokenizer {
         return decimal ? new NumberExpression<>(Double.parseDouble(buf.toString())) : new NumberExpression<Number>(Long.parseLong(buf.toString()));
     }
 
-    public RangeExpression<?> rangeExpr(Expression low) throws IOException {
+    public RangeExpression rangeExpr(Expression low) throws IOException {
         // step to beginning of next expression
         nextToken();
-        return new RangeExpression<>(Polyfill.uncheckedCast(low), numExpr());
+        return new RangeExpression((NumberExpression<?>) low, numExpr());
     }
 
     public RelativeExpression relativeExpr() throws IOException {

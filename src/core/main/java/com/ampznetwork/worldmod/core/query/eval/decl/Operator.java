@@ -66,7 +66,7 @@ public enum Operator {
 
     public Number apply(Number a, Number b) {
         if (a instanceof Double ad)
-            return apply(ad.doubleValue(), (double) b);
+            return apply(ad.doubleValue(), b.doubleValue());
         return apply((long) a, (long) b);
     }
 }

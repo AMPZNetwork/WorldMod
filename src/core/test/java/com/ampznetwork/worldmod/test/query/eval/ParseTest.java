@@ -35,7 +35,7 @@ public class ParseTest {
         var expr = Expression.parse("1..2");
         assertInstanceOf(RangeExpression.class, expr);
 
-        var range = (RangeExpression<?>) expr;
+        var range = (RangeExpression) expr;
         assertInstanceOf(NumberExpression.class, range.getLow());
         assertInstanceOf(NumberExpression.class, range.getHigh());
 
@@ -91,8 +91,8 @@ public class ParseTest {
             var rel = (RelativeExpression) expr;
             assertInstanceOf(NumberExpression.class, rel.getDelta());
 
-            var x = (NumberExpression<Integer>) rel.getDelta();
-            assertEquals(10, x.getValue());
+            var x = (NumberExpression<?>) rel.getDelta();
+            assertEquals(10, x.getValue().intValue());
         }
 
         @Test
@@ -103,11 +103,11 @@ public class ParseTest {
             var rel = (RelativeExpression) expr;
             assertInstanceOf(RangeExpression.class, rel.getDelta());
 
-            var range = (RangeExpression<Integer>) rel.getDelta();
+            var range = (RangeExpression) rel.getDelta();
             assertNotNull(range.getLow());
-            assertEquals(10, range.getLow().getValue());
+            assertEquals(10, range.getLow().getValue().intValue());
             assertNotNull(range.getHigh());
-            assertEquals(-10, range.getHigh().getValue());
+            assertEquals(-10, range.getHigh().getValue().intValue());
         }
     }
 }

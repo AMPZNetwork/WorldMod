@@ -8,12 +8,12 @@ import org.jetbrains.annotations.NotNull;
 
 @Value
 @NonFinal
-public class RangeExpression<T extends Number> implements NumericExpression {
-    NumberExpression<T> low, high;
+public class RangeExpression implements NumericExpression {
+    NumberExpression<?> low, high;
 
     @Override
-    public @NotNull Range<T> eval(QueryEvalContext context) {
-        T l = low.eval(context), r = high.eval(context);
+    public @NotNull Range<Integer> eval(QueryEvalContext context) {
+        int l = low.eval(context).intValue(), r = high.eval(context).intValue();
         return new Range<>(l, r);
     }
 

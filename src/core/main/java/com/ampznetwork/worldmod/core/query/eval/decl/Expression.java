@@ -1,12 +1,12 @@
 package com.ampznetwork.worldmod.core.query.eval.decl;
 
 import com.ampznetwork.worldmod.core.query.eval.ExpressionParser;
+import com.ampznetwork.worldmod.core.query.eval.model.QueryEvalContext;
 import com.ampznetwork.worldmod.core.query.eval.model.VarSupplier;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.StringReader;
-import java.util.Map;
 
 public interface Expression extends VarSupplier {
     @SneakyThrows
@@ -16,5 +16,5 @@ public interface Expression extends VarSupplier {
         }
     }
 
-    @NotNull Object eval(Map<String, @NotNull Long> context);
+    @NotNull Object eval(QueryEvalContext context);
 }

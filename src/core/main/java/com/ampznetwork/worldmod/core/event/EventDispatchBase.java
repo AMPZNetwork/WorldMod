@@ -14,6 +14,7 @@ import com.ampznetwork.worldmod.api.model.query.QueryVerb;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.core.WorldModCommands;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
+import com.ampznetwork.worldmod.core.query.eval.model.QueryEvalContext;
 import com.ampznetwork.worldmod.generated.PluginYml;
 import lombok.Value;
 import lombok.experimental.NonFinal;
@@ -69,8 +70,7 @@ public abstract class EventDispatchBase {
                 if (player != null && Optional.ofNullable(region.getClaimOwner())
                         .map(DbObject::getId)
                         .filter(Predicate.not(player.getId()::equals))
-                        .isPresent())
-                    cancel = chainOp_cancel.test(cancel, !flag.isAllowByDefault());
+                        .isPresent()) cancel = chainOp_cancel.test(cancel, !flag.isAllowByDefault());
                 else continue;
             }
             if (state == TriState.FALSE) cancel = chainOp_cancel.test(cancel, true);
@@ -208,7 +208,9 @@ public abstract class EventDispatchBase {
                             .filter(proxy(IWorldQuery::getVerb, QueryVerb.CONDITIONAL::equals))
                             .filter(query -> query.test(mod, data))
                             .flatMap(Streams.cast(WorldQuery.class))
-                            .filter(query -> Optional.ofNullable(query.getEvaluator()).filter(eval -> eval.test(queryVars)).isEmpty())
+                            .filter(query -> Optional.ofNullable(query.getEvaluator())
+                                    .filter(eval -> eval.test(new QueryEvalContext(mod, player, null, queryVars)))
+                                    .isEmpty())
                             .forEach(query -> {
                                 messageKey[0] = query.getMessageKey();
                                 result[0]     = EventState.Cancelled;

@@ -4,11 +4,14 @@ import com.ampznetwork.worldmod.core.query.eval.decl.Expression;
 import com.ampznetwork.worldmod.core.query.eval.decl.Operator;
 import com.ampznetwork.worldmod.core.query.eval.decl.OperatorExpression;
 import com.ampznetwork.worldmod.core.query.eval.decl.ParenthesesExpression;
+import com.ampznetwork.worldmod.core.query.eval.decl.RelativeExpression;
 import com.ampznetwork.worldmod.core.query.eval.decl.val.NumberExpression;
+import com.ampznetwork.worldmod.core.query.eval.decl.val.NumericExpression;
 import com.ampznetwork.worldmod.core.query.eval.decl.val.RangeExpression;
 import com.ampznetwork.worldmod.core.query.eval.decl.val.VariableExpression;
 import lombok.Value;
 import org.comroid.api.Polyfill;
+import org.comroid.api.func.util.Command;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -40,21 +43,20 @@ public class ExpressionParser extends StreamTokenizer {
         var expr = switch (ttype) {
             case TT_WORD -> varExpr();
             case TT_NUMBER, '-' -> numExpr();
+            case '~' -> relativeExpr();
             case '(' -> parensExpr();
             default -> throw new IllegalStateException("Unexpected value: " + ttype);
         };
 
         // if next is an operator, return the operator expression instead
         for (var op : Operator.values())
-            if (op.symbol == ttype)
-                return opExpr(expr, op);
+            if (op.symbol == ttype) return opExpr(expr, op);
 
         var ptype = ttype;
         nextToken();
 
         // check for range expression
-        if (ptype == '.' && ttype == '.')
-            return rangeExpr(expr);
+        if (ptype == '.' && ttype == '.') return rangeExpr(expr);
 
         return expr;
     }
@@ -85,9 +87,18 @@ public class ExpressionParser extends StreamTokenizer {
         return new RangeExpression<>(Polyfill.uncheckedCast(low), numExpr());
     }
 
+    public RelativeExpression relativeExpr() throws IOException {
+        // step to beginning of next expression
+        nextToken();
+        return new RelativeExpression((NumericExpression) expr());
+    }
+
     public ParenthesesExpression parensExpr() throws IOException {
         nextToken();
-        return new ParenthesesExpression(expr());
+        var expression = new ParenthesesExpression(expr());
+        if (ttype != ')') throw new Command.Error("Unterminated parentheses");
+        nextToken();
+        return expression;
     }
 
     public OperatorExpression opExpr(Expression left, Operator op) throws IOException {

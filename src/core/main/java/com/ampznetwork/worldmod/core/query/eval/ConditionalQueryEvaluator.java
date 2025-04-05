@@ -7,18 +7,17 @@ import com.ampznetwork.worldmod.core.query.condition.impl.SourceCondition;
 import com.ampznetwork.worldmod.core.query.condition.impl.TargetCondition;
 import com.ampznetwork.worldmod.core.query.eval.decl.Expression;
 import com.ampznetwork.worldmod.core.query.eval.decl.val.VariableExpression;
+import com.ampznetwork.worldmod.core.query.eval.model.QueryEvalContext;
 import com.ampznetwork.worldmod.core.query.eval.model.VarSupplier;
 import lombok.Value;
 import org.comroid.api.func.util.Streams;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 @Value
-public class ConditionalQueryEvaluator implements VarSupplier, Predicate<Map<String, @NotNull Long>> {
+public class ConditionalQueryEvaluator implements VarSupplier, Predicate<QueryEvalContext> {
     WorldQuery query;
     Expression expr, value;
     ValueComparator comparator;
@@ -43,9 +42,9 @@ public class ConditionalQueryEvaluator implements VarSupplier, Predicate<Map<Str
     }
 
     @Override
-    public boolean test(Map<String, @NotNull Long> vars) {
-        var result = expr.eval(vars);
-        var expect = value.eval(vars);
+    public boolean test(QueryEvalContext context) {
+        var result = expr.eval(context);
+        var expect = value.eval(context);
         return comparator.test(result, expect);
     }
 

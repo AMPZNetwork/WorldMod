@@ -1,18 +1,17 @@
 package com.ampznetwork.worldmod.core.query.eval.decl.val;
 
+import com.ampznetwork.worldmod.core.query.eval.model.QueryEvalContext;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-
 @Value
 @NonFinal
-public class NumberExpression<T extends Number> implements ValueExpression {
+public class NumberExpression<T extends Number> implements NumericExpression {
     @NotNull T value;
 
     @Override
-    public @NotNull T eval(Map<String, @NotNull Long> vars) {
+    public @NotNull T eval(QueryEvalContext context) {
         return value;
     }
 

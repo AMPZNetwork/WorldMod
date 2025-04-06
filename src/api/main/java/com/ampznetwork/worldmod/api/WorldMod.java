@@ -3,13 +3,16 @@ package com.ampznetwork.worldmod.api;
 import com.ampznetwork.libmod.api.LibMod;
 import com.ampznetwork.libmod.api.SubMod;
 import com.ampznetwork.libmod.api.entity.Player;
+import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.model.TextResourceProvider;
 import com.ampznetwork.worldmod.api.model.WandType;
+import com.ampznetwork.worldmod.api.model.config.WorldModConfigAdapter;
 import com.ampznetwork.worldmod.api.model.query.IQueryManager;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.api.model.sel.Area;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import org.comroid.api.Polyfill;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
@@ -18,15 +21,18 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.persistence.Tuple;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public interface WorldMod extends SubMod, Command.ContextProvider {
+public interface WorldMod extends SubMod, Command.ContextProvider, WorldModConfigAdapter {
     String AddonId   = "worldmod";
     String AddonName = "WorldMod";
 
@@ -59,15 +65,7 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
         return Stream.of(findRegions(position, worldName).findFirst().orElse(null));
     }
 
-    Properties getMessages();
-
     Map<String, IQueryManager> getQueryManagers();
-
-    boolean loggingSkipsNonPlayer();
-
-    Stream<String> loggingSkipFlagNames();
-
-    Map<WandType, String> wandItems();
 
     default Optional<WandType> findWandType(String itemResourceKey) {
         return wandItems().entrySet().stream().filter(e -> LibMod.equalResourceKey(itemResourceKey, e.getValue())).findAny().map(Map.Entry::getKey);
@@ -106,9 +104,27 @@ public interface WorldMod extends SubMod, Command.ContextProvider {
 
     TextResourceProvider text();
 
-    Stream<String> flagNames();
+    default Stream<String> flagNames() {
+        return Flag.VALUES.values().stream().flatMap(WorldMod::ownAndChildFlagNames).sorted();
+    }
 
-    Map<String, Long> flagLog(@Nullable Player player, @Nullable String target);
+    default Map<String, Long> flagLog(@Nullable Player player, @Nullable String target) {
+        var query = getEntityService().createQuery(mgr -> {
+            var q = "select action, COUNT(*) as count from worldmod_world_log e where serverName = :serverName and (result = 0 or result = 2)";
+            if (player != null) q += " and player_id = :playerId";
+            if (target != null) q += " and nonPlayerTarget = :target";
+            return mgr.createNativeQuery(q + " group by action;", Tuple.class);
+        }).setParameter("serverName", getLib().getServerName());
+        if (player != null) query.setParameter("playerId", player.getId().toString());
+        if (target != null) query.setParameter("target", target);
+        var map = Polyfill.<Stream<Tuple>>uncheckedCast(query.getResultStream())
+                .collect(Collectors.toMap(it -> it.get("action", String.class), it -> it.get("count", BigInteger.class).longValue()));
+        Flag.VALUES.values().stream().map(Flag::getCanonicalName).filter(Predicate.not(map::containsKey)).forEach(key -> map.put(key, 0L));
+        return map;
+    }
 
-    boolean isSafeMode();
+    private static Stream<String> ownAndChildFlagNames(Flag flag) {
+        var name = flag.getName();
+        return Stream.concat(Stream.of(name), flag.getChildren().stream().flatMap(WorldMod::ownAndChildFlagNames).map(str -> name + '.' + str));
+    }
 }

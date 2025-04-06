@@ -211,7 +211,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 shadowJar { setProperty("zip64",true)
-    dependsOn project("$prefix:api").simplifyArtifact
+    dependsOn project(":ChatMod:api").simplifyArtifact
 }
 
 task simplifyArtifact(type: Copy) {

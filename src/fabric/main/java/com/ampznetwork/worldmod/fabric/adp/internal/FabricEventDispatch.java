@@ -1,8 +1,8 @@
 package com.ampznetwork.worldmod.fabric.adp.internal;
 
+import com.ampznetwork.libmod.api.model.delegate.Cancellable;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.flag.Flag;
-import com.ampznetwork.worldmod.api.model.adp.IPropagationAdapter;
 import com.ampznetwork.worldmod.core.event.EventDispatchBase;
 import com.ampznetwork.worldmod.fabric.WorldModFabric;
 import lombok.Value;
@@ -32,8 +32,8 @@ public class FabricEventDispatch extends EventDispatchBase implements PlayerBloc
         return dispatchEvent(world, player, state.getBlock().getTranslationKey(), pos, Flag.Build).isCancelled();
     }
 
-    private IPropagationAdapter.Stateful dispatchEvent(World world, Object source, Object target, BlockPos pos, Flag flag) {
-        var state = new IPropagationAdapter.Stateful();
+    private Cancellable.Stateful dispatchEvent(World world, Object source, Object target, BlockPos pos, Flag flag) {
+        var state = new Cancellable.Stateful();
         var player = tryGetAsPlayer(source);
         if (player.isSpectator())
             return state;

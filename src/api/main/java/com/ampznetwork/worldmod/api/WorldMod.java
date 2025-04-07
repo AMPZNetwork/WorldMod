@@ -17,6 +17,7 @@ import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
 import org.comroid.api.info.Log;
+import org.comroid.api.tree.UncheckedCloseable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -103,6 +104,8 @@ public interface WorldMod extends SubMod, Command.ContextProvider, WorldModConfi
     }
 
     TextResourceProvider text();
+
+    UncheckedCloseable chunkload(String worldName, Vector.N2... chunks);
 
     default Stream<String> flagNames() {
         return Flag.VALUES.values().stream().flatMap(WorldMod::ownAndChildFlagNames).sorted();

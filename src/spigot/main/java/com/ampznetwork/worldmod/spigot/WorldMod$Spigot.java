@@ -14,12 +14,18 @@ import com.ampznetwork.worldmod.core.query.QueryManager;
 import com.ampznetwork.worldmod.spigot.adp.internal.SpigotEventDispatch;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.generator.WorldInfo;
+import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
+import org.comroid.api.tree.UncheckedCloseable;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,6 +36,7 @@ import java.util.stream.Stream;
 
 import static org.bukkit.Bukkit.*;
 
+@Slf4j
 @Getter
 public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod$Core {
     private final SpigotEventDispatch        eventDispatch = new SpigotEventDispatch(this);
@@ -73,6 +80,25 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod$Core {
     @Override
     public TextResourceProvider text() {
         return new TextResourceProvider(this);
+    }
+
+    @Override
+    public UncheckedCloseable chunkload(String worldName, Vector.N2... chunks) {
+        var world = getWorld(worldName);
+        if (world == null) throw new IllegalArgumentException("Unknown world: " + worldName);
+        return new UncheckedCloseable() {
+            final List<Chunk> loaded = Arrays.stream(chunks)
+                    .map(id -> world.getChunkAt((int) id.getX(), (int) id.getY()))
+                    .peek(chunk -> chunk.addPluginChunkTicket(WorldMod$Spigot.this))
+                    .toList();
+
+            @Override
+            public void close() {
+                for (var chunk : loaded) {
+                    chunk.removePluginChunkTicket(WorldMod$Spigot.this);
+                }
+            }
+        };
     }
 
     @Override

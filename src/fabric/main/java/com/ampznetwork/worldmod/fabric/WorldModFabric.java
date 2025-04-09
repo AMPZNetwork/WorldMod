@@ -92,6 +92,8 @@ public class WorldModFabric extends SubMod$Fabric implements ModInitializer, Wor
 
     @Override
     public void onInitialize() {
+        loadUnion();
+
         ServerLifecycleEvents.SERVER_STARTING.register(server -> this.server = server);
         ServerLifecycleEvents.SERVER_STARTED.register(server -> reloadQueryManagers());
 

@@ -22,15 +22,7 @@ public interface WorldMod$Core extends WorldMod {
         return prop;
     }
 
-    default void onLoad() {
-        loadUnion();
-    }
-
-    default void onInitialize() {
-        loadUnion();
-    }
-
-    private void loadUnion() {
+    default void loadUnion() {
         getScheduler().scheduleAtFixedRate(new ChunkloadingManager(this)::poll, 10, 60, TimeUnit.SECONDS);
     }
 }

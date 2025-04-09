@@ -84,6 +84,8 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod$Core {
 
     @Override
     public void onLoad() {
+        loadUnion();
+
         cmdr.register(WorldModCommands.class);
         cmdr.register(this);
 

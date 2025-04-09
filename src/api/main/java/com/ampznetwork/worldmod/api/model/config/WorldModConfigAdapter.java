@@ -9,6 +9,8 @@ import java.util.stream.Stream;
 public interface WorldModConfigAdapter extends ConfigurableMessageAdapter {
     boolean isSafeMode();
 
+    boolean chunkloadWhileOnlineOnly();
+
     boolean loggingSkipsNonPlayer();
 
     Stream<String> loggingSkipFlagNames();

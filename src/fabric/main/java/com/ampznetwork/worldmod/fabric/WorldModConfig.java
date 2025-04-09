@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 @Name(value = WorldMod.AddonId)
 public class WorldModConfig implements DataNode {
+    boolean chunkloadWhileOnlineOnly = true;
     boolean      loggingSkipsNonPlayer = true;
     List<String> loggingSkipFlags      = new ArrayList<>();
 }

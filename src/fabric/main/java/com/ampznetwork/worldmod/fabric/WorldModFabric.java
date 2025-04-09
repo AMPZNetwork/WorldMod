@@ -71,6 +71,11 @@ public class WorldModFabric extends SubMod$Fabric implements ModInitializer, Wor
     }
 
     @Override
+    public boolean chunkloadWhileOnlineOnly() {
+        return configManager.getConfig().isChunkloadWhileOnlineOnly();
+    }
+
+    @Override
     public boolean loggingSkipsNonPlayer() {
         return configManager.getConfig().isLoggingSkipsNonPlayer();
     }

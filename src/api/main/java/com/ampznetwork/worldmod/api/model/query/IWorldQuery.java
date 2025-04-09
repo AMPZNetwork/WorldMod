@@ -1,7 +1,7 @@
 package com.ampznetwork.worldmod.api.model.query;
 
 import com.ampznetwork.worldmod.api.WorldMod;
-import com.ampznetwork.worldmod.api.model.Delegate;
+import com.ampznetwork.worldmod.api.model.delegate.ModDelegate;
 import lombok.Value;
 
 import javax.persistence.AttributeConverter;
@@ -25,7 +25,7 @@ public interface IWorldQuery extends BiPredicate<WorldMod, QueryInputData> {
 
         @Override
         public IWorldQuery convertToEntityAttribute(String query) {
-            return Delegate.INSTANCE.parseQuery(query);
+            return ModDelegate.INSTANCE.parseQuery(query);
         }
     }
 }

@@ -7,6 +7,7 @@ import org.comroid.api.java.ResourceLoader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 public interface WorldMod$Core extends WorldMod {
     @Override
@@ -19,5 +20,17 @@ public interface WorldMod$Core extends WorldMod {
             prop.load(fis);
         }
         return prop;
+    }
+
+    default void onLoad() {
+        loadUnion();
+    }
+
+    default void onInitialize() {
+        loadUnion();
+    }
+
+    private void loadUnion() {
+        getScheduler().scheduleAtFixedRate(new ChunkloadingManager(this)::poll, 10, 60, TimeUnit.SECONDS);
     }
 }

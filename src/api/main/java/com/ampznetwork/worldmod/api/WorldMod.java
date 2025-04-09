@@ -2,6 +2,7 @@ package com.ampznetwork.worldmod.api;
 
 import com.ampznetwork.libmod.api.LibMod;
 import com.ampznetwork.libmod.api.SubMod;
+import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.model.TextResourceProvider;
@@ -17,7 +18,6 @@ import org.comroid.api.data.Vector;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
 import org.comroid.api.info.Log;
-import org.comroid.api.tree.UncheckedCloseable;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -86,26 +86,36 @@ public interface WorldMod extends SubMod, Command.ContextProvider, WorldModConfi
 
     default Stream<Region> findRegions(@NotNull Vector.N3 location, @NotNull String worldName) {
         return Stream.concat(getEntityService().getAccessor(Region.TYPE).querySelect("""
-                        with inside as (select a.*, ra.*
-                        from worldmod_region_areas ra
-                        join worldmod_areas a where ra.areas_id = a.id
-                        ), isMatch as (select Region_id as matchId, false
-                        ## Cuboid Matching
-                        or (shape = 0
-                        and (:posX between LEAST(x1,x2) and GREATEST(x1,x2) ## x inside
-                        and (:posY between LEAST(y1,y2) and GREATEST(y1,y2) ## y inside
-                        and (:posZ between LEAST(z1,z2) and GREATEST(z1,z2) ## z inside
-                        ))))
+                        with
+                            inside as (select a.*, ra.* from worldmod_region_areas ra
+                                        join worldmod_areas a where ra.areas_id = a.id),
+                            isMatch as (select Region_id as matchId, false
+                                            ## Cuboid Matching
+                                            or (shape = 0
+                                            and (:posX between LEAST(x1,x2) and GREATEST(x1,x2) ## x inside
+                                            and (:posY between LEAST(y1,y2) and GREATEST(y1,y2) ## y inside
+                                            and (:posZ between LEAST(z1,z2) and GREATEST(z1,z2) ## z inside
+                                            ))))
                         ## todo add more matching methods
-                        as bool from inside
-                        ) select r.* from worldmod_regions r, isMatch where bool and matchId = r.id and r.worldName = :worldName
+                                        as bool from inside)
+                        select r.* from worldmod_regions r, isMatch where bool and matchId = r.id and r.worldName = :worldName
                         """, Map.of("posX", location.getX(), "posY", location.getY(), "posZ", location.getZ(), "worldName", worldName)),
                 Stream.of(Region.global("world"))).sorted(Region.BY_PRIORITY);
     }
 
-    TextResourceProvider text();
+    default Stream<Region> findChunkloadedRegions() {
+        return getEntityService().getAccessor(Region.TYPE)
+                .querySelect("""
+                        select r.* from worldmod_regions r
+                                inner join dev.worldmod_region_flags rf on rf.id = r.id
+                                inner join dev.worldmod_region_group_flags rgf on rgf.id = r.group_id
+                            where rf.flag = 'manage.chunkload' or rgf.flag = 'manage.chunkload'
+                        """)
+                .sorted(Region.BY_PRIORITY)
+                .filter(rg -> !chunkloadWhileOnlineOnly() || rg.getMembers().stream().map(DbObject::getId).anyMatch(getPlayerAdapter()::isOnline));
+    }
 
-    UncheckedCloseable chunkload(String worldName, Vector.N2... chunks);
+    TextResourceProvider text();
 
     default Stream<String> flagNames() {
         return Flag.VALUES.values().stream().flatMap(WorldMod::ownAndChildFlagNames).sorted();

@@ -1,5 +1,7 @@
 # whether to deny everything if an error occurs within event handling
 safe-mode: true
+# whether to only respect manage.chunkload flag while any member of the region is online
+chunkload-while-online-only: true
 
 # configure wand items
 wand:

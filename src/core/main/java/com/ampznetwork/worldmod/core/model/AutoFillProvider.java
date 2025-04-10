@@ -14,6 +14,34 @@ import java.util.stream.Stream;
 import static org.comroid.api.Polyfill.*;
 
 public interface AutoFillProvider {
+    enum Regions implements Command.AutoFillProvider {
+        @Instance INSTANCE;
+
+        @Override
+        public Stream<String> autoFill(Command.Usage usage, String argName, String currentValue) {
+            return usage.getContext()
+                    .stream()
+                    .flatMap(Streams.cast(SubMod.class))
+                    .flatMap(mod -> mod.getEntityService().getAccessor(Region.TYPE).all())
+                    .flatMap(Streams.cast(Named.class))
+                    .map(Named::getName);
+        }
+    }
+
+    enum Groups implements Command.AutoFillProvider {
+        @Instance INSTANCE;
+
+        @Override
+        public Stream<String> autoFill(Command.Usage usage, String argName, String currentValue) {
+            return usage.getContext()
+                    .stream()
+                    .flatMap(Streams.cast(SubMod.class))
+                    .flatMap(mod -> mod.getEntityService().getAccessor(Group.TYPE).all())
+                    .flatMap(Streams.cast(Named.class))
+                    .map(Named::getName);
+        }
+    }
+
     enum RegionsAndGroups implements Command.AutoFillProvider {
         @Instance INSTANCE;
 

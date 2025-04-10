@@ -1,19 +1,23 @@
 package com.ampznetwork.worldmod.core;
 
+import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.libmod.api.entity.Player;
+import com.ampznetwork.libmod.api.model.API;
 import com.ampznetwork.libmod.api.model.AutoFillProvider;
 import com.ampznetwork.libmod.api.util.NameGenerator;
 import com.ampznetwork.libmod.api.util.Util;
-import com.ampznetwork.libmod.api.util.chat.BroadcastType;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.mini.PlayerRelation;
 import com.ampznetwork.worldmod.api.model.query.IQueryManager;
+import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.ampznetwork.worldmod.core.model.AutoFillProvider.Flags;
+import com.ampznetwork.worldmod.core.model.AutoFillProvider.Groups;
+import com.ampznetwork.worldmod.core.model.AutoFillProvider.Regions;
 import com.ampznetwork.worldmod.core.model.AutoFillProvider.RegionsAndGroups;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.core.ui.ClaimMenuBook;
@@ -43,6 +47,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 
+import static com.ampznetwork.libmod.api.util.chat.BroadcastType.*;
 import static com.ampznetwork.worldmod.api.WorldMod.*;
 import static java.util.stream.Collectors.*;
 import static java.util.stream.Stream.*;
@@ -56,14 +61,14 @@ public class WorldModCommands {
 
     @Alias("sel")
     @Command(permission = worldmod.SELECTION, privacy = Command.PrivacyLevel.PRIVATE)
-    public String select(UUID playerId, @Command.Arg @Nullable Shape type) {
+    public Component select(WorldMod mod, UUID playerId, @Command.Arg @Nullable Shape type) {
         if (type == null) {
             selections.remove(playerId);
-            return "Selection cleared";
+            return mod.chat().createMessage(HINT, "Selection cleared");
         }
         sel(playerId).shape(type);
         clearSel(playerId);
-        return "Now selecting as " + type.name();
+        return mod.chat().createMessage("Now selecting {} shapes", type.name());
     }
 
     @Command
@@ -113,17 +118,17 @@ public class WorldModCommands {
     @Command(permission = worldmod.SELECTION, privacy = Command.PrivacyLevel.PRIVATE)
     public static class position {
         @Command
-        public static String $(WorldMod worldMod, UUID playerId, @Command.Arg(autoFill = { "1", "2" }) int index) {
-            var pos = worldMod.getLib().getPlayerAdapter().getPosition(playerId);
+        public static Component $(WorldMod mod, UUID playerId, @Command.Arg(autoFill = { "1", "2" }) int index) {
+            var pos = mod.getLib().getPlayerAdapter().getPosition(playerId);
             if (index == 1) sel(playerId).x1((int) pos.getX()).y1((int) pos.getY()).z1((int) pos.getZ());
             else if (index == 2) sel(playerId).x2((int) pos.getX()).y2((int) pos.getY()).z2((int) pos.getZ());
-            return "Set position " + index;
+            return mod.chat().createMessage("Set position {}", index);
         }
 
         @Command
-        public static String clear(UUID playerId) {
+        public static Component clear(WorldMod mod, UUID playerId) {
             clearSel(playerId);
-            return "Selection cleared";
+            return mod.chat().createMessage(HINT, "Selection cleared");
         }
     }
 
@@ -131,95 +136,140 @@ public class WorldModCommands {
     @Alias("region")
     public static class claim {
         @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
-        public static String $(WorldMod worldMod, UUID playerId, @Nullable @Command.Arg(required = false) String name) {
-            var player = worldMod.getLib().getPlayerAdapter().getPlayer(playerId).orElseThrow();
-            if (!selections.containsKey(playerId)) throw new Command.Error("No area selected!");
+        public static Component $(WorldMod mod, UUID playerId, @Nullable @Command.Arg(required = false) String name) {
+            var player = mod.getLib().getPlayerAdapter().getPlayer(playerId).orElseThrow();
+            if (!selections.containsKey(playerId)) return mod.chat().createMessage(ERROR, "No area selected");
             var sel = sel(playerId).build();
             sel.validateShapeMask();
-            var world = worldMod.getLib().getPlayerAdapter().getWorldName(playerId);
-            var rg = Region.builder().serverName(worldMod.getLib().getServerName()).area(sel).worldName(world).claimOwner(player);
+            var world = mod.getLib().getPlayerAdapter().getWorldName(playerId);
+            var rg    = Region.builder().serverName(mod.getLib().getServerName()).area(sel).worldName(world).claimOwner(player);
             if (name != null) rg.name(name);
-            if (!worldMod.addRegion(rg.build())) throw new Command.Error("Could not create claim");
-            return "Area claimed!";
+            if (!mod.addRegion(rg.build())) return mod.chat().createMessage(FATAL, "Could not create claim");
+            return mod.chat().createMessage("Area claimed!");
         }
 
         @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
-        public static Component info(WorldMod mod, @Nullable Region region) {
+        public static Component info(
+                WorldMod mod, @Nullable Region region0,
+                @Nullable @Command.Arg(required = false, autoFillProvider = Regions.class) String regionName
+        ) {
+            var region = requireRegion(mod, region0, regionName);
             return mod.text().ofRegion(region);
         }
 
         @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
-        public static void menu(WorldMod worldMod, Player player, @Nullable Region region) {
-            isClaimed(region);
-            var menu = new ClaimMenuBook(worldMod.getLib(), region, player);
-            worldMod.getLib().getPlayerAdapter().openBook(player, menu);
-        }
-
-        @Command
-        public static String name(
-                WorldMod worldMod, Player player, @Nullable Region region,
-                @Nullable @Command.Arg(stringMode = StringMode.GREEDY, required = false) String arg
+        public static void menu(
+                WorldMod mod, Player player, @Nullable Region region0,
+                @Nullable @Command.Arg(required = false, autoFillProvider = Regions.class) String regionName
         ) {
+            var region = requireRegion(mod, region0, regionName);
             isClaimed(region);
-            if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player) != TriState.TRUE) notPermitted();
-            if (arg == null) arg = NameGenerator.POI.get();
-            region.setName(arg);
-            worldMod.getEntityService().save(region);
-            return "Name was changed to " + arg;
+            var menu = new ClaimMenuBook(mod.getLib(), region, player);
+            mod.getLib().getPlayerAdapter().openBook(player, menu);
         }
 
         @Command
-        public static String group(WorldMod worldMod, UUID playerId, @Nullable Region region, @Nullable @Command.Arg String arg) {
-            throw new Command.Error("Not implemented");
+        public static Component name(
+                WorldMod mod, Player player, @Nullable Region region0,
+                @Nullable @Command.Arg(required = false, autoFillProvider = Regions.class) String regionName,
+                @Nullable @Command.Arg(stringMode = StringMode.GREEDY, required = false) String newName
+        ) {
+            var region = requireRegion(mod, region0, regionName);
+            isClaimed(region);
+            if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player) != TriState.TRUE) notPermitted();
+            if (newName == null) newName = NameGenerator.POI.get();
+            region.setName(newName);
+            mod.getEntityService().save(region);
+            return mod.chat().createMessage("Region name was changed to {}", newName);
         }
 
         @Command
-        public static String owner(WorldMod worldMod, Player player, @Nullable Region region, @Nullable @Command.Arg String arg) {
-            isClaimed(region);
+        public static Component group(
+                WorldMod mod, Player player, @Nullable Region region0,
+                @Nullable @Command.Arg(required = false, autoFillProvider = Groups.class) String groupName,
+                @Nullable @Command.Arg(required = false, autoFillProvider = Regions.class) String regionName
+        ) {
+            var region = requireRegion(mod, region0, regionName);
             if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player) != TriState.TRUE) notPermitted();
-            if (arg == null) {
-                region.setClaimOwner(null);
-                return "Owner removed";
+
+            try {
+                if (groupName == null) {
+                    // unset
+                    region.setGroup(null);
+                    return mod.chat().createMessage(HINT, "Region {} had its group {}", region.getName(), "removed");
+                }
+
+                // find and set
+                var select = mod.getEntityAccessor(Group.TYPE).by(DbObject.WithName::getName).get(groupName);
+                if (select.isEmpty())
+                    return mod.chat().createMessage(ERROR, "Group with name '{}' was not found", groupName);
+                region.setGroup(select.get());
+                return mod.chat().createMessage("Region {} had its group set to {}", region.getName(), groupName);
+            } finally {
+                mod.getEntityService().save(region);
             }
-            var targetId = worldMod.getLib().getPlayerAdapter().getIdOrThrow(arg);
-            var target = worldMod.getLib().getPlayerAdapter().getPlayer(targetId).orElseThrow();
-            region.setClaimOwner(target);
-            worldMod.getEntityService().save(region);
-            return target.getName() + " is now owner of " + region.getBestName();
+        }
+
+        @Command
+        public static String owner(
+                WorldMod mod, Player player, @Nullable Region region0, @Nullable @Command.Arg String newOwnerName,
+                @Nullable @Command.Arg(required = false, autoFillProvider = Regions.class) String regionName
+        ) {
+            var region = requireRegion(mod, region0, regionName);
+            isClaimed(region);
+            if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player) != TriState.TRUE) notPermitted();
+
+            try {
+                if (newOwnerName == null) {
+                    region.setClaimOwner(null);
+                    return "Owner removed";
+                }
+                var targetId = mod.getLib().getPlayerAdapter().getIdOrThrow(newOwnerName);
+                var target   = mod.getLib().getPlayerAdapter().getPlayer(targetId).orElseThrow();
+                region.setClaimOwner(target);
+                return target.getName() + " is now owner of " + region.getBestName();
+            } finally {
+                mod.getEntityService().save(region);
+            }
         }
 
         @Command
         public static Component flag(
-                WorldMod mod, UUID playerId, @Nullable Region region, @Command.Arg(autoFillProvider = Flags.class) String flagName,
+                WorldMod mod, UUID playerId, @Nullable Region region0, @Command.Arg(autoFillProvider = Flags.class) String flagName,
                 @Nullable @Command.Arg(required = false) TriState state,
                 @Nullable @Command.Arg(required = false, autoFillProvider = RegionsAndGroups.class) String regionName
         ) {
-            final var regions = mod.getEntityAccessor(Region.TYPE);
-            if ((region == null || region.isGlobal())) {
-                if (regionName == null) throw new Command.Error("You must either provide a region name or be inside a region");
-                else {
-                    region = regions.by(Region::getName).get(regionName).orElseThrow(() -> new Command.Error("No such region: " + regionName));
-                }
-            }
-            var flag = Flag.getForName(flagName);
+            var region = requireRegion(mod, region0, regionName);
+            var flag   = Flag.getForName(flagName);
             if (flag == null) throw new Command.Error("No such flag: " + flagName);
-            if (state == null) state = TriState.TRUE;
+            if (state == null) state = TriState.byBoolean(flag.isAllowByDefault());
 
             final var fState  = state;
             final var removed = new boolean[1];
             var       usage   = new Flag.Usage(flag, 0, state, 0, false);
-            regions.update(region.getId(), rg -> {
+            mod.getEntityAccessor(Region.TYPE).update(region.getId(), rg -> {
                 var flags = rg.getDeclaredFlags();
                 removed[0] = flags.remove(usage) && fState == TriState.NOT_SET;
                 if (fState != TriState.NOT_SET) flags.add(usage);
             });
 
             return mod.chat()
-                    .createMessage(BroadcastType.HINT,
+                    .createMessage(HINT,
                             "Flag {} configuration {} in region {}",
                             usage,
                             removed[0] ? "removed" : "set to " + fState.name(),
                             region.getName());
+        }
+
+        private static Region requireRegion(API api, @Nullable Region region, @Nullable String regionName) {
+            if ((region == null || region.isGlobal())) {
+                if (regionName == null) throw new Command.Error("You must either provide a region name or be inside a region");
+                return api.getEntityAccessor(Region.TYPE)
+                        .by(Region::getName)
+                        .get(regionName)
+                        .orElseThrow(() -> new Command.Error("No such region: " + regionName));
+            }
+            return region;
         }
 
         @Command
@@ -239,31 +289,44 @@ public class WorldModCommands {
             }
 
             @Command
-            public static String add(
-                    WorldMod worldMod, Player player, @Nullable Region region, @Command.Arg("0") String targetName,
+            public static Component add(
+                    WorldMod mod, Player player, @Nullable Region region, @Command.Arg("0") String targetName,
                     @Command.Arg("1") @Nullable @Default("PlayerRelation.MEMBER") PlayerRelation type
             ) {
                 if (type == null) type = PlayerRelation.MEMBER;
                 isClaimed(region);
                 if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player) != TriState.TRUE) notPermitted();
-                var targetId = worldMod.getLib().getPlayerAdapter().getIdOrThrow(targetName);
-                var target = worldMod.getLib().getPlayerAdapter().getPlayer(targetId).orElseThrow();
-                (switch (type) {
-                    case MEMBER -> region.getMembers();
-                    case ADMIN -> region.getOwners();
-                    default -> throw new Command.Error("cannot add member of this type");
-                }).add(target);
-                return "%s was added to the list of %ss".formatted(player, type.name().toLowerCase());
+                var targetId = mod.getLib().getPlayerAdapter().getIdOrThrow(targetName);
+                var target   = mod.getLib().getPlayerAdapter().getPlayer(targetId).orElseThrow();
+
+                try {
+                    switch (type) {
+                        case MEMBER:
+                            region.getMembers().add(target);
+                            break;
+                        case ADMIN:
+                            region.getOwners().add(target);
+                            break;
+                        default:
+                            return mod.chat().createMessage(FATAL, "Cannot add member of type {}", type);
+                    }
+                    return mod.chat().createMessage("{} was added to the list of {}s", player, type.name().toLowerCase());
+                } finally {
+                    mod.getEntityService().save(region);
+                }
             }
 
             @Command
-            public static String remove(WorldMod worldMod, Player player, @Nullable Region region, @Command.Arg String targetName) {
+            public static Component remove(WorldMod mod, Player player, @Nullable Region region, @Command.Arg String targetName) {
                 isClaimed(region);
                 if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player) != TriState.TRUE) notPermitted();
-                var targetId = worldMod.getLib().getPlayerAdapter().getIdOrThrow(targetName);
-                var wasOwner  = region.getOwners().remove(targetId);
-                var wasMember = region.getMembers().remove(targetId);
-                return "%s was removed from the list of %s".formatted(targetName,
+                var select = mod.getLib().getPlayerAdapter().getPlayer(targetName);
+                if (select.isEmpty()) return mod.chat().createMessage(ERROR, "Player with name '{}' could not be found");
+                var target    = select.get();
+                var wasOwner  = region.getOwners().remove(target);
+                var wasMember = region.getMembers().remove(target);
+                mod.getEntityService().save(region);
+                return mod.chat().createMessage(HINT, "{} was removed from the list of {}", targetName,
                         concat(wasOwner ? of(PlayerRelation.ADMIN) : Stream.empty(), wasMember ? of(PlayerRelation.MEMBER) : Stream.empty()).map(Named::getName)
                                 .map(String::toLowerCase)
                                 .map(str -> str + 's')
@@ -322,7 +385,7 @@ public class WorldModCommands {
                     .map(Map.Entry::getValue)
                     .map(IQueryManager::getQueries)
                     .forEach(ls -> ls.add(parse));
-            return text("Query parsed and added to memory configuration; save with /worldmod:query save", GREEN);
+            return mod.chat().createMessage(HINT, "Query parsed and added to memory configuration; save with {}", "/worldmod:query save");
         }
 
         @Command(permission = worldmod.QUERY)
@@ -332,7 +395,7 @@ public class WorldModCommands {
         ) {
             remove(mod, worldName, number);
             add(mod, worldName, query);
-            return text("Query updated", AQUA);
+            return mod.chat().createMessage("Query updated");
         }
 
         @Command(permission = worldmod.QUERY)
@@ -340,18 +403,17 @@ public class WorldModCommands {
                 WorldMod mod, @Command.Arg(autoFillProvider = AutoFillProvider.WorldNames.class) @NotNull String worldName,
                 @Command.Arg int number
         ) {
-            return text("Removed " + Word.plural("world query",
-                    "\bies",
-                    mod.getQueryManagers()
-                            .entrySet()
-                            .stream()
-                            .filter(e -> worldName == null || worldName.isBlank() || worldName.equals(e.getKey()))
-                            .map(Map.Entry::getValue)
-                            .map(IQueryManager::getQueries)
-                            .filter(ls -> ls.size() <= number)
-                            .map(ls -> ls.remove(number - 1))
-                            .toList()
-                            .size()), YELLOW);
+            var count = mod.getQueryManagers()
+                    .entrySet()
+                    .stream()
+                    .filter(e -> worldName == null || worldName.isBlank() || worldName.equals(e.getKey()))
+                    .map(Map.Entry::getValue)
+                    .map(IQueryManager::getQueries)
+                    .filter(ls -> ls.size() <= number)
+                    .map(ls -> ls.remove(number - 1))
+                    .toList()
+                    .size();
+            return mod.chat().createMessage(HINT, "Removed {} world " + Word.plural("query", "\bies", count));
         }
 
         @Command(permission = worldmod.QUERY)
@@ -359,20 +421,19 @@ public class WorldModCommands {
                 WorldMod mod,
                 @Command.Arg(required = false, autoFillProvider = AutoFillProvider.WorldNames.class) @Nullable String worldName
         ) {
-            return text("Removed " + Word.plural("world query",
-                    "\bies",
-                    mod.getQueryManagers()
-                            .entrySet()
-                            .stream()
-                            .filter(e -> worldName == null || worldName.isBlank() || worldName.equals(e.getKey()))
-                            .map(Map.Entry::getValue)
-                            .map(IQueryManager::getQueries)
-                            .mapToInt(ls -> {
-                                var size = ls.size();
-                                ls.clear();
-                                return size;
-                            })
-                            .sum()), YELLOW);
+            var count = mod.getQueryManagers()
+                    .entrySet()
+                    .stream()
+                    .filter(e -> worldName == null || worldName.isBlank() || worldName.equals(e.getKey()))
+                    .map(Map.Entry::getValue)
+                    .map(IQueryManager::getQueries)
+                    .mapToInt(ls -> {
+                        var size = ls.size();
+                        ls.clear();
+                        return size;
+                    })
+                    .sum();
+            return mod.chat().createMessage(HINT, "Cleared {} world " + Word.plural("query", "\bies", count));
         }
 
         @Command(permission = worldmod.QUERY)
@@ -380,16 +441,15 @@ public class WorldModCommands {
                 WorldMod mod,
                 @Command.Arg(required = false, autoFillProvider = AutoFillProvider.WorldNames.class) @Nullable String worldName
         ) {
-            return text("Saved " + Word.plural("query manager",
-                    "s",
-                    mod.getQueryManagers()
-                            .entrySet()
-                            .stream()
-                            .filter(e -> worldName == null || worldName.isBlank() || worldName.equals(e.getKey()))
-                            .map(Map.Entry::getValue)
-                            .peek(IQueryManager::save)
-                            .toList()
-                            .size()), GREEN);
+            var count = mod.getQueryManagers()
+                    .entrySet()
+                    .stream()
+                    .filter(e -> worldName == null || worldName.isBlank() || worldName.equals(e.getKey()))
+                    .map(Map.Entry::getValue)
+                    .peek(IQueryManager::save)
+                    .mapToInt(mgr -> mgr.getQueries().size())
+                    .sum();
+            return mod.chat().createMessage(HINT, "Saved {} world " + Word.plural("query", "\bies", count));
         }
     }
 }

@@ -34,7 +34,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Value
-@EqualsAndHashCode(of = "name")
+@EqualsAndHashCode(of = { "parent", "name" })
 public class Flag implements Named, Described, Prioritized {
     private static final Map<String, Flag>        $                   = new ConcurrentHashMap<>();
     public static final  Map<String, Flag>        VALUES              = Collections.unmodifiableMap($);

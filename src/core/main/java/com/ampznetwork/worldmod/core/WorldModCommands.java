@@ -247,7 +247,7 @@ public class WorldModCommands {
             final var fState  = state;
             final var removed = new boolean[1];
             var       usage   = new Flag.Usage(flag, 0, state, 0, false);
-            mod.getEntityAccessor(Region.TYPE).update(region.getId(), rg -> {
+            mod.getEntityAccessor(Region.TYPE).update(region, rg -> {
                 var flags = rg.getDeclaredFlags();
                 removed[0] = flags.remove(usage) && fState == TriState.NOT_SET;
                 if (fState != TriState.NOT_SET) flags.add(usage);

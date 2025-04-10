@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.Value;
@@ -22,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.AttributeConverter;
+import javax.persistence.Convert;
+import javax.persistence.Embeddable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -221,8 +224,13 @@ public class Flag implements Named, Described, Prioritized {
         return parent == null ? name : parent.getCanonicalName() + '.' + name;
     }
 
+    @Override
+    public String toString() {
+        return getCanonicalName();
+    }
+
     @javax.persistence.Converter(autoApply = true)
-    public class Converter implements AttributeConverter<Flag, String> {
+    public static class Converter implements AttributeConverter<Flag, String> {
         @Override
         @SneakyThrows
         public String convertToDatabaseColumn(Flag attribute) {
@@ -247,18 +255,20 @@ public class Flag implements Named, Described, Prioritized {
     @Data
     @With
     @Builder
-    @EqualsAndHashCode
+    @Embeddable
+    @NoArgsConstructor
     @AllArgsConstructor
     @RequiredArgsConstructor
+    @EqualsAndHashCode(of = { "flag", "target" })
     public static class Usage implements Prioritized {
-        @NotNull                                                               Flag     flag;
+        @Convert(converter = Flag.Converter.class) @NotNull                    Flag    flag;
+        @lombok.Builder.Default @MagicConstant(valuesFromClass = Target.class) long    target = Bitmask.combine(Usage.Target.Guests, Usage.Target.Members);
         @lombok.Builder.Default @NotNull                                       TriState state    = TriState.NOT_SET;
-        @lombok.Builder.Default @MagicConstant(valuesFromClass = Target.class) long     target   = Bitmask.combine(Usage.Target.Guests, Usage.Target.Members);
         @lombok.Builder.Default                                                long     priority = 0;
-        @lombok.Builder.Default                                                boolean  force    = false;
+        @lombok.Builder.Default                                                boolean forced = false;
 
         public long getPriority() {
-            return force ? Long.MAX_VALUE : priority;
+            return forced ? Long.MAX_VALUE : priority;
         }
 
         public boolean appliesToUser(OwnedByParty target, UUID playerId) {
@@ -266,6 +276,11 @@ public class Flag implements Named, Described, Prioritized {
             var member = target.getMembers().stream().map(DbObject::getId).anyMatch(playerId::equals);
             var mask = this.target;
             return owner ? Usage.Target.Owners.isFlagSet(mask) : member ? Usage.Target.Members.isFlagSet(mask) : Usage.Target.Guests.isFlagSet(mask);
+        }
+
+        @Override
+        public String toString() {
+            return String.valueOf(forced ? 'f' : priority) + ' ' + flag.getCanonicalName() + " @" + target + " = " + state.name().toLowerCase();
         }
 
         public enum Target implements Named, Bitmask.Attribute<Usage.Target> {

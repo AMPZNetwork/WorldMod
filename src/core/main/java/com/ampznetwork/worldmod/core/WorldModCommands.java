@@ -4,6 +4,7 @@ import com.ampznetwork.libmod.api.entity.Player;
 import com.ampznetwork.libmod.api.model.AutoFillProvider;
 import com.ampznetwork.libmod.api.util.NameGenerator;
 import com.ampznetwork.libmod.api.util.Util;
+import com.ampznetwork.libmod.api.util.chat.BroadcastType;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
@@ -12,6 +13,8 @@ import com.ampznetwork.worldmod.api.model.mini.PlayerRelation;
 import com.ampznetwork.worldmod.api.model.query.IQueryManager;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.api.model.sel.Area;
+import com.ampznetwork.worldmod.core.model.AutoFillProvider.Flags;
+import com.ampznetwork.worldmod.core.model.AutoFillProvider.RegionsAndGroups;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.core.ui.ClaimMenuBook;
 import com.ampznetwork.worldmod.generated.PluginYml.Permission.worldmod;
@@ -186,6 +189,40 @@ public class WorldModCommands {
         }
 
         @Command
+        public static Component flag(
+                WorldMod mod, UUID playerId, @Nullable Region region, @Command.Arg(autoFillProvider = Flags.class) String flagName,
+                @Nullable @Command.Arg(required = false) TriState state,
+                @Nullable @Command.Arg(required = false, autoFillProvider = RegionsAndGroups.class) String regionName
+        ) {
+            final var regions = mod.getEntityAccessor(Region.TYPE);
+            if ((region == null || region.isGlobal())) {
+                if (regionName == null) throw new Command.Error("You must either provide a region name or be inside a region");
+                else {
+                    region = regions.by(Region::getName).get(regionName).orElseThrow(() -> new Command.Error("No such region: " + regionName));
+                }
+            }
+            var flag = Flag.getForName(flagName);
+            if (flag == null) throw new Command.Error("No such flag: " + flagName);
+            if (state == null) state = TriState.TRUE;
+
+            final var fState  = state;
+            final var removed = new boolean[1];
+            var       usage   = new Flag.Usage(flag, 0, state, 0, false);
+            regions.update(region.getId(), rg -> {
+                var flags = rg.getDeclaredFlags();
+                removed[0] = flags.remove(usage) && fState == TriState.NOT_SET;
+                if (fState != TriState.NOT_SET) flags.add(usage);
+            });
+
+            return mod.chat()
+                    .createMessage(BroadcastType.HINT,
+                            "Flag {} configuration {} in region {}",
+                            usage,
+                            removed[0] ? "removed" : "set to " + fState.name(),
+                            region.getName());
+        }
+
+        @Command
         public static class member {
             @Command
             public static String list(WorldMod worldMod, @Nullable Region region) {
@@ -231,14 +268,6 @@ public class WorldModCommands {
                                 .map(String::toLowerCase)
                                 .map(str -> str + 's')
                                 .collect(joining(" and ")));
-            }
-        }
-
-        @Command
-        public static class flag {
-            @Command
-            public static String set(WorldMod worldMod, UUID playerId, @Nullable Region region, @Command.Arg String name, @Command.Arg String value) {
-                throw new Command.Error("Not implemented");
             }
         }
     }

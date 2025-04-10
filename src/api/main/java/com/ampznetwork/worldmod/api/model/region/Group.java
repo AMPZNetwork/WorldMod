@@ -17,14 +17,13 @@ import org.comroid.api.attr.Named;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.CollectionTable;
-import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -37,17 +36,18 @@ import java.util.stream.Stream;
 //@RequiredArgsConstructor
 @Table(name = "worldmod_region_groups")
 public class Group extends DbObject.WithName implements PropagationController, Prioritized, Named {
-    public static final                                                                     EntityType<Group, Builder<Group, ?>> TYPE     = Polyfill.uncheckedCast(
-            new EntityType<>(
-                    Group::builder,
+    public static final                                                                      EntityType<Group, Builder<Group, ?>> TYPE     = Polyfill.uncheckedCast(
+            new EntityType<>(Group::builder,
                     null,
                     Group.class,
                     Group.Builder.class));
-    @Default                                                                                long                                 priority = 0;
-    @Singular("owner") @ManyToMany @CollectionTable(name = "worldmod_region_group_owners")  Set<Player>                          owners   = new HashSet<>();
+    @Default                                                                                 long                                 priority = 0;
+    @Singular("owner") @ManyToMany @CollectionTable(name = "worldmod_region_group_owners")   Set<Player>                          owners   = new HashSet<>();
     @Singular("member") @ManyToMany @CollectionTable(name = "worldmod_region_group_members") Set<Player>                          members  = new HashSet<>();
-    @Column(name = "flag") @CollectionTable(name = "worldmod_region_group_flags", joinColumns = @JoinColumn(name = "id"))
-    @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class)
+    @Singular @ElementCollection @Convert(converter = Flag.Converter.class)
+    @CollectionTable(name = "worldmod_group_flags",
+                     joinColumns = @JoinColumn(name = "id"),
+                     uniqueConstraints = { @UniqueConstraint(columnNames = { "id", "flag", "state", "target" }) })
     Set<Flag.Usage> declaredFlags = new HashSet<>();
 
     @Override

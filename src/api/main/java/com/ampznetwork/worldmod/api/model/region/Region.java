@@ -8,7 +8,6 @@ import com.ampznetwork.libmod.api.util.NameGenerator;
 import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.math.Shape;
 import com.ampznetwork.worldmod.api.model.mini.PointCollider;
-import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.ampznetwork.worldmod.api.model.mini.PropagationController;
 import com.ampznetwork.worldmod.api.model.mini.ShapeCollider;
 import com.ampznetwork.worldmod.api.model.query.IWorldQuery;
@@ -30,17 +29,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.CollectionTable;
-import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -60,7 +58,7 @@ import static java.util.stream.Stream.*;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 @Table(name = "worldmod_regions", uniqueConstraints = @UniqueConstraint(columnNames = { "name", "worldName" }))
-public class Region extends DbObject implements PropagationController, ShapeCollider, Prioritized, Named, PointCollider {
+public class Region extends DbObject implements PropagationController, ShapeCollider, Named, PointCollider {
     private static final Map<String, Region>                    GlobalRegions      = new ConcurrentHashMap<>();
     public static final  EntityType<Region, Builder<Region, ?>> TYPE               = Polyfill.uncheckedCast(new EntityType<>(Region::builder,
             null,
@@ -88,14 +86,27 @@ public class Region extends DbObject implements PropagationController, ShapeColl
     @Singular("query") @ElementCollection @CollectionTable(name = "worldmod_region_queries") @Convert(converter = IWorldQuery.Converter.class)
     Set<IWorldQuery> queries;
     @Singular("area") @ManyToMany @CollectionTable(name = "worldmod_region_areas") Set<Area> areas;
-    @ElementCollection(fetch = FetchType.EAGER) @Singular("flag") @Convert(converter = Flag.Usage.Converter.class) @Column(name = "flag")
-    @CollectionTable(name = "worldmod_region_flags", joinColumns = @JoinColumn(name = "id")) Set<Flag.Usage> declaredFags;
-    @Default @Nullable @NonFinal @ManyToOne                                                  Player          claimOwner = null;
-    @Default @Nullable @NonFinal @ManyToOne                                                  Group           group      = null;
-    @Default @NonFinal                                                                       long            priority   = 0;
+    @Singular @ElementCollection @Convert(converter = Flag.Converter.class)
+    @CollectionTable(name = "worldmod_region_flags",
+                     joinColumns = @JoinColumn(name = "id"),
+                     uniqueConstraints = { @UniqueConstraint(columnNames = { "id", "flag", "state", "target" }) })
+    Set<Flag.Usage> declaredFlags = new HashSet<>();
+    @Default @Nullable @NonFinal @ManyToOne Player claimOwner = null;
+    @Default @Nullable @NonFinal @ManyToOne Group  group      = null;
+    @Default @NonFinal                      long   priority   = 0;
 
+    @Override
     public Set<Player> getOwners() {
         return Stream.concat(Stream.of(claimOwner), owners.stream()).filter(Objects::nonNull).collect(Collectors.toUnmodifiableSet());
+    }
+
+    @Override
+    public Stream<Flag.Usage> streamDeclaredFlags() {
+        var group = getGroup();
+        return (group == null
+                ? declaredFlags.stream()
+                : concat(declaredFlags.stream(), group.streamDeclaredFlags())).sorted(Comparator.<Flag.Usage>comparingLong(
+                value -> -value.getFlag().getPriority()).thenComparingLong(value -> -value.getPriority()));
     }
 
     public boolean isGlobal() {
@@ -110,13 +121,6 @@ public class Region extends DbObject implements PropagationController, ShapeColl
     @Override
     public boolean isPointInside(Vector.N3 point) {
         return areas.stream().anyMatch(area -> area.isPointInside(point));
-    }
-
-    @Override
-    public Stream<Flag.Usage> streamDeclaredFlags() {
-        var group = getGroup();
-        return (group == null ? declaredFags.stream() : concat(declaredFags.stream(), group.streamDeclaredFlags())).sorted(Comparator.<Flag.Usage>comparingLong(
-                value -> -value.getFlag().getPriority()).thenComparingLong(value -> -value.getPriority()));
     }
 
     public Stream<Region> findOverlaps(API api) {

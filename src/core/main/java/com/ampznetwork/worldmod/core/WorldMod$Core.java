@@ -14,7 +14,7 @@ public interface WorldMod$Core extends WorldMod {
     @SneakyThrows
     default Properties getMessages() {
         var path = "plugins/WorldMod/messages.lang";
-        ResourceLoader.assertFile(WorldModCommands.class, "messages.lang", new File(path), () -> "# Include custom messages here");
+        ResourceLoader.assertFile(WorldModCommands.class, "/messages.lang", new File(path), () -> "# Include custom messages here");
         var prop = new Properties();
         try (var fis = new FileInputStream(path)) {
             prop.load(fis);

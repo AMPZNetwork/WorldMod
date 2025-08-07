@@ -1,5 +1,6 @@
 package com.ampznetwork.worldmod.spigot;
 
+import com.ampznetwork.libmod.api.model.info.DatabaseInfo;
 import com.ampznetwork.libmod.spigot.SubMod$Spigot;
 import com.ampznetwork.worldmod.api.model.TextResourceProvider;
 import com.ampznetwork.worldmod.api.model.WandType;
@@ -20,6 +21,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.generator.WorldInfo;
 import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Set;
@@ -75,6 +77,16 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod$Core {
             map.put(type, itemResourceKey);
         }
         return map;
+    }
+
+    @Override
+    public @Nullable DatabaseInfo getDatabaseInfo() {
+        return config.contains("database") ? database() : null;
+    }
+
+    @Override
+    public DatabaseInfo database() {
+        return config.getObject("database", DatabaseInfo.class);
     }
 
     @Override

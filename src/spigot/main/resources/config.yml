@@ -3,6 +3,13 @@ safe-mode: true
 # whether to only respect manage.chunkload flag while any member of the region is online
 chunkload-while-online-only: true
 
+# note: if your common database defined in LibMod is remote, uncomment this to use a local h2 based database to avoid performance issues
+#database:
+#  type: h2
+#  url: jdbc:h2:file:./worldmod.h2
+#  username: sa
+#  password:
+
 # configure wand items
 wand:
   selection: minecraft:stick

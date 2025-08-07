@@ -8,7 +8,9 @@ import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.api.model.TextResourceProvider;
 import com.ampznetwork.worldmod.api.model.WandType;
 import com.ampznetwork.worldmod.api.model.config.WorldModConfigAdapter;
+import com.ampznetwork.worldmod.api.model.log.LogEntry;
 import com.ampznetwork.worldmod.api.model.query.IQueryManager;
+import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.api.model.sel.Area;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -27,6 +29,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -53,6 +56,13 @@ public interface WorldMod extends SubMod, Command.ContextProvider, WorldModConfi
     }
 
     @Override
+    default Set<Class<? extends DbObject>> getEntityTypes() {
+        return Stream.concat(getLib().getEntityTypes().stream(),
+                        Stream.of(Region.class, Group.class, LogEntry.class, Area.class))
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    @Override
     default TextColor getThemeColor() {
         return NamedTextColor.LIGHT_PURPLE;
     }
@@ -69,13 +79,21 @@ public interface WorldMod extends SubMod, Command.ContextProvider, WorldModConfi
     Map<String, IQueryManager> getQueryManagers();
 
     default Optional<WandType> findWandType(String itemResourceKey) {
-        return wandItems().entrySet().stream().filter(e -> LibMod.equalResourceKey(itemResourceKey, e.getValue())).findAny().map(Map.Entry::getKey);
+        return wandItems().entrySet()
+                .stream()
+                .filter(e -> LibMod.equalResourceKey(itemResourceKey, e.getValue()))
+                .findAny()
+                .map(Map.Entry::getKey);
     }
 
     default boolean addRegion(Region region) {
-        if (region.findOverlaps(this).findAny().isPresent()) throw new Command.Error("The selected area is overlapping with another claim");
+        if (region.findOverlaps(this).findAny().isPresent())
+            throw new Command.Error("The selected area is overlapping with another claim");
         try {
-            region.getAreas().stream().filter(a -> getEntityService().getAccessor(Area.TYPE).get(a.getId()).isEmpty()).forEach(getEntityService()::save);
+            region.getAreas()
+                    .stream()
+                    .filter(a -> getEntityService().getAccessor(Area.TYPE).get(a.getId()).isEmpty())
+                    .forEach(getEntityService()::save);
             getEntityService().save(region);
             return true;
         } catch (Throwable t) {
@@ -99,8 +117,15 @@ public interface WorldMod extends SubMod, Command.ContextProvider, WorldModConfi
                         ## todo add more matching methods
                                         as bool from inside)
                         select r.* from worldmod_regions r, isMatch where bool and matchId = r.id and r.worldName = :worldName
-                        """, Map.of("posX", location.getX(), "posY", location.getY(), "posZ", location.getZ(), "worldName", worldName)),
-                Stream.of(Region.global("world"))).sorted(Region.BY_PRIORITY);
+                        """,
+                Map.of("posX",
+                        location.getX(),
+                        "posY",
+                        location.getY(),
+                        "posZ",
+                        location.getZ(),
+                        "worldName",
+                        worldName)), Stream.of(Region.global("world"))).sorted(Region.BY_PRIORITY);
     }
 
     default Stream<Region> findChunkloadedRegions() {
@@ -112,7 +137,10 @@ public interface WorldMod extends SubMod, Command.ContextProvider, WorldModConfi
                             where rf.flag = 'manage.chunkload' or rgf.flag = 'manage.chunkload'
                         """)
                 .sorted(Region.BY_PRIORITY)
-                .filter(rg -> !chunkloadWhileOnlineOnly() || rg.getMembers().stream().map(DbObject::getId).anyMatch(getPlayerAdapter()::isOnline));
+                .filter(rg -> !chunkloadWhileOnlineOnly() || rg.getMembers()
+                        .stream()
+                        .map(DbObject::getId)
+                        .anyMatch(getPlayerAdapter()::isOnline));
     }
 
     TextResourceProvider text();
@@ -131,13 +159,19 @@ public interface WorldMod extends SubMod, Command.ContextProvider, WorldModConfi
         if (player != null) query.setParameter("playerId", player.getId().toString());
         if (target != null) query.setParameter("target", target);
         var map = Polyfill.<Stream<Tuple>>uncheckedCast(query.getResultStream())
-                .collect(Collectors.toMap(it -> it.get("action", String.class), it -> it.get("count", BigInteger.class).longValue()));
-        Flag.VALUES.values().stream().map(Flag::getCanonicalName).filter(Predicate.not(map::containsKey)).forEach(key -> map.put(key, 0L));
+                .collect(Collectors.toMap(it -> it.get("action", String.class),
+                        it -> it.get("count", BigInteger.class).longValue()));
+        Flag.VALUES.values()
+                .stream()
+                .map(Flag::getCanonicalName)
+                .filter(Predicate.not(map::containsKey))
+                .forEach(key -> map.put(key, 0L));
         return map;
     }
 
     private static Stream<String> ownAndChildFlagNames(Flag flag) {
         var name = flag.getName();
-        return Stream.concat(Stream.of(name), flag.getChildren().stream().flatMap(WorldMod::ownAndChildFlagNames).map(str -> name + '.' + str));
+        return Stream.concat(Stream.of(name),
+                flag.getChildren().stream().flatMap(WorldMod::ownAndChildFlagNames).map(str -> name + '.' + str));
     }
 }

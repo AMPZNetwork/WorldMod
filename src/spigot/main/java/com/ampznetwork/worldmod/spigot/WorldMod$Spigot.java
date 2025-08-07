@@ -1,5 +1,6 @@
 package com.ampznetwork.worldmod.spigot;
 
+import com.ampznetwork.libmod.api.interop.database.IEntityService;
 import com.ampznetwork.libmod.api.model.info.DatabaseInfo;
 import com.ampznetwork.libmod.spigot.SubMod$Spigot;
 import com.ampznetwork.worldmod.api.model.TextResourceProvider;
@@ -80,13 +81,19 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod$Core {
     }
 
     @Override
-    public @Nullable DatabaseInfo getDatabaseInfo() {
-        return config.contains("database") ? database() : null;
+    public DatabaseInfo database() {
+        var obj = config.getConfigurationSection("database");
+        if (obj == null) return null;
+        return new DatabaseInfo(
+                IEntityService.DatabaseType.valueOf(obj.getString("type")),
+                obj.getString("url"),
+                obj.getString("username"),
+                obj.getString("password"));
     }
 
     @Override
-    public DatabaseInfo database() {
-        return config.getObject("database", DatabaseInfo.class);
+    public @Nullable DatabaseInfo getDatabaseInfo() {
+        return config.contains("database") ? database() : null;
     }
 
     @Override

@@ -129,11 +129,12 @@ public interface WorldMod extends SubMod, Command.ContextProvider, WorldModConfi
     }
 
     default Stream<Region> findChunkloadedRegions() {
-        return getEntityService().getAccessor(Region.TYPE)
+        var entityService = getEntityService();
+        return entityService == null ? Stream.empty() : entityService.getAccessor(Region.TYPE)
                 .querySelect("""
                         select r.* from worldmod_regions r
-                                inner join dev.worldmod_region_flags rf on rf.id = r.id
-                                inner join dev.worldmod_region_group_flags rgf on rgf.id = r.group_id
+                                inner join worldmod_region_flags rf on rf.id = r.id
+                                inner join worldmod_region_group_flags rgf on rgf.id = r.group_id
                             where rf.flag = 'manage.chunkload' or rgf.flag = 'manage.chunkload'
                         """)
                 .sorted(Region.BY_PRIORITY)

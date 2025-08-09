@@ -1,7 +1,6 @@
 package com.ampznetwork.worldmod.api.model.config;
 
 import com.ampznetwork.libmod.api.model.config.ConfigurableMessageAdapter;
-import com.ampznetwork.libmod.api.model.info.DatabaseInfo;
 import com.ampznetwork.worldmod.api.model.WandType;
 
 import java.util.Map;
@@ -17,6 +16,4 @@ public interface WorldModConfigAdapter extends ConfigurableMessageAdapter {
     Stream<String> loggingSkipFlagNames();
 
     Map<WandType, String> wandItems();
-
-    DatabaseInfo database();
 }

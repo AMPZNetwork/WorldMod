@@ -81,19 +81,15 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod$Core {
     }
 
     @Override
-    public DatabaseInfo database() {
-        var obj = config.getConfigurationSection("database");
-        if (obj == null) return null;
-        return new DatabaseInfo(
-                IEntityService.DatabaseType.valueOf(obj.getString("type")),
-                obj.getString("url"),
-                obj.getString("username"),
-                obj.getString("password"));
-    }
-
-    @Override
     public @Nullable DatabaseInfo getDatabaseInfo() {
-        return config.contains("database") ? database() : null;
+        if (config.isString("database") && config.getString("database").equalsIgnoreCase("inherit"))
+            return lib.getDatabaseInfo();
+        var obj = config.getConfigurationSection("database");
+        if (obj == null) return super.getDatabaseInfo();
+        return new DatabaseInfo(IEntityService.DatabaseType.valueOf(obj.getString("type")),
+                obj.getString("url", ""),
+                obj.getString("username", ""),
+                obj.getString("password", ""));
     }
 
     @Override

@@ -134,8 +134,8 @@ public interface WorldMod extends SubMod, Command.ContextProvider, WorldModConfi
                 .querySelect("""
                         select r.* from worldmod_regions r
                                 inner join worldmod_region_flags rf on rf.id = r.id
-                                inner join worldmod_region_group_flags rgf on rgf.id = r.group_id
-                            where rf.flag = 'manage.chunkload' or rgf.flag = 'manage.chunkload'
+                                inner join worldmod_group_flags gf on gf.id = r.group_id
+                            where rf.flag = 'manage.chunkload' or gf.flag = 'manage.chunkload'
                         """)
                 .sorted(Region.BY_PRIORITY)
                 .filter(rg -> !chunkloadWhileOnlineOnly() || rg.getMembers()

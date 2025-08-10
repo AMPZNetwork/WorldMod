@@ -22,7 +22,7 @@ values ('00000000-1000-0000-0000-000000000001', 'spawn', 500, 'smp', 'world', nu
        ('00000000-1000-0000-ffff-000000000001', 'house', 0, 'smp', 'world', '00000000-ffff-0000-0000-000000000002', null),
        ('00000000-1000-0000-ffff-000000000002', 'castle', 0, 'smp', 'world', '00000000-ffff-0000-0000-000000000003', null)
 ;
-insert into worldmod_region_group_flags (id, flag)
+insert into worldmod_group_flags (id, flag)
 values ('00000000-2000-0000-0000-000000000001', 'manage.chunkload')
 ;
 insert into worldmod_region_flags (id, flag)

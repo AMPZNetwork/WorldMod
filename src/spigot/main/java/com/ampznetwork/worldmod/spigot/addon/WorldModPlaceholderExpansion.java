@@ -4,8 +4,10 @@ import com.ampznetwork.libmod.api.util.ServerProperties;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.generated.PluginYml;
-import lombok.EqualsAndHashCode;
-import lombok.Value;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.comroid.api.data.bind.DataStructure;
@@ -15,9 +17,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-@Value
-@EqualsAndHashCode(callSuper = true)
-public class WorldModPlaceholderExpansion extends PlaceholderExpansion {
+@Getter
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public final class WorldModPlaceholderExpansion extends PlaceholderExpansion {
     WorldMod mod;
 
     @Override

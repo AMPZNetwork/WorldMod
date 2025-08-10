@@ -138,7 +138,7 @@ public class WorldModCommands {
         @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
         public static Component create(
                 WorldMod mod, UUID playerId,
-                @Nullable @Command.Arg(required = false) String name
+                @Nullable @Command.Arg(required = false, stringMode = StringMode.GREEDY) String name
         ) {
             var player = mod.getLib().getPlayerAdapter().getPlayer(playerId).orElseThrow();
             if (!selections.containsKey(playerId)) return mod.chat().createMessage(ERROR, "No area selected");

@@ -145,7 +145,7 @@ public class Region extends DbObject implements PropagationController, ShapeColl
                                 .boxed()
                                 .parallel()
                                 .flatMap(y -> IntStream.rangeClosed((int) lim.a.getZ(), (int) lim.b.getZ()).parallel().mapToObj(z -> new Vector.N3(x, y, z)))))
-                .peek(System.out::println)
+                //.peek(System.out::println)
                 .collect(Collectors.toUnmodifiableSet());
         return api.getEntityService()
                 .getAccessor(Region.TYPE)

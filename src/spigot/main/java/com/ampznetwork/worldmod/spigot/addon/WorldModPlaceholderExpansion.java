@@ -1,5 +1,6 @@
 package com.ampznetwork.worldmod.spigot.addon;
 
+import com.ampznetwork.libmod.api.util.ServerProperties;
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.flag.Flag;
 import com.ampznetwork.worldmod.generated.PluginYml;
@@ -74,11 +75,9 @@ public class WorldModPlaceholderExpansion extends PlaceholderExpansion {
                                 playerAdapter.getWorldName(plr.getUniqueId()))
                                .map(rg -> rg.getEffectiveFlagValueForPlayer(flag,
                                        playerAdapter.convertNativePlayer(source).orElseThrow()))
-                               .map(state -> switch (state) {
-                                   case NOT_SET -> "unset";
-                                   case FALSE -> "no";
-                                   case TRUE -> "yes";
-                               })
+                               .map(state -> (!"pvp".equals(flag.getName()) || !ServerProperties.LOCAL.isPvp()) || state.toBooleanOrElse(
+                                       false))
+                               .map(b -> b ? "yes" : "no")
                        : null;
             }
         }

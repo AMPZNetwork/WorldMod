@@ -13,6 +13,7 @@ import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.ampznetwork.worldmod.core.WorldMod$Core;
 import com.ampznetwork.worldmod.core.WorldModCommands;
 import com.ampznetwork.worldmod.core.query.QueryManager;
+import com.ampznetwork.worldmod.spigot.addon.WorldModPlaceholderExpansion;
 import com.ampznetwork.worldmod.spigot.adp.internal.SpigotEventDispatch;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -106,6 +107,8 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod$Core {
         loadUnion();
 
         this.config = super.getConfig();
+
+        if (lib.isPlaceholderApiPresent()) new WorldModPlaceholderExpansion(this).register();
     }
 
     @Override

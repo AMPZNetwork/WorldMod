@@ -47,7 +47,7 @@ public final class WorldModPlaceholderExpansion extends PlaceholderExpansion {
         Object     value  = player;
         var        path   = params.split("_");
         BlobSource source = RootSource.valueOf(path[i++]);
-        while (source != null) {
+        while (source != null && i < path.length) {
             value  = source.apply(mod, value, path[i++]);
             source = value instanceof BlobSource bsrc ? bsrc : null;
             value  = value instanceof ObjectSource(Object target) ? target : value;

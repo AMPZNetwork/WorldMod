@@ -106,16 +106,16 @@ public interface WorldMod extends SubMod, Command.ContextProvider, WorldModConfi
         return Stream.concat(getEntityService().getAccessor(Region.TYPE).querySelect("""
                         with
                             inside as (select a.*, ra.* from worldmod_region_areas ra
-                                        join worldmod_areas a where ra.areas_id = a.id),
+                                                                 join worldmod_areas a where ra.areas_id = a.id),
                             isMatch as (select Region_id as matchId, false
-                                            ## Cuboid Matching
-                                            or (shape = 0
-                                            and (:posX between LEAST(x1,x2) and GREATEST(x1,x2) ## x inside
-                                            and (:posY between LEAST(y1,y2) and GREATEST(y1,y2) ## y inside
-                                            and (:posZ between LEAST(z1,z2) and GREATEST(z1,z2) ## z inside
-                                            ))))
-                        ## todo add more matching methods
-                                        as bool from inside)
+                                -- Cuboid Matching
+                                    or (shape = 0
+                                    and (:posX between LEAST(x1,x2) and GREATEST(x1,x2) -- x inside
+                                    and (:posY between LEAST(y1,y2) and GREATEST(y1,y2) -- y inside
+                                    and (:posZ between LEAST(z1,z2) and GREATEST(z1,z2) -- z inside
+                            ))))
+                            -- todo add more matching methods
+                        as bool from inside)
                         select r.* from worldmod_regions r, isMatch where bool and matchId = r.id and r.worldName = :worldName
                         """,
                 Map.of("posX",

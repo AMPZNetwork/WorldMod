@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -272,11 +273,20 @@ public abstract class EventDispatchBase {
                 .y((int) location.getY())
                 .z((int) location.getZ())
                 .result(result);
-        if (source instanceof Player player) builder.player(player);
-        else builder.nonPlayerSource(source == null ? null : String.valueOf(source));
-        if (target instanceof Player playerTarget) builder.target(playerTarget);
-        else builder.nonPlayerTarget(target == null ? null : String.valueOf(target));
-        mod.getEntityService().save(builder.build());
+
+        var players = new ArrayList<Player>(2);
+        if (source instanceof Player player) {
+            builder.player(player);
+            players.add(player);
+        } else builder.nonPlayerSource(source == null ? null : String.valueOf(source));
+        if (target instanceof Player playerTarget) {
+            builder.target(playerTarget);
+            players.add(playerTarget);
+        } else builder.nonPlayerTarget(target == null ? null : String.valueOf(target));
+
+        var entityService = mod.getEntityService();
+        players.forEach(entityService::save);
+        entityService.save(builder.build());
     }
 
     private int pollUseCounter(Player player, Vector.N3 location, int limit, boolean reverse) {

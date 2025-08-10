@@ -68,7 +68,8 @@ public final class WorldModPlaceholderExpansion extends PlaceholderExpansion {
             public Object apply(WorldMod mod, Object source, String key) {
                 var playerAdapter = mod.getPlayerAdapter();
                 return source instanceof OfflinePlayer plr ? new ObjectSource(mod.findRegions(playerAdapter.getPosition(
-                        plr.getUniqueId()), playerAdapter.getWorldName(plr.getUniqueId()))) : null;
+                        plr.getUniqueId()), playerAdapter.getWorldName(plr.getUniqueId())).findAny().orElse(null)) :
+                       null;
             }
         }, flag {
             @Override

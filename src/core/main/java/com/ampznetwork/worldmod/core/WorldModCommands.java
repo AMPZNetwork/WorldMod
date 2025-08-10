@@ -136,7 +136,10 @@ public class WorldModCommands {
     @Alias("region")
     public static class claim {
         @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
-        public static Component $(WorldMod mod, UUID playerId, @Nullable @Command.Arg(required = false) String name) {
+        public static Component create(
+                WorldMod mod, UUID playerId,
+                @Nullable @Command.Arg(required = false) String name
+        ) {
             var player = mod.getLib().getPlayerAdapter().getPlayer(playerId).orElseThrow();
             if (!selections.containsKey(playerId)) return mod.chat().createMessage(ERROR, "No area selected");
             var sel = sel(playerId).build();

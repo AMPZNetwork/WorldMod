@@ -17,8 +17,7 @@ import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.api.model.sel.Area;
 import com.ampznetwork.worldmod.core.model.AutoFillProvider.Flags;
 import com.ampznetwork.worldmod.core.model.AutoFillProvider.Groups;
-import com.ampznetwork.worldmod.core.model.AutoFillProvider.Regions;
-import com.ampznetwork.worldmod.core.model.AutoFillProvider.RegionsAndGroups;
+import com.ampznetwork.worldmod.core.model.AutoFillProvider.RegionNames;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.generated.PluginYml.Permission.worldmod;
 import lombok.experimental.UtilityClass;
@@ -71,7 +70,10 @@ public class WorldModCommands {
     }
 
     @Command
-    public Component lookup(WorldMod mod, Player player, @Command.Arg(stringMode = StringMode.GREEDY) String query) {
+    public Component lookup(
+            WorldMod mod, Player player, @Command.Arg(stringMode = StringMode.GREEDY,
+                                                      autoFillProvider = WorldQuery.AutoFillProvider.class) String query
+    ) {
         var parse = WorldQuery.parse(query);
         return mod.getEntityService()
                 .getAccessor(LogEntry.TYPE)
@@ -157,7 +159,7 @@ public class WorldModCommands {
         @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
         public static Component info(
                 WorldMod mod, UUID playerId, @Nullable Region region0,
-                @Nullable @Command.Arg(required = false, autoFillProvider = Regions.class) String regionName
+                @Nullable @Command.Arg(required = false, autoFillProvider = RegionNames.class) String regionName
         ) {
             var region = region0 == null ? Region.global(mod.getPlayerAdapter().getWorldName(playerId)) : region0;
             return mod.text().ofRegion(region);
@@ -166,7 +168,7 @@ public class WorldModCommands {
         @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
         public static Component name(
                 WorldMod mod, Player player, @Nullable Region region0,
-                @Nullable @Command.Arg(required = false, autoFillProvider = Regions.class) String name0,
+                @Nullable @Command.Arg(required = false, autoFillProvider = RegionNames.class) String name0,
                 @Nullable @Command.Arg(stringMode = StringMode.GREEDY, required = false) String newName
         ) {
             var region = requireRegion(mod, player, region0, name0);
@@ -180,8 +182,8 @@ public class WorldModCommands {
         @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
         public static Component group(
                 WorldMod mod, Player player, @Nullable Region region0,
-                @Nullable @Command.Arg(required = false, autoFillProvider = Groups.class) String groupName,
-                @Nullable @Command.Arg(required = false, autoFillProvider = Regions.class) String regionName
+                @Nullable @Command.Arg(autoFillProvider = Groups.class) String groupName,
+                @Nullable @Command.Arg(required = false, autoFillProvider = RegionNames.class) String regionName
         ) {
             var region = requireRegion(mod, player, region0, regionName);
             isPermitted(region, player, Flag.Manage);
@@ -206,8 +208,9 @@ public class WorldModCommands {
 
         @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
         public static String owner(
-                WorldMod mod, Player player, @Nullable Region region0, @Nullable @Command.Arg String newOwnerName,
-                @Nullable @Command.Arg(required = false, autoFillProvider = Regions.class) String regionName
+                WorldMod mod, Player player, @Nullable Region region0,
+                @Nullable @Command.Arg(autoFillProvider = AutoFillProvider.PlayerNames.class) String newOwnerName,
+                @Nullable @Command.Arg(required = false, autoFillProvider = RegionNames.class) String regionName
         ) {
             var region = requireRegion(mod, player, region0, regionName);
             isPermitted(region, player, Flag.Manage);
@@ -231,7 +234,7 @@ public class WorldModCommands {
                 WorldMod mod, Player player, @Nullable Region region0,
                 @Command.Arg(autoFillProvider = Flags.class) String flagName,
                 @Nullable @Command.Arg(required = false) TriState state,
-                @Nullable @Command.Arg(required = false, autoFillProvider = RegionsAndGroups.class) String regionName
+                @Nullable @Command.Arg(required = false, autoFillProvider = RegionNames.class) String regionName
         ) {
             var region = requireRegion(mod, player, region0, regionName);
             var flag   = Flag.getForName(flagName);

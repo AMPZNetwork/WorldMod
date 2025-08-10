@@ -38,6 +38,13 @@ permissions:
   worldmod:
     description: WorldMod root permission node
     children:
+      worldmod.admin:
+        description: Admin Permission for WorldMod
+        default: op
+        children:
+          worldmod.admin.bypass:
+            description: Admin Bypass Permission
+            default: op
       worldmod.reload:
         description: Permission for the /worldmod:reload command
         default: op

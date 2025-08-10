@@ -57,7 +57,7 @@ import static java.util.stream.Stream.*;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@Table(name = "worldmod_regions", uniqueConstraints = @UniqueConstraint(columnNames = { "name", "worldName" }))
+@Table(name = "worldmod_regions")
 public class Region extends DbObject implements PropagationController, ShapeCollider, Named, PointCollider {
     private static final Map<String, Region>                    GlobalRegions      = new ConcurrentHashMap<>();
     public static final  EntityType<Region, Builder<Region, ?>> TYPE               = Polyfill.uncheckedCast(new EntityType<>(Region::builder,

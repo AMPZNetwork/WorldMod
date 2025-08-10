@@ -142,7 +142,11 @@ public class WorldModCommands {
             var sel = sel(playerId).build();
             sel.validateShapeMask();
             var world = mod.getLib().getPlayerAdapter().getWorldName(playerId);
-            var rg    = Region.builder().serverName(mod.getLib().getServerName()).area(sel).worldName(world).claimOwner(player);
+            var rg = Region.builder()
+                    .serverName(mod.getLib().getServerName())
+                    .area(sel)
+                    .worldName(world)
+                    .claimOwner(player);
             if (name != null) rg.name(name);
             if (!mod.addRegion(rg.build())) return mod.chat().createMessage(FATAL, "Could not create claim");
             return mod.chat().createMessage("Area claimed!");
@@ -150,10 +154,10 @@ public class WorldModCommands {
 
         @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
         public static Component info(
-                WorldMod mod, @Nullable Region region0,
+                WorldMod mod, UUID playerId, @Nullable Region region0,
                 @Nullable @Command.Arg(required = false, autoFillProvider = Regions.class) String regionName
         ) {
-            var region = requireRegion(mod, region0, regionName);
+            var region = region0 == null ? Region.global(mod.getPlayerAdapter().getWorldName(playerId)) : region0;
             return mod.text().ofRegion(region);
         }
 
@@ -235,7 +239,8 @@ public class WorldModCommands {
 
         @Command
         public static Component flag(
-                WorldMod mod, UUID playerId, @Nullable Region region0, @Command.Arg(autoFillProvider = Flags.class) String flagName,
+                WorldMod mod, UUID playerId, @Nullable Region region0,
+                @Command.Arg(autoFillProvider = Flags.class) String flagName,
                 @Nullable @Command.Arg(required = false) TriState state,
                 @Nullable @Command.Arg(required = false, autoFillProvider = RegionsAndGroups.class) String regionName
         ) {
@@ -263,7 +268,8 @@ public class WorldModCommands {
 
         private static Region requireRegion(API api, @Nullable Region region, @Nullable String regionName) {
             if ((region == null || region.isGlobal())) {
-                if (regionName == null) throw new Command.Error("You must either provide a region name or be inside a region");
+                if (regionName == null)
+                    throw new Command.Error("You must either provide a region name or be inside a region");
                 return api.getEntityAccessor(Region.TYPE)
                         .by(Region::getName)
                         .get(regionName)
@@ -310,27 +316,36 @@ public class WorldModCommands {
                         default:
                             return mod.chat().createMessage(FATAL, "Cannot add member of type {}", type);
                     }
-                    return mod.chat().createMessage("{} was added to the list of {}s", player, type.name().toLowerCase());
+                    return mod.chat()
+                            .createMessage("{} was added to the list of {}s", player, type.name().toLowerCase());
                 } finally {
                     mod.getEntityService().save(region);
                 }
             }
 
             @Command
-            public static Component remove(WorldMod mod, Player player, @Nullable Region region, @Command.Arg String targetName) {
+            public static Component remove(
+                    WorldMod mod, Player player, @Nullable Region region,
+                    @Command.Arg String targetName
+            ) {
                 isClaimed(region);
                 if (region.getEffectiveFlagValueForPlayer(Flag.Manage, player) != TriState.TRUE) notPermitted();
                 var select = mod.getLib().getPlayerAdapter().getPlayer(targetName);
-                if (select.isEmpty()) return mod.chat().createMessage(ERROR, "Player with name '{}' could not be found");
+                if (select.isEmpty())
+                    return mod.chat().createMessage(ERROR, "Player with name '{}' could not be found");
                 var target    = select.get();
                 var wasOwner  = region.getOwners().remove(target);
                 var wasMember = region.getMembers().remove(target);
                 mod.getEntityService().save(region);
-                return mod.chat().createMessage(HINT, "{} was removed from the list of {}", targetName,
-                        concat(wasOwner ? of(PlayerRelation.ADMIN) : Stream.empty(), wasMember ? of(PlayerRelation.MEMBER) : Stream.empty()).map(Named::getName)
-                                .map(String::toLowerCase)
-                                .map(str -> str + 's')
-                                .collect(joining(" and ")));
+                return mod.chat()
+                        .createMessage(HINT,
+                                "{} was removed from the list of {}",
+                                targetName,
+                                concat(wasOwner ? of(PlayerRelation.ADMIN) : Stream.empty(),
+                                        wasMember ? of(PlayerRelation.MEMBER) : Stream.empty()).map(Named::getName)
+                                        .map(String::toLowerCase)
+                                        .map(str -> str + 's')
+                                        .collect(joining(" and ")));
             }
         }
     }
@@ -339,8 +354,8 @@ public class WorldModCommands {
     public static class query {
         @Command(permission = worldmod.QUERY)
         public static Component list(
-                WorldMod mod,
-                @Command.Arg(required = false, autoFillProvider = AutoFillProvider.WorldNames.class) @Nullable String worldName
+                WorldMod mod, @Command.Arg(required = false,
+                                           autoFillProvider = AutoFillProvider.WorldNames.class) @Nullable String worldName
         ) {
             var         dash = text("\n - ");
             final int[] i    = new int[]{ 0 };
@@ -354,17 +369,22 @@ public class WorldModCommands {
                             .flatMap(Collection::stream)
                             .map(Object::toString)
                             .map(content -> {
-                                var shortened = content.length() < MAX_LINE_LENGTH ? content : content.substring(0, MAX_LINE_LENGTH) + "...";
+                                var shortened = content.length() < MAX_LINE_LENGTH
+                                                ? content
+                                                : content.substring(0, MAX_LINE_LENGTH) + "...";
                                 return text("").append(text("["))
                                         .append(text(++i[0], YELLOW))
                                         .append(text("|"))
                                         .append(text("#", AQUA).decorate(TextDecoration.BOLD)
                                                 .hoverEvent(HoverEvent.showText(text("Update Query...")))
-                                                .clickEvent(ClickEvent.suggestCommand("/worldmod:query edit %d %s".formatted(i[0], content))))
+                                                .clickEvent(ClickEvent.suggestCommand("/worldmod:query edit %d %s".formatted(
+                                                        i[0],
+                                                        content))))
                                         .append(text("|"))
                                         .append(text("-", RED).decorate(TextDecoration.BOLD)
                                                 .hoverEvent(HoverEvent.showText(text("Remove Query")))
-                                                .clickEvent(ClickEvent.suggestCommand(("/worldmod:query remove %d").formatted(i[0]))))
+                                                .clickEvent(ClickEvent.suggestCommand(("/worldmod:query remove %d").formatted(
+                                                        i[0]))))
                                         .append(text("] "))
                                         .append(text(shortened, GRAY).hoverEvent(HoverEvent.showText(text(content))));
                             })
@@ -374,8 +394,10 @@ public class WorldModCommands {
 
         @Command(permission = worldmod.QUERY)
         public static Component add(
-                WorldMod mod, @Command.Arg(autoFillProvider = AutoFillProvider.WorldNames.class) @NotNull String worldName,
-                @Command.Arg(stringMode = StringMode.GREEDY, autoFillProvider = WorldQuery.AutoFillProvider.class) String query
+                WorldMod mod,
+                @Command.Arg(autoFillProvider = AutoFillProvider.WorldNames.class) @NotNull String worldName,
+                @Command.Arg(stringMode = StringMode.GREEDY,
+                             autoFillProvider = WorldQuery.AutoFillProvider.class) String query
         ) {
             final var parse = WorldQuery.parse(query);
             mod.getQueryManagers()
@@ -385,13 +407,18 @@ public class WorldModCommands {
                     .map(Map.Entry::getValue)
                     .map(IQueryManager::getQueries)
                     .forEach(ls -> ls.add(parse));
-            return mod.chat().createMessage(HINT, "Query parsed and added to memory configuration; save with {}", "/worldmod:query save");
+            return mod.chat()
+                    .createMessage(HINT,
+                            "Query parsed and added to memory configuration; save with {}",
+                            "/worldmod:query save");
         }
 
         @Command(permission = worldmod.QUERY)
         public static Component edit(
-                WorldMod mod, @Command.Arg(autoFillProvider = AutoFillProvider.WorldNames.class) @NotNull String worldName, @Command.Arg int number,
-                @Command.Arg(stringMode = StringMode.GREEDY, autoFillProvider = WorldQuery.AutoFillProvider.class) String query
+                WorldMod mod,
+                @Command.Arg(autoFillProvider = AutoFillProvider.WorldNames.class) @NotNull String worldName,
+                @Command.Arg int number, @Command.Arg(stringMode = StringMode.GREEDY,
+                                                      autoFillProvider = WorldQuery.AutoFillProvider.class) String query
         ) {
             remove(mod, worldName, number);
             add(mod, worldName, query);
@@ -400,7 +427,8 @@ public class WorldModCommands {
 
         @Command(permission = worldmod.QUERY)
         public static Component remove(
-                WorldMod mod, @Command.Arg(autoFillProvider = AutoFillProvider.WorldNames.class) @NotNull String worldName,
+                WorldMod mod,
+                @Command.Arg(autoFillProvider = AutoFillProvider.WorldNames.class) @NotNull String worldName,
                 @Command.Arg int number
         ) {
             var count = mod.getQueryManagers()
@@ -418,8 +446,8 @@ public class WorldModCommands {
 
         @Command(permission = worldmod.QUERY)
         public static Component clear(
-                WorldMod mod,
-                @Command.Arg(required = false, autoFillProvider = AutoFillProvider.WorldNames.class) @Nullable String worldName
+                WorldMod mod, @Command.Arg(required = false,
+                                           autoFillProvider = AutoFillProvider.WorldNames.class) @Nullable String worldName
         ) {
             var count = mod.getQueryManagers()
                     .entrySet()
@@ -438,8 +466,8 @@ public class WorldModCommands {
 
         @Command(permission = worldmod.QUERY)
         public static Component save(
-                WorldMod mod,
-                @Command.Arg(required = false, autoFillProvider = AutoFillProvider.WorldNames.class) @Nullable String worldName
+                WorldMod mod, @Command.Arg(required = false,
+                                           autoFillProvider = AutoFillProvider.WorldNames.class) @Nullable String worldName
         ) {
             var count = mod.getQueryManagers()
                     .entrySet()

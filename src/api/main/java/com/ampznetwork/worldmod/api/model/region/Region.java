@@ -86,7 +86,7 @@ public class Region extends DbObject implements PropagationController, ShapeColl
     @Singular("query") @ElementCollection @CollectionTable(name = "worldmod_region_queries") @Convert(converter = IWorldQuery.Converter.class)
     Set<IWorldQuery> queries;
     @Singular("area") @ManyToMany @CollectionTable(name = "worldmod_region_areas") Set<Area> areas;
-    @Singular @ElementCollection @Convert(converter = Flag.Converter.class)
+    @Singular("flag") @ElementCollection @Convert(converter = Flag.Converter.class)
     @CollectionTable(name = "worldmod_region_flags",
                      joinColumns = @JoinColumn(name = "id"),
                      uniqueConstraints = { @UniqueConstraint(columnNames = { "id", "flag", "state", "target" }) })

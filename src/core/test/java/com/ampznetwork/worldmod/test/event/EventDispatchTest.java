@@ -11,7 +11,9 @@ import net.kyori.adventure.util.TriState;
 import org.comroid.api.data.Vector;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
+import java.util.Set;
 import java.util.UUID;
 
 import static com.ampznetwork.worldmod.api.flag.Flag.*;
@@ -34,21 +36,21 @@ public class EventDispatchTest {
                 /*.area(new Area(Shape.Cuboid, List.of(
                         new Vector.N4(0, 0, 0, 0),
                         new Vector.N4(16, 0, 16, 0)
-                )))*/
-                .owner(Player.builder().id(PlayerOwner).name("Steve").build())
+                )))*/.owner(Player.builder().id(PlayerOwner).name("Steve").build())
                 .member(Player.builder().id(PlayerMember).name("Dinnerbone").build())
-                .flag(Flag.Usage.builder()
-                        .flag(Build)
-                        .state(TriState.TRUE)
-                        .force(true)
-                        .target(Usage.Target.Owners.getAsLong())
-                        .build())
-                .flag(Flag.Usage.builder()
-                        .flag(Build)
-                        .state(TriState.TRUE)
-                        .target(Usage.Target.Members.getAsLong())
-                        .build())
                 .build();
+        Region.getDeclaredFlags()
+                .addAll(Set.of(Flag.Usage.builder()
+                                .flag(Build)
+                                .state(TriState.TRUE)
+                                .forced(true)
+                                .target(Usage.Target.Owners.getAsLong())
+                                .build(),
+                        Flag.Usage.builder()
+                                .flag(Build)
+                                .state(TriState.TRUE)
+                                .target(Usage.Target.Members.getAsLong())
+                                .build()));
     }
 
     @BeforeEach
@@ -107,19 +109,19 @@ public class EventDispatchTest {
         Assertions.assertEquals(expect, propAdp.state(), "Invalid Event cancellation state");
     }
 
-    //@Test
+    @Test
     public void testPropagate_Owner() {
         testPropagate(PlayerOwner, LocationInside, 2);
         testPropagate(PlayerOwner, LocationOutside, 0);
     }
 
-    //@Test
+    @Test
     public void testPropagate_Member() {
         testPropagate(PlayerMember, LocationInside, 0);
         testPropagate(PlayerMember, LocationOutside, 0);
     }
 
-    //@Test
+    @Test
     public void testPropagate_Guest() {
         testPropagate(PlayerGuest, LocationInside, 1);
         testPropagate(PlayerGuest, LocationOutside, 0);

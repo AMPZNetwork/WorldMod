@@ -16,17 +16,17 @@ import java.util.stream.Stream;
 public enum ConditionType implements ValueAutofillOptionsProvider {
     REGION("#global") {
         @Override
-        public Stream<String> autoFillValue(Command.Usage usage, String argName, LibMod mod, String value) {
+        public Stream<String> autoFillValue(Command.Usage usage, LibMod mod, String value) {
             return mod.getEntityService().getAccessor(Region.TYPE).all().map(Named::getName);
         }
     }, GROUP {
         @Override
-        public Stream<String> autoFillValue(Command.Usage usage, String argName, LibMod mod, String value) {
+        public Stream<String> autoFillValue(Command.Usage usage, LibMod mod, String value) {
             return mod.getEntityService().getAccessor(Group.TYPE).all().map(Named::getName);
         }
     }, SOURCE("@a") {
         @Override
-        public Stream<String> autoFillValue(Command.Usage usage, String argName, LibMod mod, String value) {
+        public Stream<String> autoFillValue(Command.Usage usage, LibMod mod, String value) {
             return Stream.concat(
                     // player names, todo: selectors
                     mod.getPlayerAdapter().getCurrentPlayers().map(Player::getName),
@@ -35,7 +35,7 @@ public enum ConditionType implements ValueAutofillOptionsProvider {
         }
     }, TARGET("@a") {
         @Override
-        public Stream<String> autoFillValue(Command.Usage usage, String argName, LibMod mod, String value) {
+        public Stream<String> autoFillValue(Command.Usage usage, LibMod mod, String value) {
             return Stream.concat(
                     // player names, todo: selectors
                     mod.getPlayerAdapter().getCurrentPlayers().map(Player::getName),
@@ -44,22 +44,22 @@ public enum ConditionType implements ValueAutofillOptionsProvider {
         }
     }, RADIUS(NUMERICS), WORLD {
         @Override
-        public Stream<String> autoFillValue(Command.Usage usage, String argName, LibMod mod, String value) {
+        public Stream<String> autoFillValue(Command.Usage usage, LibMod mod, String value) {
             return mod.getLib().worldNames();
         }
     }, SINCE {
         @Override
-        public Stream<String> autoFillValue(Command.Usage usage, String argName, LibMod mod, String value) {
-            return Command.AutoFillProvider.Duration.INSTANCE.autoFill(usage, argName, value);
+        public Stream<String> autoFillValue(Command.Usage usage, LibMod mod, String value) {
+            return Command.AutoFillProvider.Duration.INSTANCE.autoFill(usage, "duration", value);
         }
     }, TYPE, FLAG {
         @Override
-        public Stream<String> autoFillValue(Command.Usage usage, String argName, LibMod mod, String value) {
+        public Stream<String> autoFillValue(Command.Usage usage, LibMod mod, String value) {
             return mod.sub(WorldMod.class).flagNames();
         }
     }, TAG, X(NUMERICS, "~"), Y(NUMERICS, "~"), Z(NUMERICS, "~"), MESSAGE {
         @Override
-        public Stream<String> autoFillValue(Command.Usage usage, String argName, LibMod mod, String value) {
+        public Stream<String> autoFillValue(Command.Usage usage, LibMod mod, String value) {
             return mod.sub(WorldMod.class).getMessages().keySet().stream().map(String::valueOf);
         }
     };
@@ -76,8 +76,8 @@ public enum ConditionType implements ValueAutofillOptionsProvider {
     }
 
     @Override
-    public Stream<String> autoFillValue(Command.Usage usage, String argName, LibMod mod, String value) {
+    public Stream<String> autoFillValue(Command.Usage usage, LibMod mod, String value) {
         return Stream.concat(Arrays.stream(constants).flatMap(ValueAutofillOptionsProvider::expandDigit),
-                delegate == null ? Stream.of(value) : delegate.autoFillValue(usage, argName, mod, value));
+                delegate == null ? Stream.of(value) : delegate.autoFillValue(usage, mod, value));
     }
 }

@@ -208,11 +208,11 @@ public class WorldQuery implements IWorldQuery {
     }
 
     @Value
-    public static class AutoFillProvider implements Command.AutoFillProvider {
+    public static class AutoFillProvider implements Command.AutoFillProvider.Strings {
         public static final @Instance AutoFillProvider INSTANCE = new AutoFillProvider();
 
         @Override
-        public Stream<String> autoFill(Command.Usage usage, String argName, String currentValue) {
+        public Stream<String> strings(Command.Usage usage, String currentValue) {
             var split = currentValue.split(" ");
             if (split.length <= 1)
                 // return possible verbs
@@ -223,7 +223,12 @@ public class WorldQuery implements IWorldQuery {
                    Arrays.stream(ConditionType.values()).map(java.lang.Enum::name).map(String::toLowerCase) :
                    // else return value-dependent autofill
                    ConditionType.valueOf(split[0].toUpperCase())
-                           .autoFillValue(usage, argName, usage.getContext().stream().flatMap(Streams.cast(LibMod.class)).findAny().orElseThrow(), split[1]);
+                           .autoFillValue(usage,
+                                   usage.getContext()
+                                           .stream()
+                                           .flatMap(Streams.cast(LibMod.class))
+                                           .findAny()
+                                           .orElseThrow(), split[1]);
         }
     }
 }

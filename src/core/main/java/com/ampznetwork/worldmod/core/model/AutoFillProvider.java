@@ -59,33 +59,30 @@ public interface AutoFillProvider {
         }
     }
 
-    enum Groups implements Command.AutoFillProvider {
+    enum Groups implements Command.AutoFillProvider.Named<Group> {
         @Instance INSTANCE;
 
         @Override
-        public Stream<String> autoFill(Command.Usage usage, String argName, String currentValue) {
+        public Stream<Group> objects(Command.Usage usage, String currentValue) {
             return usage.getContext()
                     .stream()
                     .flatMap(Streams.cast(SubMod.class))
-                    .flatMap(mod -> mod.getEntityService().getAccessor(Group.TYPE).all())
-                    .flatMap(Streams.cast(Named.class))
-                    .map(Named::getName);
+                    .flatMap(mod -> mod.getEntityService().getAccessor(Group.TYPE).all());
         }
     }
 
     @Deprecated
-    enum RegionsAndGroups implements Command.AutoFillProvider {
+    enum RegionsAndGroups implements Command.AutoFillProvider.Named<Named> {
         @Instance INSTANCE;
 
         @Override
-        public Stream<String> autoFill(Command.Usage usage, String argName, String currentValue) {
+        public Stream<org.comroid.api.attr.Named> objects(Command.Usage usage, String currentValue) {
             return usage.getContext()
                     .stream()
                     .flatMap(Streams.cast(SubMod.class))
                     .flatMap(mod -> Stream.of(Region.TYPE, Group.TYPE)
                             .flatMap(type -> mod.getEntityService().getAccessor(uncheckedCast(type)).all()))
-                    .flatMap(Streams.cast(Named.class))
-                    .map(Named::getName);
+                    .flatMap(Streams.cast(org.comroid.api.attr.Named.class));
         }
     }
 

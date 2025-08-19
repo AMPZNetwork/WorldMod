@@ -73,10 +73,14 @@ public class WorldQuery implements IWorldQuery {
                     case "towards", "target", "value" -> new TargetCondition(comparator(comp), values);
                     case "radius" -> new RadiusCondition(wrapParseArg("radius", () -> Integer.parseInt(values[0])));
                     case "world" -> new WorldCondition(comparator(comp), values);
-                    case "since" -> new TimeCondition(wrapParseArg("duration", () -> Instant.now().minus(Polyfill.parseDuration(values[0]))));
+                    case "since" -> new TimeCondition(wrapParseArg("duration",
+                            () -> Instant.now().minus(Polyfill.parseDuration(values[0]))));
                     case "type" -> new BlockTypeCondition(comparator(comp), values);
                     case "flag" -> new FlagCondition(wrapParseArg("flag",
-                            () -> Arrays.stream(values).map(Flag::getForName).filter(Objects::nonNull).toArray(Flag[]::new)));
+                            () -> Arrays.stream(values)
+                                    .map(Flag::getForName)
+                                    .filter(Objects::nonNull)
+                                    .toArray(Flag[]::new)));
                     case "tag" -> new TagCondition(comparator(comp), values);
                     case "x", "y", "z" -> wrapParseArg("coordinate", () -> {
                         var value = values[0];
@@ -84,8 +88,13 @@ public class WorldQuery implements IWorldQuery {
                         Vector.N3 a, b = null;
                         var condition = builder.conditions == null
                                         ? null
-                                        : builder.conditions.stream().flatMap(Streams.cast(PositionCondition.class)).findAny().orElse(null);
-                        if (value.contains("..")) b = Optional.ofNullable(condition).map(PositionCondition::getB).orElseGet(Vector.N3::new);
+                                        : builder.conditions.stream()
+                                                .flatMap(Streams.cast(PositionCondition.class))
+                                                .findAny()
+                                                .orElse(null);
+                        if (value.contains("..")) b = Optional.ofNullable(condition)
+                                .map(PositionCondition::getB)
+                                .orElseGet(Vector.N3::new);
                         if (condition == null) {
                             a         = new Vector.N3();
                             condition = new PositionCondition(new ValueComparator[3], a, b);
@@ -109,7 +118,8 @@ public class WorldQuery implements IWorldQuery {
                     }
                     default -> throw new IllegalStateException("Unexpected value: " + key);
                 };
-                if (add != null && (builder.conditions == null || !builder.conditions.contains(add))) builder.condition(add);
+                if (add != null && (builder.conditions == null || !builder.conditions.contains(add))) builder.condition(
+                        add);
             }
 
             return builder.build();
@@ -124,7 +134,10 @@ public class WorldQuery implements IWorldQuery {
     ArrayList<QueryCondition> conditions;
 
     @lombok.Builder
-    private WorldQuery(@NotNull QueryVerb verb, @Nullable String messageKey, @Singular List<QueryCondition> conditions) {
+    private WorldQuery(
+            @NotNull QueryVerb verb, @Nullable String messageKey,
+            @Singular List<QueryCondition> conditions
+    ) {
         this.verb       = verb;
         this.messageKey = messageKey;
         this.conditions = new ArrayList<>(conditions);
@@ -173,9 +186,11 @@ public class WorldQuery implements IWorldQuery {
 
     @Override
     public String toString() {
-        return verb.name().toLowerCase() + ' ' + (evaluator == null ? "" : evaluator.toString() + ' ') + conditions.stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(" ")) + (messageKey == null ? "" : " message=" + messageKey);
+        return verb.name().toLowerCase() + ' ' + (evaluator == null
+                                                  ? ""
+                                                  : evaluator.toString() + ' ') + conditions.stream()
+                       .map(Object::toString)
+                       .collect(Collectors.joining(" ")) + (messageKey == null ? "" : " message=" + messageKey);
     }
 
     @Override
@@ -213,11 +228,14 @@ public class WorldQuery implements IWorldQuery {
 
         @Override
         public Stream<String> strings(Command.Usage usage, String currentValue) {
-            var split = currentValue.split(" ");
-            if (split.length <= 1)
+            var split     = currentValue.split(" ");
+            var hasSpaces = currentValue.chars().filter(c -> c == ' ').findAny().isPresent();
+
+            if (!hasSpaces)
                 // return possible verbs
                 return Arrays.stream(QueryVerb.values()).map(java.lang.Enum::name).map(String::toLowerCase);
-            split = split[split.length - 1].split(kvPairPattern);
+
+            if (!hasSpaces) split = split[split.length - 1].split(kvPairPattern);
             return split.length <= 1 ?
                    // return possible condition keys
                    Arrays.stream(ConditionType.values()).map(java.lang.Enum::name).map(String::toLowerCase) :
@@ -228,7 +246,8 @@ public class WorldQuery implements IWorldQuery {
                                            .stream()
                                            .flatMap(Streams.cast(LibMod.class))
                                            .findAny()
-                                           .orElseThrow(), split[1]);
+                                           .orElseThrow(),
+                                   split[1]);
         }
     }
 }

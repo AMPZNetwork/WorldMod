@@ -26,10 +26,12 @@ import org.comroid.annotations.Instance;
 import org.comroid.api.Polyfill;
 import org.comroid.api.data.Vector;
 import org.comroid.api.func.exc.ThrowingSupplier;
-import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Debug;
 import org.comroid.api.func.util.Streams;
 import org.comroid.api.info.Log;
+import org.comroid.commands.autofill.model.StringBasedAutoFillProvider;
+import org.comroid.commands.impl.CommandUsage;
+import org.comroid.commands.model.CommandError;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -217,17 +219,17 @@ public class WorldQuery implements IWorldQuery {
         }
     }
 
-    private static Command.Error wrapExc(String detail, Throwable t) {
+    private static CommandError wrapExc(String detail, Throwable t) {
         Debug.log(log, detail, t);
-        return new Command.Error(detail + "; " + t.toString());
+        return new CommandError(detail + "; " + t.toString());
     }
 
     @Value
-    public static class AutoFillProvider implements Command.AutoFillProvider.Strings {
+    public static class AutoFillProvider implements StringBasedAutoFillProvider {
         public static final @Instance AutoFillProvider INSTANCE = new AutoFillProvider();
 
         @Override
-        public Stream<String> strings(Command.Usage usage, String currentValue) {
+        public Stream<String> strings(CommandUsage usage, String currentValue) {
             var split     = currentValue.split(" ");
             var hasSpaces = currentValue.chars().filter(c -> c == ' ').findAny().isPresent();
 

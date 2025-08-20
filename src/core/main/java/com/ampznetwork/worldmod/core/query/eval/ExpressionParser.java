@@ -10,7 +10,7 @@ import com.ampznetwork.worldmod.core.query.eval.decl.val.NumericExpression;
 import com.ampznetwork.worldmod.core.query.eval.decl.val.RangeExpression;
 import com.ampznetwork.worldmod.core.query.eval.decl.val.VariableExpression;
 import lombok.Value;
-import org.comroid.api.func.util.Command;
+import org.comroid.commands.model.CommandError;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -93,7 +93,7 @@ public class ExpressionParser extends StreamTokenizer {
     public ParenthesesExpression parensExpr() throws IOException {
         nextToken();
         var expression = new ParenthesesExpression(expr());
-        if (ttype != ')') throw new Command.Error("Unterminated parentheses");
+        if (ttype != ')') throw new CommandError("Unterminated parentheses");
         nextToken();
         return expression;
     }

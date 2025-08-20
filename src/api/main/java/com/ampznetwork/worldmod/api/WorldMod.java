@@ -17,9 +17,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.comroid.api.Polyfill;
 import org.comroid.api.data.Vector;
-import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
 import org.comroid.api.info.Log;
+import org.comroid.commands.model.CommandContextProvider;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,18 +36,18 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public interface WorldMod extends SubMod, Command.ContextProvider, WorldModConfigAdapter {
+public interface WorldMod extends SubMod, CommandContextProvider, WorldModConfigAdapter {
     String AddonId   = "worldmod";
     String AddonName = "WorldMod";
 
     @Contract("->fail")
     static void notPermitted() {
-        throw new Command.Error("You are not permitted to perform this action");
+        throw new Error("You are not permitted to perform this action");
     }
 
     @Contract("null->fail")
     static void isClaimed(Region region) {
-        if (region == null) throw new Command.Error("This area is not claimed");
+        if (region == null) throw new Error("This area is not claimed");
     }
 
     @Override
@@ -88,7 +88,7 @@ public interface WorldMod extends SubMod, Command.ContextProvider, WorldModConfi
 
     default boolean addRegion(Region region) {
         if (region.findOverlaps(this).findAny().isPresent())
-            throw new Command.Error("The selected area is overlapping with another claim");
+            throw new Error("The selected area is overlapping with another claim");
         try {
             region.getAreas()
                     .stream()

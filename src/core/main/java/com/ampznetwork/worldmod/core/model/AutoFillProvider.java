@@ -8,8 +8,10 @@ import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.generated.PluginYml;
 import org.comroid.annotations.Instance;
 import org.comroid.api.attr.Named;
-import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
+import org.comroid.commands.autofill.IAutoFillProvider;
+import org.comroid.commands.autofill.impl.NamedAutoFillAdapter;
+import org.comroid.commands.impl.CommandUsage;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -22,11 +24,11 @@ import java.util.stream.Stream;
 import static org.comroid.api.Polyfill.*;
 
 public interface AutoFillProvider {
-    enum RegionNames implements Command.AutoFillProvider {
+    enum RegionNames implements IAutoFillProvider {
         @Instance INSTANCE;
 
         @Override
-        public Stream<String> autoFill(Command.Usage usage, String argName, String currentValue) {
+        public Stream<String> autoFill(CommandUsage usage, String argName, String currentValue) {
             var mod     = usage.getContext().stream().flatMap(Streams.cast(SubMod.class)).findAny().orElseThrow();
             var regions = mod.getEntityService().getAccessor(Region.TYPE);
             return usage.getContext()
@@ -59,11 +61,11 @@ public interface AutoFillProvider {
         }
     }
 
-    enum Groups implements Command.AutoFillProvider.Named<Group> {
+    enum Groups implements NamedAutoFillAdapter<Group> {
         @Instance INSTANCE;
 
         @Override
-        public Stream<Group> objects(Command.Usage usage, String currentValue) {
+        public Stream<Group> objects(CommandUsage usage, String currentValue) {
             return usage.getContext()
                     .stream()
                     .flatMap(Streams.cast(SubMod.class))
@@ -72,11 +74,11 @@ public interface AutoFillProvider {
     }
 
     @Deprecated
-    enum RegionsAndGroups implements Command.AutoFillProvider.Named<Named> {
+    enum RegionsAndGroups implements NamedAutoFillAdapter<Named> {
         @Instance INSTANCE;
 
         @Override
-        public Stream<org.comroid.api.attr.Named> objects(Command.Usage usage, String currentValue) {
+        public Stream<org.comroid.api.attr.Named> objects(CommandUsage usage, String currentValue) {
             return usage.getContext()
                     .stream()
                     .flatMap(Streams.cast(SubMod.class))
@@ -86,11 +88,11 @@ public interface AutoFillProvider {
         }
     }
 
-    enum Flags implements Command.AutoFillProvider {
+    enum Flags implements IAutoFillProvider {
         @Instance INSTANCE;
 
         @Override
-        public Stream<String> autoFill(Command.Usage usage, String argName, String currentValue) {
+        public Stream<String> autoFill(CommandUsage usage, String argName, String currentValue) {
             return Flag.VALUES.keySet()
                     .stream()
                     .map(str -> str.contains(".") ? str.substring(0, str.indexOf(".") + 1) : str);

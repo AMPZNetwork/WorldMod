@@ -8,8 +8,8 @@ import com.ampznetwork.worldmod.core.query.condition.AbstractCondition;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
+import org.comroid.commands.model.CommandError;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -33,7 +33,7 @@ public class RadiusCondition extends AbstractCondition {
                 .map(PositionCondition::getA)
                 .findAny()
                 .or(() -> Optional.ofNullable(executor).map(mod.getLib().getPlayerAdapter()::getPosition))
-                .orElseThrow(() -> new Command.Error("Could not find any position to calculate radius around"));
+                .orElseThrow(() -> new CommandError("Could not find any position to calculate radius around"));
         var position = data.getPosition();
 
         // check if pos is inside radius around center

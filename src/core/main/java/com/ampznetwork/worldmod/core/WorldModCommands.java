@@ -30,11 +30,13 @@ import net.kyori.adventure.util.TriState;
 import org.comroid.annotations.Alias;
 import org.comroid.annotations.Default;
 import org.comroid.api.attr.Named;
-import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
 import org.comroid.api.text.StringMode;
 import org.comroid.api.text.Word;
 import org.comroid.api.text.minecraft.McFormatCode;
+import org.comroid.commands.Command;
+import org.comroid.commands.model.CommandError;
+import org.comroid.commands.model.CommandPrivacyLevel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,7 +60,7 @@ public class WorldModCommands {
     public static final int MAX_LINE_LENGTH = 45;
 
     @Alias("sel")
-    @Command(permission = worldmod.SELECTION, privacy = Command.PrivacyLevel.PRIVATE)
+    @Command(permission = worldmod.SELECTION, privacy = CommandPrivacyLevel.PRIVATE)
     public Component select(WorldMod mod, UUID playerId, @Command.Arg @Nullable Shape type) {
         if (type == null) {
             selections.remove(playerId);
@@ -116,9 +118,9 @@ public class WorldModCommands {
     }
 
     @Alias("pos")
-    @Command(permission = worldmod.SELECTION, privacy = Command.PrivacyLevel.PRIVATE)
+    @Command(permission = worldmod.SELECTION, privacy = CommandPrivacyLevel.PRIVATE)
     public static class position {
-        @Command(permission = worldmod.SELECTION, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.SELECTION, privacy = CommandPrivacyLevel.PRIVATE)
         public static Component $(WorldMod mod, UUID playerId, @Command.Arg(autoFill = { "1", "2" }) int index) {
             var pos = mod.getLib().getPlayerAdapter().getPosition(playerId);
             if (index == 1) sel(playerId).x1((int) pos.getX()).y1((int) pos.getY()).z1((int) pos.getZ());
@@ -126,7 +128,7 @@ public class WorldModCommands {
             return mod.chat().createMessage("Set position {}", index);
         }
 
-        @Command(permission = worldmod.SELECTION, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.SELECTION, privacy = CommandPrivacyLevel.PRIVATE)
         public static Component clear(WorldMod mod, UUID playerId) {
             clearSel(playerId);
             return mod.chat().createMessage(HINT, "Selection cleared");
@@ -136,7 +138,7 @@ public class WorldModCommands {
     @Command
     @Alias("region")
     public static class claim {
-        @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.CLAIM, privacy = CommandPrivacyLevel.PRIVATE)
         public static Component create(
                 WorldMod mod, UUID playerId,
                 @Nullable @Command.Arg(required = false, stringMode = StringMode.GREEDY) String name
@@ -156,7 +158,7 @@ public class WorldModCommands {
             return mod.chat().createMessage("Area claimed!");
         }
 
-        @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.CLAIM, privacy = CommandPrivacyLevel.PRIVATE)
         public static Component info(
                 WorldMod mod, UUID playerId, @Nullable Region region0,
                 @Nullable @Command.Arg(required = false, autoFillProvider = RegionNames.class) String regionName
@@ -165,7 +167,7 @@ public class WorldModCommands {
             return mod.text().ofRegion(region);
         }
 
-        @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.CLAIM, privacy = CommandPrivacyLevel.PRIVATE)
         public static Component name(
                 WorldMod mod, Player player, @Nullable Region region0,
                 @Nullable @Command.Arg(required = false, autoFillProvider = RegionNames.class) String name0,
@@ -179,7 +181,7 @@ public class WorldModCommands {
             return mod.chat().createMessage("Region name was changed to {}", newName);
         }
 
-        @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.CLAIM, privacy = CommandPrivacyLevel.PRIVATE)
         public static Component group(
                 WorldMod mod, Player player, @Nullable Region region0,
                 @Nullable @Command.Arg(autoFillProvider = Groups.class) String groupName,
@@ -206,7 +208,7 @@ public class WorldModCommands {
             }
         }
 
-        @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.CLAIM, privacy = CommandPrivacyLevel.PRIVATE)
         public static String owner(
                 WorldMod mod, Player player, @Nullable Region region0,
                 @Nullable @Command.Arg(autoFillProvider = AutoFillProvider.PlayerNames.class) String newOwnerName,
@@ -229,7 +231,7 @@ public class WorldModCommands {
             }
         }
 
-        @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.CLAIM, privacy = CommandPrivacyLevel.PRIVATE)
         public static Component flag(
                 WorldMod mod, Player player, @Nullable Region region0,
                 @Command.Arg(autoFillProvider = Flags.class) String flagName,
@@ -238,7 +240,7 @@ public class WorldModCommands {
         ) {
             var region = requireRegion(mod, player, region0, regionName);
             var flag   = Flag.getForName(flagName);
-            if (flag == null) throw new Command.Error("No such flag: " + flagName);
+            if (flag == null) throw new CommandError("No such flag: " + flagName);
             if (state == null) state = TriState.byBoolean(flag.isAllowByDefault());
 
             final var fState  = state;
@@ -268,19 +270,19 @@ public class WorldModCommands {
         ) {
             if ((region == null || region.isGlobal())) {
                 if (regionName == null)
-                    throw new Command.Error("You must either provide a region name or be inside a region");
+                    throw new CommandError("You must either provide a region name or be inside a region");
                 return api.getEntityAccessor(Region.TYPE)
                         .all()
                         .filter(rg -> player.equals(rg.getClaimOwner()) && regionName.equals(rg.getName()))
                         .findAny()
-                        .orElseThrow(() -> new Command.Error("No such region: " + regionName));
+                        .orElseThrow(() -> new CommandError("No such region: " + regionName));
             }
             return region;
         }
 
         @Command
         public static class member {
-            @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
+            @Command(permission = worldmod.CLAIM, privacy = CommandPrivacyLevel.PRIVATE)
             public static String list(WorldMod worldMod, @Nullable Region region) {
                 isClaimed(region);
                 return """
@@ -294,7 +296,7 @@ public class WorldModCommands {
                         region.getMembers().stream().map(Player::getName).collect(joining(", ")));
             }
 
-            @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
+            @Command(permission = worldmod.CLAIM, privacy = CommandPrivacyLevel.PRIVATE)
             public static Component add(
                     WorldMod mod, Player player, @Nullable Region region, @Command.Arg("0") String targetName,
                     @Command.Arg("1") @Nullable @Default("PlayerRelation.MEMBER") PlayerRelation type
@@ -323,7 +325,7 @@ public class WorldModCommands {
                 }
             }
 
-            @Command(permission = worldmod.CLAIM, privacy = Command.PrivacyLevel.PRIVATE)
+            @Command(permission = worldmod.CLAIM, privacy = CommandPrivacyLevel.PRIVATE)
             public static Component remove(
                     WorldMod mod, Player player, @Nullable Region region,
                     @Command.Arg String targetName
@@ -352,7 +354,7 @@ public class WorldModCommands {
 
     @Command(permission = worldmod.QUERY)
     public static class query {
-        @Command(permission = worldmod.QUERY, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.QUERY, privacy = CommandPrivacyLevel.PRIVATE)
         public static Component list(
                 WorldMod mod, @Command.Arg(required = false,
                                            autoFillProvider = AutoFillProvider.WorldNames.class) @Nullable String worldName
@@ -392,7 +394,7 @@ public class WorldModCommands {
                             .collect(Util.Kyori.collector(dash)));
         }
 
-        @Command(permission = worldmod.QUERY, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.QUERY, privacy = CommandPrivacyLevel.PRIVATE)
         public static Component add(
                 WorldMod mod,
                 @Command.Arg(autoFillProvider = AutoFillProvider.WorldNames.class) @NotNull String worldName,
@@ -413,7 +415,7 @@ public class WorldModCommands {
                             "/worldmod:query save");
         }
 
-        @Command(permission = worldmod.QUERY, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.QUERY, privacy = CommandPrivacyLevel.PRIVATE)
         public static Component edit(
                 WorldMod mod,
                 @Command.Arg(autoFillProvider = AutoFillProvider.WorldNames.class) @NotNull String worldName,
@@ -425,7 +427,7 @@ public class WorldModCommands {
             return mod.chat().createMessage("Query updated");
         }
 
-        @Command(permission = worldmod.QUERY, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.QUERY, privacy = CommandPrivacyLevel.PRIVATE)
         public static Component remove(
                 WorldMod mod,
                 @Command.Arg(autoFillProvider = AutoFillProvider.WorldNames.class) @NotNull String worldName,
@@ -444,7 +446,7 @@ public class WorldModCommands {
             return mod.chat().createMessage(HINT, "Removed {} world " + Word.plural("query", "\bies", count));
         }
 
-        @Command(permission = worldmod.QUERY, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.QUERY, privacy = CommandPrivacyLevel.PRIVATE)
         public static Component clear(
                 WorldMod mod, @Command.Arg(required = false,
                                            autoFillProvider = AutoFillProvider.WorldNames.class) @Nullable String worldName
@@ -464,7 +466,7 @@ public class WorldModCommands {
             return mod.chat().createMessage(HINT, "Cleared {} world " + Word.plural("query", "\bies", count));
         }
 
-        @Command(permission = worldmod.QUERY, privacy = Command.PrivacyLevel.PRIVATE)
+        @Command(permission = worldmod.QUERY, privacy = CommandPrivacyLevel.PRIVATE)
         public static Component save(
                 WorldMod mod, @Command.Arg(required = false,
                                            autoFillProvider = AutoFillProvider.WorldNames.class) @Nullable String worldName

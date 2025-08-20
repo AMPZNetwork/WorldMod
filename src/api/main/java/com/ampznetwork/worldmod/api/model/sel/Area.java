@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.comroid.api.Polyfill;
 import org.comroid.api.data.Vector;
-import org.comroid.api.func.util.Command;
+import org.comroid.commands.model.CommandError;
 import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.Entity;
@@ -81,7 +81,7 @@ public final class Area extends DbObject implements ShapeCollider {
                     if (!sb.isEmpty()) sb.append(',');
                     sb.append(Character.toString(i % 8 + 'x')).append(i / 8);
                 }
-            throw new Command.Error("Invalid coordinates set; missing " + sb);
+            throw new CommandError("Invalid coordinates set; missing " + sb);
         }
     }
 

@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.generator.WorldInfo;
-import org.comroid.api.func.util.Command;
 import org.comroid.api.func.util.Streams;
 import org.jetbrains.annotations.Nullable;
 
@@ -124,13 +123,11 @@ public class WorldMod$Spigot extends SubMod$Spigot implements WorldMod$Core {
         getPluginManager().registerEvents(eventDispatch, this);
     }
 
-    @Command(privacy = Command.PrivacyLevel.PRIVATE)
-    public String reload() {
-        onDisable();
-        reloadConfig();
+    @Override
+    public Object reload() {
+        var result = super.reload();
         reloadQueryManagers();
-        onEnable();
-        return "Reload complete!";
+        return result;
     }
 
     public void reloadQueryManagers() {

@@ -28,7 +28,7 @@ public interface AutoFillProvider {
         @Instance INSTANCE;
 
         @Override
-        public Stream<String> autoFill(CommandUsage usage, String argName, String currentValue) {
+        public Stream<? extends CharSequence> autoFill(CommandUsage usage, String argName, String currentValue) {
             var mod     = usage.getContext().stream().flatMap(Streams.cast(SubMod.class)).findAny().orElseThrow();
             var regions = mod.getEntityService().getAccessor(Region.TYPE);
             return usage.getContext()
@@ -92,7 +92,7 @@ public interface AutoFillProvider {
         @Instance INSTANCE;
 
         @Override
-        public Stream<String> autoFill(CommandUsage usage, String argName, String currentValue) {
+        public Stream<? extends CharSequence> autoFill(CommandUsage usage, String argName, String currentValue) {
             return Flag.VALUES.keySet()
                     .stream()
                     .map(str -> str.contains(".") ? str.substring(0, str.indexOf(".") + 1) : str);

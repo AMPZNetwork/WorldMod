@@ -17,7 +17,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.comroid.api.Polyfill;
 import org.comroid.api.data.Vector;
-import org.comroid.api.func.util.Streams;
 import org.comroid.api.info.Log;
 import org.comroid.commands.model.CommandContextProvider;
 import org.jetbrains.annotations.Contract;
@@ -26,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.Tuple;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -68,12 +66,14 @@ public interface WorldMod extends SubMod, CommandContextProvider, WorldModConfig
     }
 
     @Override
-    default Stream<Object> expandContext(Object... context) {
+    default Stream<?> expandContext(Object context) {
         var playerAdapter = getLib().getPlayerAdapter();
-        var playerId      = Arrays.stream(context).flatMap(Streams.cast(UUID.class)).findAny().orElseThrow();
-        var position      = playerAdapter.getPosition(playerId);
-        var worldName     = playerAdapter.getWorldName(playerId);
-        return Stream.of(findRegions(position, worldName).findFirst().orElse(null));
+        if (context instanceof UUID id) {
+            var position  = playerAdapter.getPosition(id);
+            var worldName = playerAdapter.getWorldName(id);
+            return findRegions(position, worldName).limit(1);
+        }
+        return Stream.empty();
     }
 
     Map<String, IQueryManager> getQueryManagers();

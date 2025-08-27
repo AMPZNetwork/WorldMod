@@ -1,8 +1,24 @@
+import java.time.Instant
+
+static int getCommitTimestampMinutes() {
+    def result = new StringBuilder()
+    var proc = 'git log -1 --format=%ct'.execute()
+    proc.consumeProcessOutputStream(result)
+    proc.waitFor()
+
+    long seconds
+    if (result.toString().isBlank())
+        seconds = (long) (Instant.now().toEpochMilli() / 1000)
+    else seconds = result.toString().trim().toLong()
+    return (int) seconds / 600
+}
+
 apply from: "$rootProject.projectDir/gradle/scripts/java-lib.gradle"
 apply from: "$rootProject.projectDir/gradle/scripts/setup/spigot.gradle"
 apply from: "$rootProject.projectDir/gradle/scripts/deploy/shadowJar.gradle"
 
 group = 'com.ampznetwork.worldmod'
+version = "0.1.${getCommitTimestampSeconds()}"
 
 dependencies {
     // rabbit

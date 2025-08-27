@@ -1,3 +1,18 @@
+import java.time.Instant
+
+static int getCommitTimestampMinutes() {
+    def result = new StringBuilder()
+    var proc = 'git log -1 --format=%ct'.execute()
+    proc.consumeProcessOutputStream(result)
+    proc.waitFor()
+
+    long seconds
+    if (result.toString().isBlank())
+        seconds = (long) (Instant.now().toEpochMilli() / 1000)
+    else seconds = result.toString().trim().toLong()
+    return (int) seconds / 600
+}
+
 plugins {
     id 'java-library'
     id 'org.comroid.codegen.spigot'
@@ -5,6 +20,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/scripts/java-lib.gradle"
 
 group = 'com.ampznetwork.worldmod'
+version = "0.1.${getCommitTimestampSeconds()}"
 
 dependencies {
     api project(":LibMod:api")

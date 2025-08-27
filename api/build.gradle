@@ -20,7 +20,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/scripts/java-lib.gradle"
 
 group = 'com.ampznetwork.worldmod'
-version = "0.1.${getCommitTimestampSeconds()}"
+version = "0.1.${getCommitTimestampMinutes()}"
 
 dependencies {
     api project(":LibMod:api")

@@ -13,6 +13,7 @@ import com.ampznetwork.worldmod.api.model.query.IQueryManager;
 import com.ampznetwork.worldmod.api.model.region.Group;
 import com.ampznetwork.worldmod.api.model.region.Region;
 import com.ampznetwork.worldmod.api.model.sel.Area;
+import jakarta.persistence.Tuple;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.comroid.api.Polyfill;
@@ -23,7 +24,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.persistence.Tuple;
 import java.math.BigInteger;
 import java.util.Map;
 import java.util.Optional;

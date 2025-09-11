@@ -20,7 +20,6 @@ import com.ampznetwork.worldmod.core.model.AutoFillProvider.Groups;
 import com.ampznetwork.worldmod.core.model.AutoFillProvider.RegionNames;
 import com.ampznetwork.worldmod.core.query.WorldQuery;
 import com.ampznetwork.worldmod.generated.PluginYml.Permission.worldmod;
-import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -54,14 +53,10 @@ import static java.util.stream.Stream.*;
 import static net.kyori.adventure.text.Component.*;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
 
-@UtilityClass
 public class WorldModCommands {
-    private static final Map<UUID, Area.Builder> selections      = new ConcurrentHashMap<>();
-    public static final int MAX_LINE_LENGTH = 45;
-
     @Alias("sel")
     @Command(permission = worldmod.SELECTION, privacy = CommandPrivacyLevel.PRIVATE)
-    public Component select(WorldMod mod, UUID playerId, @Command.Arg @Nullable Shape type) {
+    public static Component select(WorldMod mod, UUID playerId, @Command.Arg @Nullable Shape type) {
         if (type == null) {
             selections.remove(playerId);
             return mod.chat().createMessage(HINT, "Selection cleared");
@@ -71,8 +66,11 @@ public class WorldModCommands {
         return mod.chat().createMessage("Now selecting {} shapes", type.name());
     }
 
+    private static final Map<UUID, Area.Builder> selections      = new ConcurrentHashMap<>();
+    public static final int MAX_LINE_LENGTH = 45;
+
     @Command
-    public Component lookup(
+    public static Component lookup(
             WorldMod mod, Player player, @Command.Arg(stringMode = StringMode.GREEDY,
                                                       autoFillProvider = WorldQuery.AutoFillProvider.class) String query
     ) {
@@ -84,6 +82,10 @@ public class WorldModCommands {
                         (txt, log) -> txt.append(text("\n").append(text(log.getAction()))),
                         ComponentBuilder::append,
                         ComponentBuilder::build));
+    }
+
+    private WorldModCommands() {
+        throw new UnsupportedOperationException();
     }
 
     public static Area.Builder sel(UUID playerId) {

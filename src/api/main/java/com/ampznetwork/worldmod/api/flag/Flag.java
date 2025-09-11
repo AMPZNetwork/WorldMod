@@ -4,6 +4,9 @@ import com.ampznetwork.libmod.api.entity.DbObject;
 import com.ampznetwork.worldmod.api.model.mini.OwnedByParty;
 import com.ampznetwork.worldmod.api.model.mini.Prioritized;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,9 +25,6 @@ import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Convert;
-import javax.persistence.Embeddable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -229,7 +229,7 @@ public class Flag implements Named, Described, Prioritized {
         return getCanonicalName();
     }
 
-    @javax.persistence.Converter(autoApply = true)
+    @jakarta.persistence.Converter(autoApply = true)
     public static class Converter implements AttributeConverter<Flag, String> {
         @Override
         @SneakyThrows
@@ -288,7 +288,7 @@ public class Flag implements Named, Described, Prioritized {
         }
 
         @Value
-        @javax.persistence.Converter(autoApply = true)
+        @jakarta.persistence.Converter(autoApply = true)
         public static class Converter implements AttributeConverter<Usage, String> {
             @Override
             @SneakyThrows

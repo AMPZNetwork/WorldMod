@@ -28,9 +28,6 @@ dependencies {
     // json
     api 'com.fasterxml.jackson.core:jackson-databind:2.+'
 
-    // persistence
-    api 'javax.persistence:javax.persistence-api:2.2'
-
     // utility
     compileOnly 'org.projectlombok:lombok:+'
     annotationProcessor 'org.projectlombok:lombok:+'

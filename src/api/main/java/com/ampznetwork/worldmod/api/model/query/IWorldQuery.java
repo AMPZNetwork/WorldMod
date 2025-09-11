@@ -2,10 +2,10 @@ package com.ampznetwork.worldmod.api.model.query;
 
 import com.ampznetwork.worldmod.api.WorldMod;
 import com.ampznetwork.worldmod.api.model.delegate.ModDelegate;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Query;
 import lombok.Value;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Query;
 import java.util.function.BiPredicate;
 
 public interface IWorldQuery extends BiPredicate<WorldMod, QueryInputData> {
@@ -16,7 +16,7 @@ public interface IWorldQuery extends BiPredicate<WorldMod, QueryInputData> {
     Query toLookupQuery(WorldMod mod);
 
     @Value
-    @javax.persistence.Converter(autoApply = true)
+    @jakarta.persistence.Converter(autoApply = true)
     class Converter implements AttributeConverter<IWorldQuery, String> {
         @Override
         public String convertToDatabaseColumn(IWorldQuery query) {

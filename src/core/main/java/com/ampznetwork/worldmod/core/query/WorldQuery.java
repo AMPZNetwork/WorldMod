@@ -19,6 +19,7 @@ import com.ampznetwork.worldmod.core.query.condition.impl.TargetCondition;
 import com.ampznetwork.worldmod.core.query.condition.impl.TimeCondition;
 import com.ampznetwork.worldmod.core.query.condition.impl.WorldCondition;
 import com.ampznetwork.worldmod.core.query.eval.ConditionalQueryEvaluator;
+import jakarta.persistence.Query;
 import lombok.Singular;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,6 @@ import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.persistence.Query;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;

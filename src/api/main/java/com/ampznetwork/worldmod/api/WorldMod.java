@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.math.BigInteger;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -161,7 +160,7 @@ public interface WorldMod extends SubMod, CommandContextProvider, WorldModConfig
         if (target != null) query.setParameter("target", target);
         var map = Polyfill.<Stream<Tuple>>uncheckedCast(query.getResultStream())
                 .collect(Collectors.toMap(it -> it.get("action", String.class),
-                        it -> it.get("count", BigInteger.class).longValue()));
+                        it -> it.get("count", Long.class)));
         Flag.VALUES.values()
                 .stream()
                 .map(Flag::getCanonicalName)
